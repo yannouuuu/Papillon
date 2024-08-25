@@ -20,7 +20,12 @@ jobs:
       - name: Install Cocoapods
         run: |
           sudo gem install cocoapods
-          cd ios && pod install
+
+      - name: Install Pods and update hermes-engine
+        run: |
+          cd ios
+          pod install
+          pod update hermes-engine --no-repo-update
 
       - name: Build iOS app
         env:
@@ -40,8 +45,9 @@ jobs:
           security unlock-keychain -p "" build.keychain
           
           # Build IPA
-          xcodebuild -workspace ios/Papillon.xcworkspace -scheme Papillon -configuration Release -archivePath Papillon.xcarchive archive
-          xcodebuild -exportArchive -archivePath Papillon.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath ./
+          cd ios
+          xcodebuild -workspace Papillon.xcworkspace -scheme Papillon -configuration Release -archivePath Papillon.xcarchive archive
+          xcodebuild -exportArchive -archivePath Papillon.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath ./
 
       - name: List directory contents
         run: ls -R
@@ -50,7 +56,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ios-app
-          path: ./*.ipa
+          path: ios/*.ipa
 
       - name: Trigger Stores Deployment
         if: success()
