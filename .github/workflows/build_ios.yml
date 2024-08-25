@@ -21,9 +21,10 @@ jobs:
         run: |
           sudo gem install cocoapods
 
-      - name: Install Pods and update hermes-engine
+      - name: Install Pods and set Hermes Engine version
         run: |
           cd ios
+          sed -i '' 's/pod '"'"'hermes-engine'"'"'/pod '"'"'hermes-engine'"'"', '"'"'0.74.3'"'"'/' Podfile
           pod install
           pod update hermes-engine --no-repo-update
 
