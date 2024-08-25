@@ -73,12 +73,6 @@
         }
       ],
       [
-        "expo-asset",
-        {
-          "assets": ["assets/wallet"]
-        }
-      ],
-      [
         "expo-camera",
         {
           "cameraPermission": "Autoriser $(PRODUCT_NAME) à utiliser votre caméra.",
