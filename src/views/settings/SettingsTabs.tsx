@@ -63,13 +63,6 @@ export const defaultTabs = [
     icon: require("@/../assets/lottie/tab_chat.json"),
     enabled: true,
   },
-  {
-    tab: "Menu",
-    label: "Cantine",
-    description: "Consultez les repas à venir",
-    icon: require("@/../assets/lottie/tab_pizza.json"),
-    enabled: true,
-  },
 ];
 
 
