@@ -1,0 +1,138 @@
+name: GitHub Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_name:
+        description: 'Nom de la release (ex: v7.0.0)'
+        required: true
+        default: 'v${{ github.run_number }}'
+      release_details:
+        description: 'Body de la release'
+        required: false
+        default: 'Mise en garde, ou autre information importante par rapport à la release'
+      is_beta:
+        description: 'Est-ce une version beta? (Cochez pour oui, décochez pour non)'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest release tag
+        id: get_latest_release
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const releases = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 1
+            });
+            return releases.data[0] ? releases.data[0].tag_name : '';
+          result-encoding: string
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Temporarily fetch all to ensure we get the last release
+          ref: main
+
+      - name: Fetch history since last release
+        run: |
+          git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          LAST_RELEASE="${{ steps.get_latest_release.outputs.result }}"
+          if [ -n "$LAST_RELEASE" ]; then
+            git fetch --shallow-since=$(git log -1 --format=%ai $LAST_RELEASE)
+          fi
+
+      - name: Get commit messages
+        id: get_commits
+        run: |
+          LAST_RELEASE="${{ steps.get_latest_release.outputs.result }}"
+          if [ -n "$LAST_RELEASE" ]; then
+            COMMITS=$(git log $LAST_RELEASE..HEAD --pretty=format:"- %s")
+          else
+            COMMITS=$(git log --pretty=format:"- %s")
+          fi
+          echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Download iOS artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ios-app
+
+      - name: Download Android artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: android-app
+
+      - name: Set beta suffix
+        run: |
+          if ${{ github.event.inputs.is_beta }}; then
+            echo "BETA_SUFFIX=-beta" >> $GITHUB_ENV
+          else
+            echo "BETA_SUFFIX=" >> $GITHUB_ENV
+          fi
+
+      - name: Set release name with beta suffix
+        run: echo "FULL_RELEASE_NAME=${{ github.event.inputs.release_name }}${{ env.BETA_SUFFIX }}" >> $GITHUB_ENV
+
+      - name: Rename artifacts with version
+        run: |
+          mv Papillon.ipa Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa
+          mv app-release.apk Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk
+
+      - name: Generate checksums
+        run: |
+          echo "IOS_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa | awk '{ print $1 }')" >> $GITHUB_ENV
+          echo "ANDROID_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk | awk '{ print $1 }')" >> $GITHUB_ENV
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.FULL_RELEASE_NAME }}
+          release_name: ${{ env.FULL_RELEASE_NAME }}
+          body: |
+            ${{ github.event.inputs.release_details }}
+
+            <details>
+            <summary>Commits since last release</summary>
+
+            ${{ steps.get_commits.outputs.COMMITS }}
+
+            </details>
+
+            Build Signatures:
+            - iOS (IPA) SHA256: ${{ env.IOS_CHECKSUM }}
+            - Android (APK) SHA256: ${{ env.ANDROID_CHECKSUM }}
+          draft: false
+          prerelease: ${{ github.event.inputs.is_beta }}
+
+      - name: Upload iOS Build
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa
+          asset_name: Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa
+          asset_content_type: application/octet-stream
+
+      - name: Upload Android Build
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk
+          asset_name: Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk
+          asset_content_type: application/vnd.android.package-archive

@@ -1,0 +1,32 @@
+name: Start Build Process
+
+on:
+  workflow_dispatch:
+
+jobs:
+  trigger_builds:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger iOS Build
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build_ios.yml',
+              ref: 'main'
+            })
+
+      - name: Trigger Android Build
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build_android.yml',
+              ref: 'main'
+            })

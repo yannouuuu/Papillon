@@ -1,0 +1,63 @@
+name: Build iOS App
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  build_ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Cocoapods
+        run: |
+          sudo gem install cocoapods
+          cd ios && pod install
+
+      - name: Build iOS app
+        env:
+          PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+        run: |
+          # Decode provisioning profile and certificate
+          echo $PROVISIONING_PROFILE_BASE64 | base64 --decode > profile.mobileprovision
+          echo $CERTIFICATE_BASE64 | base64 --decode > certificate.p12
+          
+          # Create keychain and import certificate
+          security create-keychain -p "" build.keychain
+          security import certificate.p12 -t agg -k build.keychain -P $CERTIFICATE_PASSWORD -A
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          
+          # Build IPA
+          xcodebuild -workspace ios/Papillon.xcworkspace -scheme Papillon -configuration Release -archivePath Papillon.xcarchive archive
+          xcodebuild -exportArchive -archivePath Papillon.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath ./
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-app
+          path: Papillon.ipa
+
+      - name: Trigger Stores Deployment
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'stores_deployment.yml',
+              ref: 'main'
+            })
