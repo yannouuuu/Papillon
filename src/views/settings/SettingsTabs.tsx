@@ -62,7 +62,7 @@ export const defaultTabs = [
     description: "Votre messagerie scolaire",
     icon: require("@/../assets/lottie/tab_chat.json"),
     enabled: true,
-  },²
+  },
 ];
 
 
