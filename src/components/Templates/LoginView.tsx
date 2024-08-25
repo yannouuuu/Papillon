@@ -143,6 +143,7 @@ const LoginView: React.FC<{
                 fontSize: 16,
                 fontFamily: "medium",
                 flex: 1,
+                color: theme.colors.text,
               }}
             />
           </NativeItem>
@@ -167,6 +168,7 @@ const LoginView: React.FC<{
                   fontSize: 16,
                   fontFamily: "medium",
                   flex: 1,
+                  color: theme.colors.text,
                 }}
                 secureTextEntry={!showPassword}
               />
@@ -214,6 +216,7 @@ const LoginView: React.FC<{
                     fontSize: 16,
                     fontFamily: "medium",
                     flex: 1,
+                    color: theme.colors.text,
                   }}
                   secureTextEntry={field.secureTextEntry}
                 />
