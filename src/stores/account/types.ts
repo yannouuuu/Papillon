@@ -84,7 +84,7 @@ interface BaseAccount {
 interface BaseExternalAccount {
   localID: string
   isExternal: true
-
+  username: string
   data: Record<string, unknown>
 }
 

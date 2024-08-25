@@ -27,6 +27,7 @@ const ExternalTurboselfLogin: Screen<"ExternalTurboselfLogin"> = ({ navigation }
       const new_account: TurboselfAccount = {
         instance: undefined,
         service: AccountService.Turboself,
+        username,
         authentication: {
           auth, session
         },
