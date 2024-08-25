@@ -43,7 +43,7 @@ const SettingsExternalServices: Screen<"SettingsExternalServices"> = ({
 
   const showAccountInfo = (account: any) => {
     let info = `Service: ${getServiceName(account.service)}\n`;
-    info += `ID: ${account.authentication.auth.username || account.authentication.username || "N. not"}\n`;
+    info += `ID: ${account.username || "N. not"}\n`;
     info += `School ID: ${account.authentication.schoolID || "N. not"}\n`;
 
 
@@ -130,9 +130,7 @@ const SettingsExternalServices: Screen<"SettingsExternalServices"> = ({
                 <View>
                   <NativeText variant="title">{getServiceName(account.service)}</NativeText>
                   <NativeText variant="subtitle">
-                    {account.isExternal 
-                      ? (account.authentication.username ?? account.authentication.auth.username) 
-                      : `${account.studentName?.first} ${account.studentName?.last}`}
+                    {account.isExternal ? account.username : `${account.studentName?.first} ${account.studentName?.last}`}
                   </NativeText>
                 </View>
               </NativeItem>

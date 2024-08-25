@@ -109,6 +109,7 @@ export interface EcoleDirecteAccount extends BaseAccount {
 export interface TurboselfAccount extends BaseExternalAccount {
   service: AccountService.Turboself
   instance: undefined
+  username: string
   authentication: {
     auth: TSAuthentication
     session: TSSession
@@ -118,6 +119,7 @@ export interface TurboselfAccount extends BaseExternalAccount {
 export interface ARDAccount extends BaseExternalAccount {
   service: AccountService.ARD
   instance?: ARDClient
+  username: string
   authentication: {
     pid: string
     username: string
