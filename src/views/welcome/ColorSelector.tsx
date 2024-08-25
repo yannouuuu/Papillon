@@ -21,7 +21,6 @@ import { alertExpoGo, expoGoWrapper, isExpoGo } from "@/utils/native/expoGoAlert
 const ColorSelector: Screen<"ColorSelector"> = ({ route, navigation }) => {
   const theme = useTheme();
   const { colors } = theme;
-  const [message, setMessage] = useState<string>("Du Vert ! MAIS OMG");
   const insets = useSafeAreaInsets();
   const account = useCurrentAccount(store => store.account);
   const mutateProperty = useCurrentAccount(store => store.mutateProperty);
