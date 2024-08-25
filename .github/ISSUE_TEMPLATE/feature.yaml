@@ -1,0 +1,17 @@
+name: 💅 Fonctionnalité
+description: Suggérez une fonctionnalité.
+title: '[Feature]: '
+labels: [feature]
+body:
+  - type: textarea
+    attributes:
+      label: Description de la fonctionnalité
+      description: "Ajout d'un générateur de poneys ? D'un calcul de l'aura de l'élève ?"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Contexte supplémentaire
+      description: "Ajoutez tout autre contexte ou design permettant de clarifier votre idée."
+    validations:
+      required: false
