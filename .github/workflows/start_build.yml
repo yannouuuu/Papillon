@@ -4,9 +4,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  trigger_builds:
+  clean_and_build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
+      - name: Clean environment
+        run: |
+          rm -rf node_modules
+          rm -rf ios/build
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf android/app/build
+          rm -rf $HOME/.gradle/caches/
+
       - name: Trigger iOS Build
         uses: actions/github-script@v6
         with:
