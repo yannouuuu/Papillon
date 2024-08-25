@@ -1,4 +1,8 @@
 name: Build Android App
+
+on:
+  workflow_dispatch:
+
 jobs:
   build_android:
     runs-on: ubuntu-latest
