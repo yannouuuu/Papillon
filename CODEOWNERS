@@ -1,5 +1,7 @@
 * @ecnivtwelve
-* @tryon-dev
+
+src/views/account/Restaurant/* @tryon-dev
+src/utils/magic/* @tryon-dev
 
 src/stores/* @Vexcited
 src/services/* @Vexcited
