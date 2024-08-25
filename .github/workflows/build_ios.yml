@@ -43,11 +43,14 @@ jobs:
           xcodebuild -workspace ios/Papillon.xcworkspace -scheme Papillon -configuration Release -archivePath Papillon.xcarchive archive
           xcodebuild -exportArchive -archivePath Papillon.xcarchive -exportOptionsPlist ios/ExportOptions.plist -exportPath ./
 
+      - name: List directory contents
+        run: ls -R
+
       - name: Upload IPA
         uses: actions/upload-artifact@v3
         with:
           name: ios-app
-          path: Papillon.ipa
+          path: ./*.ipa
 
       - name: Trigger Stores Deployment
         if: success()
