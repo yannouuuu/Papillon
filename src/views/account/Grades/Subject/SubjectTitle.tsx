@@ -9,6 +9,8 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 const SubjectTitle = ({ navigation, subject, subjectData, allGrades }) => {
   const theme = useTheme();
 
+
+
   return (
     <TouchableOpacity
       style={{
@@ -77,7 +79,7 @@ const SubjectTitle = ({ navigation, subject, subjectData, allGrades }) => {
         }}
       >
         <AnimatedNbr
-          value={subject.average.average.value ? subject.average.average.value.toFixed(2):"N. not"}
+          value={typeof subject.average.average.value === "number" ? subject.average.average.value.toFixed(2) : "N. not"}
           style={{
             fontSize: 18,
             lineHeight: 20,
