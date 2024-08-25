@@ -52,6 +52,12 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Image
+        source={require("../../../assets/images/mask_logotype.png")}
+        style={styles.logotype}
+        tintColor={colors.primary}
+        resizeMode="contain"
+      />
       <MaskStars />
 
       <PapillonShineBubble
@@ -63,12 +69,6 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
       <View
         style={styles.presentation}
       >
-        <Image
-          source={require("../../../assets/images/mask_logotype.png")}
-          style={styles.logotype}
-          tintColor={colors.primary}
-          resizeMode="contain"
-        />
 
         <Text
           style={[styles.presentation_text, { color: colors.text + "79" }]}
@@ -88,6 +88,7 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
 
         <ButtonCta
           value="Besoin d'aide ?"
+          onPress={() => openUrl("https://discord.gg/ywkBZx2jFB")}
         />
       </View>
 
@@ -118,6 +119,7 @@ const styles = StyleSheet.create({
 
   logotype: {
     height: 28,
+    top: 20,
   },
 
   presentation_text: {
