@@ -1,6 +1,6 @@
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RouteParameters } from "@/router/helpers/types";
-import { KeyRound, LockKeyhole } from "lucide-react-native";
+import { Check, KeyRound, LockKeyhole } from "lucide-react-native";
 import pronote from "pawnote";
 import {info} from "@/utils/logger/logger";
 
@@ -50,7 +50,20 @@ const determinateAuthenticationView = async <ScreenName extends keyof RouteParam
   });
 
   info(JSON.stringify(instance, null, 2), (new Error()).stack!);
-
+  if(pronoteURL.includes("demo.index-education.net")) {
+    showAlert({
+      title: "Instance non supporté",
+      message: "Désolé, les instances de démonstration ne sont pas supportées, elles peuvent être instables ou ne pas fonctionner correctement.",
+      actions: [
+        {
+          title: "Continuer quand même",
+          icon: <Check />,
+          primary: true,
+          backgroundColor: "#BE0B00",
+        },
+      ]
+    });
+  } 
   if (instance.casToken && instance.casURL) {
     showAlert({
       title: `L'instance ${instance.name} nécessite une connexion ENT.`,
