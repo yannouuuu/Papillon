@@ -1,21 +1,21 @@
 name: GitHub Deployment
 
 on:
-  workflow_dispatch:
-    inputs:
-      release_name:
-        description: 'Nom de la release (ex: v7.0.0)'
-        required: true
-        default: 'v'
-      release_details:
-        description: 'Body de la release'
-        required: false
-        default: ''
-      is_beta:
-        description: 'Est-ce une version beta? (Cochez pour oui, décochez pour non)'
-        required: true
-        default: true
-        type: boolean
+#  workflow_dispatch:
+#    inputs:
+#      release_name:
+#        description: 'Nom de la release (ex: v7.0.0)'
+#        required: true
+#        default: 'v'
+#      release_details:
+#        description: 'Body de la release'
+#        required: false
+#        default: ''
+#      is_beta:
+#        description: 'Est-ce une version beta? (Cochez pour oui, décochez pour non)'
+#        required: true
+#        default: true
+#        type: boolean
 
 jobs:
   create_release:
