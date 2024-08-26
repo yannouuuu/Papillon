@@ -2,12 +2,6 @@ name: Start Build Process
 
 on:
   workflow_dispatch:
-    inputs:
-      is_beta:
-        description: 'Déployer en beta sur le Play Store ?'
-        required: true
-        type: boolean
-        default: false
 
 jobs:
   clean:
@@ -82,9 +76,6 @@ jobs:
           xcodebuild -workspace Papillon.xcworkspace -scheme Papillon -configuration Release -archivePath Papillon.xcarchive archive
           xcodebuild -exportArchive -archivePath Papillon.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath ./
 
-      - name: List directory contents
-        run: ls -R
-
       - name: Upload IPA
         uses: actions/upload-artifact@v3
         with:
@@ -150,8 +141,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'stores_deployment.yml',
-              ref: 'main',
-              inputs: {
-                is_beta: '${{ github.event.inputs.is_beta }}'
-              }
+              ref: 'main'
             })

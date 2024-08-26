@@ -67,10 +67,15 @@ jobs:
         with:
           name: ios-app
 
-      - name: Download Android artifact
+      - name: Download Android APK artifact
         uses: actions/download-artifact@v3
         with:
-          name: android-app
+          name: android-apk
+
+      - name: Download Android AAB artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: android-aab
 
       - name: Set beta suffix
         run: |
@@ -87,11 +92,13 @@ jobs:
         run: |
           mv Papillon.ipa Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa
           mv app-release.apk Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk
+          mv app-release.aab Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.aab
 
       - name: Generate checksums
         run: |
           echo "IOS_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa | awk '{ print $1 }')" >> $GITHUB_ENV
-          echo "ANDROID_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk | awk '{ print $1 }')" >> $GITHUB_ENV
+          echo "ANDROID_APK_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk | awk '{ print $1 }')" >> $GITHUB_ENV
+          echo "ANDROID_AAB_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.aab | awk '{ print $1 }')" >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
@@ -113,7 +120,8 @@ jobs:
 
             Build Signatures:
             - iOS (IPA) SHA256: ${{ env.IOS_CHECKSUM }}
-            - Android (APK) SHA256: ${{ env.ANDROID_CHECKSUM }}
+            - Android (APK) SHA256: ${{ env.ANDROID_APK_CHECKSUM }}
+            - Android (AAB) SHA256: ${{ env.ANDROID_AAB_CHECKSUM }}
           draft: false
           prerelease: ${{ github.event.inputs.is_beta }}
 
@@ -127,7 +135,7 @@ jobs:
           asset_name: Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa
           asset_content_type: application/octet-stream
 
-      - name: Upload Android Build
+      - name: Upload Android APK Build
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -136,3 +144,13 @@ jobs:
           asset_path: ./Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk
           asset_name: Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk
           asset_content_type: application/vnd.android.package-archive
+
+      - name: Upload Android AAB Build
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.aab
+          asset_name: Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.aab
+          asset_content_type: application/octet-stream

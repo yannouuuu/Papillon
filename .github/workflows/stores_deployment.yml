@@ -1,10 +1,10 @@
-name: Deploy to Stores
+name: Deploy to Beta Channels
 
 on:
   workflow_dispatch:
 
 jobs:
-  deploy_to_stores:
+  deploy_to_beta_channels:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,7 +19,7 @@ jobs:
         with:
           name: android-aab
 
-      - name: Deploy to App Store
+      - name: Upload to TestFlight
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
@@ -28,18 +28,27 @@ jobs:
           # Create App Store Connect API key file
           echo "$APP_STORE_CONNECT_API_KEY_CONTENT" | base64 --decode > appstore_connect_api_key.p8
           
-          # Use altool to upload the IPA
+          # Upload to TestFlight
           xcrun altool --upload-app -f Papillon.ipa -t ios \
             --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
             --apiIssuer "$APP_STORE_CONNECT_API_ISSUER_ID" \
             --verbose
+          
+          echo "iOS build uploaded to TestFlight for beta testing"
 
-      - name: Upload Android Release to Play Store
+      - name: Upload Android Release to Play Store Beta
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
           packageName: com.votre.packagename
           releaseFiles: android-aab/*.aab
-          track: ${{ github.event.inputs.is_beta == 'true' && 'beta' || 'production' }}
+          track: beta
           status: completed
           changesNotSentForReview: false
+
+      - name: Notify successful beta deployment
+        run: |
+          echo "Both iOS and Android builds have been successfully uploaded to their respective beta channels (TestFlight and Play Store Beta)."
+          echo "To release to production:"
+          echo "- For iOS: Go to App Store Connect, test the build in TestFlight, then submit for App Store review when ready."
+          echo "- For Android: Go to the Google Play Console, test the build in the beta track, then promote to production when ready."
