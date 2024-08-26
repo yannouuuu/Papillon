@@ -44,8 +44,8 @@ const ChatCreate: Screen<"ChatCreate"> = ({
         padding: 20,
       }}
     >
-      <TextInput value={subject} onChangeText={setSubject} placeholder="Sujet de la discussion" />
-      <TextInput value={content} onChangeText={setContent} placeholder="Contenu du premier message" />
+      <TextInput value={subject} onChangeText={setSubject} placeholder="Sujet de la discussion" style={{ color: colors.text }} />
+      <TextInput value={content} onChangeText={setContent} placeholder="Contenu du premier message" style={{ color: colors.text }} />
       <View>
         <NativeText>Sélectionner les destinataires :</NativeText>
         {recipients?.map((recipient, index) => (
