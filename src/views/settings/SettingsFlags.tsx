@@ -31,7 +31,7 @@ const SettingsFlags: Screen<"SettingsFlags"> = ({ navigation }) => {
         <NativeList>
           <NativeItem>
             <TextInput
-              style={{ flex: 1, fontSize: 16, fontFamily: "medium" }}
+              style={{ flex: 1, fontSize: 16, fontFamily: "medium", color: colors.text }}
               placeholder="Ajouter un flag"
               ref={textInputRef}
               onSubmitEditing={(e) => {
