@@ -5,7 +5,7 @@ on:
 
 jobs:
   deploy_to_stores:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -25,12 +25,21 @@ jobs:
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
         run: |
-          # Use App Store Connect API to upload and submit the IPA
-          #WIP
+          # Create App Store Connect API key file
+          echo "$APP_STORE_CONNECT_API_KEY_CONTENT" | base64 --decode > appstore_connect_api_key.p8
+          
+          # Use altool to upload the IPA
+          xcrun altool --upload-app -f Papillon.ipa -t ios \
+            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_API_ISSUER_ID" \
+            --verbose
 
-      - name: Deploy to Play Store
-        env:
-          PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_JSON_KEY }}
-        run: |
-          # Use Google Play Developer API to upload and release the AAB
-          #WIP
+      - name: Upload Android Release to Play Store
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          packageName: xyz.getpapillon.app
+          releaseFiles: android-aab/*.aab
+          track: production
+          status: completed
+          changesNotSentForReview: false
