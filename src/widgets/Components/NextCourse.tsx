@@ -2,6 +2,7 @@ import { WidgetProps } from "@/components/Home/Widget";
 import WidgetHeader from "@/components/Home/WidgetHeader";
 import ColorIndicator from "@/components/Lessons/ColorIndicator";
 import { getSubjectData } from "@/services/shared/Subject";
+import { TimetableClass } from "@/services/shared/Timetable";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { useTheme } from "@react-navigation/native";
@@ -15,12 +16,11 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
   const account = useCurrentAccount(store => store.account!);
   const timetables = useTimetableStore(store => store.timetables);
 
-  const [nextCourse, setNextCourse] = useState(null);
+  const [nextCourse, setNextCourse] = useState<TimetableClass | null>(null);
+  const [widgetTitle, setWidgetTitle] = useState("Prochain cours");
 
   const todayDate = new Date();
   const today = todayDate.getTime();
-
-  const [widgetTitle, setWidgetTitle] = useState("Prochain cours");
 
   useImperativeHandle(ref, () => ({
     handlePress: () => null
@@ -101,12 +101,14 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
           </Text>
         </View>
       )}
-
     </View>
   );
 });
 
-const NextCourseLesson: React.FC = ({ nextCourse, setWidgetTitle }) => {
+const NextCourseLesson: React.FC<{
+  nextCourse: TimetableClass,
+  setWidgetTitle: (title: string) => unknown
+}> = ({ nextCourse, setWidgetTitle }) => {
   const [subjectData, setSubjectData] = useState({ color: "#888888", pretty: "Matière inconnue" });
   const colors = useTheme().colors;
 
