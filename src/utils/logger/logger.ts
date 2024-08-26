@@ -9,7 +9,7 @@ const type_list = [
   "NAV"
 ];
 
-function get_iso_date () {
+export function get_iso_date () {
   let now = new Date();
   return now.toISOString();
 }
@@ -94,7 +94,7 @@ async function get_brute_logs (): Promise<string> {
 export interface Log {
   type: string;
   date: string;
-  from: string;
+  from?: string;
   message: string;
 }
 

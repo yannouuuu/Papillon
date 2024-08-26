@@ -1,6 +1,7 @@
 import type { Chat } from "@/services/shared/Chat";
 import type { Grade } from "@/services/shared/Grade";
 import type { AccountService } from "@/stores/account/types";
+import { Log } from "@/utils/logger/logger";
 import type { CurrentPosition } from "@/utils/native/location";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type pronote from "pawnote";
@@ -96,7 +97,10 @@ export type RouteParameters = {
   PriceBeforeScan: undefined
 
   AddonSettingsPage: undefined;
-  AddonLogs: undefined;
+  AddonLogs: {
+    logs: Log[],
+    name: string
+  };
   AddonPage: undefined;
 };
 
