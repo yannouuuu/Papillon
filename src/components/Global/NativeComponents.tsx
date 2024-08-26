@@ -1,43 +1,39 @@
-import React, { ReactNode } from "react";
-import { View, Text, Pressable, StyleSheet, StyleProp, ViewStyle, TextStyle, Platform, TouchableNativeFeedback } from "react-native";
+import React, { type ReactNode, isValidElement, Children } from "react";
+import { View, Text, Pressable, StyleSheet, type StyleProp, type ViewStyle, type TextStyle, Platform, TouchableNativeFeedback } from "react-native";
+import Reanimated, { type AnimatedProps, LinearTransition } from "react-native-reanimated";
 import { useTheme } from "@react-navigation/native";
 import { ChevronRight } from "lucide-react-native";
-import Reanimated, {
-  FadeIn,
-  FadeInDown,
-  FadeInLeft,
-  FadeInRight,
-  FadeInUp,
-  FadeOut,
-  FadeOutDown,
-  FadeOutLeft,
-  FadeOutUp,
-  FlipInXDown,
-  LinearTransition,
-  runOnJS,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
+
+/**
+ * Pour une raison quelconque, Reanimated n'epxose
+ * pas ce type donc on doit aller le chercher
+ * manuellement.
+ */
+type EntryOrExitLayoutType = NonNullable<AnimatedProps<{}>["entering"]>;
 
 interface NativeListProps {
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
   inline?: boolean;
   animated?: boolean;
-  entering?: boolean;
-  exiting?: boolean;
+  entering?: EntryOrExitLayoutType;
+  exiting?: EntryOrExitLayoutType;
 }
 
-export const NativeList: React.FC<NativeListProps> = ({ children, style, inline, animated, entering, exiting }: NativeListProps) => {
+export const NativeList: React.FC<NativeListProps> = ({
+  children,
+  style,
+  inline,
+  animated,
+  entering,
+  exiting
+}) => {
   const theme = useTheme();
   const { colors } = theme;
 
-  // for each element of children, render it wrapped in a View
-  // with a style of styles.item
-  const childrenWithProps = React.Children.map(children, (child, index) => {
-    if (!React.isValidElement(child)) return null;
+  const childrenWithProps = Children.map(children, (child, index) => {
+    if (!isValidElement(child)) return null;
 
     const newChild = child && React.cloneElement(child as React.ReactElement<any>, {
       separator: (child.props.separator !== false) && index < (React.Children.count(children) - 1),
@@ -73,8 +69,8 @@ export const NativeList: React.FC<NativeListProps> = ({ children, style, inline,
         style,
       ]}
       layout={animated && animPapillon(LinearTransition)}
-      entering={entering && entering}
-      exiting={exiting && exiting}
+      entering={entering}
+      exiting={exiting}
     >
       <Reanimated.View
         style={[{
@@ -91,13 +87,14 @@ export const NativeList: React.FC<NativeListProps> = ({ children, style, inline,
 };
 
 interface NativeListHeaderProps {
-  icon?: ReactNode;
-  label: string;
-  trailing?: ReactNode;
-  animated?: boolean;
-  entering?: boolean;
-  exiting?: boolean;
-  style?: StyleProp<ViewStyle>;
+  icon?: ReactNode
+  label: string
+  leading?: ReactNode
+  trailing?: ReactNode
+  animated?: boolean
+  entering?: EntryOrExitLayoutType
+  exiting?: EntryOrExitLayoutType
+  style?: StyleProp<ViewStyle>
 }
 
 export const NativeListHeader: React.FC<NativeListHeaderProps> = ({ icon, label, leading, trailing, animated, entering, exiting, style }) => {
@@ -118,8 +115,8 @@ export const NativeListHeader: React.FC<NativeListHeaderProps> = ({ icon, label,
     <Reanimated.View
       style={[list_header_styles.container, style]}
       layout={animated && animPapillon(LinearTransition)}
-      entering={entering && entering}
-      exiting={exiting && exiting}
+      entering={entering}
+      exiting={exiting}
     >
       {icon && (
         <View
@@ -129,7 +126,7 @@ export const NativeListHeader: React.FC<NativeListHeaderProps> = ({ icon, label,
         </View>
       )}
 
-      {leading && leading}
+      {leading}
 
       <Text
         style={[
@@ -146,6 +143,33 @@ export const NativeListHeader: React.FC<NativeListHeaderProps> = ({ icon, label,
   );
 };
 
+type NativePressableProps = React.ComponentProps<typeof Pressable> & {
+  androidStyle?: StyleProp<ViewStyle>
+};
+
+export const NativePressable: React.FC<NativePressableProps> = (props) => {
+  if (Platform.OS === "android") {
+    return (
+      <TouchableNativeFeedback {...props as React.ComponentProps<typeof TouchableNativeFeedback>}>
+        <View
+          style={[{
+            flexDirection: "row",
+            alignItems: "center",
+          }, props.style as StyleProp<ViewStyle>, props.androidStyle]}
+        >
+          {props.children as ReactNode}
+        </View>
+      </TouchableNativeFeedback>
+    );
+  }
+
+  return (
+    <Pressable {...props}>
+      {props.children}
+    </Pressable>
+  );
+};
+
 interface NativeItemProps {
   children?: ReactNode;
   onPress?: () => void;
@@ -154,14 +178,13 @@ interface NativeItemProps {
   trailing?: ReactNode;
   chevron?: boolean;
   style?: StyleProp<ViewStyle>;
-  contentContainerStyle?: StyleProp<ViewStyle>;
   animated?: boolean;
-  entering?: boolean;
-  exiting?: boolean;
+  entering?: EntryOrExitLayoutType;
+  exiting?: EntryOrExitLayoutType;
   onLongPress?: () => void;
   delayLongPress?: number;
   icon?: ReactNode;
-  iconStyle?: StyleProp<ViewStyle>;
+  iconStyle?: ViewStyle;
   onTouchStart?: () => void;
   onTouchEnd?: () => void;
   androidStyle?: StyleProp<ViewStyle>;
@@ -170,33 +193,6 @@ interface NativeItemProps {
   endPadding?: number;
   disabled?: boolean;
 }
-
-export const NativePressable = (props) => {
-  if (Platform.OS === "android") {
-    return (
-      <TouchableNativeFeedback
-        {...props}
-      >
-        <View
-          style={[{
-            flexDirection: "row",
-            alignItems: "center",
-          }, props.style, props.androidStyle]}
-        >
-          {props.children}
-        </View>
-      </TouchableNativeFeedback>
-    );
-  }
-
-  return (
-    <Pressable
-      {...props}
-    >
-      {props.children}
-    </Pressable>
-  );
-};
 
 export const NativeItem: React.FC<NativeItemProps> = ({
   children,
@@ -208,7 +204,6 @@ export const NativeItem: React.FC<NativeItemProps> = ({
   trailing,
   chevron,
   style,
-  contentContainerStyle,
   animated,
   entering,
   exiting,
@@ -329,9 +324,6 @@ interface NativeIconProps {
 }
 
 export const NativeIcon: React.FC<NativeIconProps> = ({ icon, color, style }) => {
-  const theme = useTheme();
-  const { colors } = theme;
-
   return (
     <View
       style={[{
@@ -403,7 +395,6 @@ export const NativeText: React.FC<NativeTextProps> = (props) => {
         fontSize: 16,
         lineHeight: 19,
       };
-      break;
   }
 
   return (
