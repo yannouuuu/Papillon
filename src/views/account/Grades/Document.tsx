@@ -8,7 +8,7 @@ import { Asterisk, Calculator, Scale, School, UserMinus, UserPlus, Users } from 
 import { getAverageDiffGrade } from "@/utils/grades/getAverages";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Grade } from "@/services/shared/Grade";
-import type { getAverageDiffGradeReturn } from "@/utils/grades/getAverages";
+import type { AverageDiffGrade } from "@/utils/grades/getAverages";
 import { Screen } from "@/router/helpers/types";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
 
@@ -39,12 +39,12 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
     });
   }, [navigation, subjectData]);
 
-  const [gradeDiff, setGradeDiff] = useState({} as getAverageDiffGradeReturn);
-  const [classDiff, setClassDiff] = useState({} as getAverageDiffGradeReturn);
+  const [gradeDiff, setGradeDiff] = useState({} as AverageDiffGrade);
+  const [classDiff, setClassDiff] = useState({} as AverageDiffGrade);
 
   useEffect(() => {
-    const gD = getAverageDiffGrade([grade], allGrades, "student") as getAverageDiffGradeReturn;
-    const cD = getAverageDiffGrade([grade], allGrades, "average") as getAverageDiffGradeReturn;
+    const gD = getAverageDiffGrade([grade], allGrades, "student") as AverageDiffGrade;
+    const cD = getAverageDiffGrade([grade], allGrades, "average") as AverageDiffGrade;
 
     setGradeDiff(gD);
     setClassDiff(cD);
