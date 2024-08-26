@@ -8,7 +8,7 @@ export interface GradeHistory {
 type Target = "student" | "average" | "min" | "max";
 
 export type AverageDiffGrade = {
-  difference: number;
+  difference?: number;
   with: number;
   without: number;
 };
