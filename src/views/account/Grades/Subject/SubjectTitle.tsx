@@ -1,4 +1,4 @@
-import AnimatedNbr from "@/components/Global/AnimatedNumber";
+import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { NativeText } from "@/components/Global/NativeComponents";
 import { getCourseSpeciality } from "@/utils/format/format_cours_name";
 import { useTheme } from "@react-navigation/native";
@@ -8,8 +8,6 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 const SubjectTitle = ({ navigation, subject, subjectData, allGrades }) => {
   const theme = useTheme();
-
-
 
   return (
     <TouchableOpacity
@@ -78,7 +76,7 @@ const SubjectTitle = ({ navigation, subject, subjectData, allGrades }) => {
           gap: 2,
         }}
       >
-        <AnimatedNbr
+        <AnimatedNumber
           value={typeof subject.average.average.value === "number" ? subject.average.average.value.toFixed(2) : "N. not"}
           style={{
             fontSize: 18,
