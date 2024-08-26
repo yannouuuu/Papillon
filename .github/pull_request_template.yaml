@@ -2,9 +2,6 @@ name: 🚀 Nouvelle Pull Request
 description: Proposez vos modifications pour améliorer Papillon
 title: '[PR]: '
 labels: [pull-request]
-assignees:
-  - Vexcited
-  - ecnivtwelve
 body:
   - type: markdown
     attributes:
