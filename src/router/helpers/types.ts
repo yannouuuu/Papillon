@@ -1,3 +1,4 @@
+import { AddonPlacementManifest } from "@/addons/types";
 import type { Chat } from "@/services/shared/Chat";
 import type { Grade } from "@/services/shared/Grade";
 import type { AccountService } from "@/stores/account/types";
@@ -63,7 +64,9 @@ export type RouteParameters = {
 
   // settings.index
   SettingStack: any;
-  Settings: undefined;
+  Settings?: {
+    view: keyof RouteParameters
+  };
   SettingsNotifications: undefined;
   SettingsTrophies: undefined;
   SettingsProfile: undefined;
@@ -92,11 +95,14 @@ export type RouteParameters = {
   ExternalTurboselfLogin: undefined
   ExternalArdLogin: undefined
   QrcodeAnswer: undefined
-  QrcodeScanner: undefined
+  QrcodeScanner: { accountID: string }
   PriceDetectionOnboarding: undefined
   PriceBeforeScan: undefined
 
-  AddonSettingsPage: undefined;
+  AddonSettingsPage: {
+    addon: AddonPlacementManifest
+    from: keyof RouteParameters
+  };
   AddonLogs: {
     logs: Log[],
     name: string
