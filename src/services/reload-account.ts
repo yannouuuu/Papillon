@@ -28,6 +28,11 @@ export async function reload <T extends Account> (account: T): Promise<Reconnect
       const instance = await reload(account);
       return { instance, authentication: account.authentication };
     }
+    case AccountService.Skolengo: {
+      const { reload } = await import("./skolengo/reload-skolengo");
+      const res = await reload(account);
+      return { instance: res.instance, authentication: res.authentication };
+    }
     default: {
       throw new Error("Service not implemented.");
     }

@@ -63,7 +63,7 @@ export const defaultTabs = [
     icon: require("@/../assets/lottie/tab_chat.json"),
     enabled: true,
   },
-];
+] as const;
 
 
 const SettingsTabs = () => {

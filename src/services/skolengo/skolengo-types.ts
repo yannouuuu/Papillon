@@ -1,5 +1,6 @@
-import type { TokenResponse } from "expo-auth-session";
+import type { DiscoveryDocument, TokenResponse } from "expo-auth-session";
 import type { TokenSetParameters } from "openid-client";
+import { School } from "scolengo-api/types/models/School";
 
 export type SkolengoJWT = {
   sub: string
@@ -44,3 +45,9 @@ export const authTokenToSkolengoTokenSet = (authToken: TokenResponse): SkolengoT
   "expires_at": authToken.issuedAt + (authToken.expiresIn || 86400),
   "scope": authToken.scope,
 });
+
+export type SkolengoAuthConfig = {
+  tokenSet: SkolengoTokenSet;
+  discovery: DiscoveryDocument;
+  school: School;
+};
