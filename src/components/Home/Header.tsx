@@ -1,5 +1,5 @@
 import { CopyPlus } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useTheme } from "@react-navigation/native";
@@ -11,7 +11,7 @@ import Reanimated, {
 } from "react-native-reanimated";
 
 import { get_home_widgets } from "@/addons/addons";
-import AddonsWebview from "@/components/Addons/AddonsWebview";
+import AddonsWebview, { type AddonHomePageInfo } from "@/components/Addons/AddonsWebview";
 import { NativeText } from "@/components/Global/NativeComponents";
 import { defaultTabs } from "@/views/settings/SettingsTabs";
 import { Widgets } from "@/widgets";
@@ -20,15 +20,13 @@ import { PressableScale } from "react-native-pressable-scale";
 import Widget from "./Widget";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteParameters } from "@/router/helpers/types";
-import { Tab } from "@/stores/account/types";
+import type { Tab } from "@/stores/account/types";
 
 const Header: React.FC<{
   scrolled: boolean
-  openAccountSwitcher?: () => void
   navigation: NativeStackNavigationProp<RouteParameters, "HomeScreen", undefined>
 }> = ({
   scrolled,
-  openAccountSwitcher = () => void 0,
   navigation,
 }) => {
   const account = useCurrentAccount(store => store.account!);
@@ -38,36 +36,30 @@ const Header: React.FC<{
     { name: "Menu", enabled: true },
   ]);
 
-  const [addons, setAddons] = useState<Array<{
-    name: string,
-    icon: string,
-    url: string
-  }>>([]);
-
-  const [addonsTitle, setAddonsTitle] = useState([]);
+  const [addons] = useState<AddonHomePageInfo[]>([]);
+  const [addonsTitle, setAddonsTitle] = useState<string[]>([]);
 
   const dims = Dimensions.get("window");
   const tablet = dims.width > 600;
 
   useEffect(() => {
+    // On récupère le fichier principal de chaque extension.
     get_home_widgets().then((addons) => {
-      //get list of main file for each addon
-      let res: Array<{
-        name: string,
-        icon: string,
-        url: string
-      }> = [];
+      let res: AddonHomePageInfo[] = [];
 
       addons.forEach((addon) => {
         addon.placement.forEach((placement) => {
           res.push({
             name: addon.name,
             icon: addon.icon,
+            // @ts-expect-error : à vérifier avec Rémy.
             url: addon.base_path + "/" + placement.main
           });
         });
       });
-      //setAddons(res);
+
+      // TODO: activer lorsque c'est fonctionnel ?
+      // setAddons(res);
     });
   }, []);
 
@@ -141,7 +133,7 @@ const Header: React.FC<{
             >
               {tabs.map((tab, index) => {
                 if (tab.name === "Home") return null;
-                const defaultTab = defaultTabs.find(t => t.tab === tab.name);
+                const defaultTab = defaultTabs.find(curr => curr.tab === tab.name);
 
                 if (tab.enabled) return null;
                 if (!defaultTab) return null;
@@ -165,7 +157,7 @@ const Header: React.FC<{
                     text={defaultTab.label}
                     scrolled={scrolled}
                     onPress={() => {
-                      navigation.navigate(tab);
+                      navigation.navigate(tab.name as RouteParameters[keyof RouteParameters]);
                     }}
                   />
                 );
@@ -221,6 +213,7 @@ const Header: React.FC<{
       >
         {!scrolled && (
           <Reanimated.View
+            // @ts-expect-error : average Reanimated issue.
             entering={FadeInRight.easing(Easing.bezier(0, 0, 0, 1)).duration(500).delay(250).withInitialValues({
               opacity: 0,
               transform: [{translateX: 20}]
@@ -241,7 +234,7 @@ const Header: React.FC<{
             {addons.map((addon, index) => (
               <Widget
                 key={index}
-                widget={
+                widget={forwardRef(() => (
                   <View style={{flex: 1}} onLayout={() => {
                     let temp = addonsTitle;
                     temp[index] = addon.name;
@@ -267,14 +260,15 @@ const Header: React.FC<{
                       <NativeText variant="subtitle" numberOfLines={1}
                         style={{flex: 1}}>{addonsTitle[index]}</NativeText>
                     </View>
-                    <AddonsWebview name={addon.name} url={addon.url} icon={addon.icon}
+                    <AddonsWebview addon={addon} url={addon.url}
                       navigation={navigation} setTitle={(title) => {
                         let temp = addonsTitle;
                         temp[index] = title;
                         setAddonsTitle(temp);
-                      }}/>
+                      }}
+                    />
                   </View>
-                }
+                ))}
               />
             ))}
           </Reanimated.View>
