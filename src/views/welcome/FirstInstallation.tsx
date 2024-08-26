@@ -88,7 +88,7 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
 
         <ButtonCta
           value="Besoin d'aide ?"
-          onPress={() => openUrl("https://discord.gg/ywkBZx2jFB")}
+          onPress={() => openUrl("https://github.com/PapillonApp/Papillon/issues")}
         />
       </View>
 
