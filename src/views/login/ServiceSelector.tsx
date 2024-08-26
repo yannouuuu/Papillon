@@ -13,6 +13,8 @@ import { useAlert } from "@/providers/AlertProvider";
 import { Audio } from "expo-av";
 import { useTheme } from "@react-navigation/native";
 import GetV6Data from "@/utils/login/GetV6Data";
+import { Check, Undo2 } from "lucide-react-native";
+import Constants from "expo-constants";
 
 const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
   const theme = useTheme();
@@ -45,6 +47,37 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
       case "ed":
         navigation.navigate("EcoleDirecteCredentials");
         playSound();
+        break;
+      case "skolengo":
+        // TODO : Remove this alert when Skolengo is fully supported
+        if(__DEV__) {
+          showAlert({
+            title: "[DEBUG] Service en développement",
+            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponible.",
+            actions: [
+              {
+                title: "Annuler",
+                onPress: () => {},
+                icon: <Undo2 />,
+                primary: false,
+              },
+              {
+                title: "Continuer",
+                onPress: () => {
+                  navigation.navigate("SkolengoAuthenticationSelector");
+                  playSound();
+                },
+                icon: <Check />,
+                primary: true,
+              }
+            ]
+          });
+        } else {
+          showAlert({
+            title: "Service non supporté",
+            message: "Désolé, ce service n'est pas encore supporté. Veuillez réessayer dans une prochaine version."
+          });
+        }
         break;
       default:
         UnsupportedAlert();

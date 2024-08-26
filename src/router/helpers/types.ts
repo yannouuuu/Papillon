@@ -5,6 +5,7 @@ import type { CurrentPosition } from "@/utils/native/location";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type pronote from "pawnote";
 import type React from "react";
+import type { School as SkolengoSchool} from "scolengo-api/types/models/School";
 
 export type RouteParameters = {
   // welcome.index
@@ -38,6 +39,11 @@ export type RouteParameters = {
   // login.ecoledirecte
   EcoleDirecteCredentials: undefined;
 
+  // login.skolengo
+  SkolengoAuthenticationSelector: undefined;
+  SkolengoGeolocation: undefined;
+  SkolengoInstanceSelector: { pos: CurrentPosition | null };
+  SkolengoWebview: { school: SkolengoSchool };
   // account.index
   Home: undefined
   HomeScreen?: { onboard: boolean };
