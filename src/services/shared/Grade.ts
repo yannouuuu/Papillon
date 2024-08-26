@@ -64,3 +64,8 @@ export interface AverageOverview {
   overall: GradeValue;
   classOverall: GradeValue;
 }
+
+export interface GradesPerSubject {
+  average: SubjectAverage
+  grades: Array<Grade>
+}
