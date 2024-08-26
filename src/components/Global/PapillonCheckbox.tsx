@@ -53,8 +53,8 @@ const LoaderSpinner = ({ size = 50, color = "#000000", strokeWidth = 4 }) => {
 };
 
 interface CheckboxProps {
-  checked: boolean
-  loading: boolean
+  checked?: boolean
+  loading?: boolean
   onPress: () => unknown
   style?: StyleProp<ViewStyle>
   color?: string
