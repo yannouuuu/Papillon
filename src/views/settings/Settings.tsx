@@ -1,12 +1,8 @@
 import type { Screen } from "@/router/helpers/types";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-
-import {Alert, Image, Platform, Text, View} from "react-native";
-
+import { Alert, Image, Platform, Text, View } from "react-native";
 import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-
 import AppJSON from "../../../app.json";
 
 import Reanimated, {
@@ -63,13 +59,13 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   }, []);
 
   useEffect(() => {
-    if(route.params?.view) {
+    if (route.params?.view) {
+      // @ts-expect-error : on ignore le state de navigation
       navigation.navigate(route.params.view);
     }
   }, [route.params]);
 
   useEffect(() => {
-    // on focus
     const unsubscribe = navigation.addListener("focus", async () => {
       setTimeout(() => {
         get_settings_widgets().then((addons) => {
@@ -241,7 +237,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
             zIndex: 1000,
           }}
         >
-          <ModalHandle theme={theme} />
+          <ModalHandle />
         </Reanimated.View>
       }
 
@@ -299,11 +295,11 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
             }
             <NativeList>
               {tab.tabs.map((subtab, index) => (
-                (Platform.OS === "android" && subtab.android === false) ? <View key={index}/> :
+                (Platform.OS === "android" && "android" in subtab && !subtab.android) ? <View key={index} /> :
                   <NativeItem
                     key={index}
                     onPress={subtab.onPress}
-                    disabled={subtab.disabled}
+                    disabled={"disabled" in subtab && subtab.disabled}
                     leading={
                       <NativeIcon
                         icon={subtab.icon}
@@ -317,8 +313,8 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
                     <NativeText variant="title">
                       {subtab.label}
                     </NativeText>
-                    {subtab.description &&
-                      <NativeText variant="subtitle" style={{marginTop: -3}}>
+                    {"description" in subtab && subtab.description &&
+                      <NativeText variant="subtitle" style={{ marginTop: -3 }}>
                         {subtab.description}
                       </NativeText>
                     }

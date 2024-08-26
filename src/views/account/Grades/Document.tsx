@@ -8,7 +8,7 @@ import { Asterisk, Calculator, Scale, School, UserMinus, UserPlus, Users } from 
 import { getAverageDiffGrade } from "@/utils/grades/getAverages";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Grade } from "@/services/shared/Grade";
-import type { getAverageDiffGradeReturn } from "@/utils/grades/getAverages";
+import type { AverageDiffGrade } from "@/utils/grades/getAverages";
 import { Screen } from "@/router/helpers/types";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
 
@@ -39,12 +39,12 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
     });
   }, [navigation, subjectData]);
 
-  const [gradeDiff, setGradeDiff] = useState({} as getAverageDiffGradeReturn);
-  const [classDiff, setClassDiff] = useState({} as getAverageDiffGradeReturn);
+  const [gradeDiff, setGradeDiff] = useState({} as AverageDiffGrade);
+  const [classDiff, setClassDiff] = useState({} as AverageDiffGrade);
 
   useEffect(() => {
-    const gD = getAverageDiffGrade([grade], allGrades, "student") as getAverageDiffGradeReturn;
-    const cD = getAverageDiffGrade([grade], allGrades, "average") as getAverageDiffGradeReturn;
+    const gD = getAverageDiffGrade([grade], allGrades, "student") as AverageDiffGrade;
+    const cD = getAverageDiffGrade([grade], allGrades, "average") as AverageDiffGrade;
 
     setGradeDiff(gD);
     setClassDiff(cD);
@@ -58,13 +58,15 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
           icon: <Asterisk />,
           title: "Coefficient",
           description: "Coefficient de la matière",
-          value: "x" + parseFloat(grade.coefficient).toFixed(2),
+          value: "x" + grade.coefficient.toFixed(2),
         },
         grade.outOf.value !== 20 && !grade.student.disabled && {
           icon: <Calculator />,
           title: "Remis sur /20",
           description: "Valeur recalculée sur 20",
-          value: parseFloat(grade.student.value / grade.outOf.value * 20).toFixed(2),
+          value: (typeof grade.student.value === "number" && typeof grade.outOf.value === "number")
+            ? (grade.student.value / grade.outOf.value * 20).toFixed(2)
+            : "??",
           bareme: "/20",
         }
       ],
@@ -76,21 +78,21 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
           icon: <Users />,
           title: "Note moyenne",
           description: "Moyenne de la classe",
-          value: parseFloat(grade.average.value).toFixed(2),
+          value: grade.average.value?.toFixed(2) ?? "??",
           bareme: "/" + grade.outOf.value,
         },
         {
           icon: <UserPlus />,
           title: "Note maximale",
           description: "Meilleure note de la classe",
-          value: parseFloat(grade.max.value).toFixed(2),
+          value: grade.max.value?.toFixed(2) ?? "??",
           bareme: "/" + grade.outOf.value,
         },
         {
           icon: <UserMinus />,
           title: "Note minimale",
           description: "Moins bonne note de la classe",
-          value: parseFloat(grade.min.value).toFixed(2),
+          value: grade.min.value?.toFixed(2) ?? "??",
           bareme: "/" + grade.outOf.value,
         }
       ]
@@ -104,7 +106,7 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
           description: "Impact de la note sur la moyenne générale",
           value:
             (gradeDiff.difference > 0 ? "+ " : "- ") +
-            parseFloat(gradeDiff.difference).toFixed(2).replace("-", "") + " pts",
+            gradeDiff.difference.toFixed(2).replace("-", "") + " pts",
           color: gradeDiff.difference > 0 ? "#00C853" : "#FF1744",
         },
         !grade.average.disabled && {
@@ -112,7 +114,7 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
           title: "Moyenne de la classe",
           value:
             (classDiff.difference > 0 ? "+ " : "- ") +
-            parseFloat(classDiff.difference).toFixed(2).replace("-", "") + " pts",
+            classDiff.difference.toFixed(2).replace("-", "") + " pts",
         }
       ]
     }
@@ -134,10 +136,10 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
           <NativeListHeader label={list.title} />
 
           <NativeList>
-            {list.items.filter(Boolean).map((item, index) => (
+            {list.items.map((item, index) => item && (
               <NativeItem
                 key={index}
-                icon={item.icon || null}
+                icon={item.icon}
                 trailing={
                   <View
                     style={{
@@ -152,15 +154,16 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
                         fontSize: 18,
                         lineHeight: 22,
                         fontFamily: "semibold",
-                        color: item.color || theme.colors.text,
+                        color: "color" in item ? item.color : theme.colors.text,
                       }}
                     >
                       {item.value}
                     </NativeText>
-                    {item.bareme &&
-                    <NativeText variant="subtitle">
-                      {item.bareme}
-                    </NativeText>
+
+                    {"bareme" in item &&
+                      <NativeText variant="subtitle">
+                        {item.bareme}
+                      </NativeText>
                     }
                   </View>
                 }
@@ -168,10 +171,11 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
                 <NativeText variant="overtitle">
                   {item.title}
                 </NativeText>
+
                 {item.description &&
-                <NativeText variant="subtitle">
-                  {item.description}
-                </NativeText>
+                  <NativeText variant="subtitle">
+                    {item.description}
+                  </NativeText>
                 }
               </NativeItem>
             ))}
@@ -180,7 +184,6 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
       ))}
 
       <InsetsBottomView />
-
     </ScrollView>
   );
 };

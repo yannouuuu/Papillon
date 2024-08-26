@@ -13,8 +13,8 @@ const expressions = [
   { label: "Flûte !", emoji: "😮" },
   { label: "Oh non !", emoji: "😢" },
   { label: "Catastrophe !", emoji: "😱" }
-];
+] as const;
 
-export const getErrorTitle = () => {
+export const getErrorTitle = (): typeof expressions[number] => {
   return expressions[Math.floor(Math.random() * expressions.length)];
 };

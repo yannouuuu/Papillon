@@ -1,52 +1,70 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import type React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import LottieView from "lottie-react-native";
 import { X } from "lucide-react-native";
 import { defaultTabs } from "@/views/settings/SettingsTabs";
+import { type RouteProp, useTheme } from "@react-navigation/native";
+import type { RouteParameters } from "@/router/helpers/types";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 interface TabAnimatedTitleProps {
-  theme: any;
-  route: any;
-  navigation: any;
+  route: RouteProp<RouteParameters, keyof RouteParameters>;
+  navigation?: NativeStackNavigationProp<RouteParameters, keyof RouteParameters>;
+  style?: StyleProp<ViewStyle>
 }
 
-const TabAnimatedTitle = ({ theme, route, navigation }: TabAnimatedTitleProps) => {
+const TabAnimatedTitle = ({ route, navigation }: TabAnimatedTitleProps) => {
   return {
     headerTitle: () => <View />,
     headerLeft: () => (
-      <TabAnimatedTitleLeft theme={theme} route={route} navigation={navigation} />
+      <TabAnimatedTitleLeft
+        route={route}
+        navigation={navigation}
+      />
     ),
     headerRight: () => (
-      <TabAnimatedTitleRight theme={theme} route={route} navigation={navigation} />
+      <TabAnimatedTitleRight
+        route={route}
+        navigation={navigation}
+      />
     ),
   };
 };
 
-const TabAnimatedTitleLeft = ({ theme, route, navigation, style }: TabAnimatedTitleProps) => {
+const TabAnimatedTitleLeft = ({ route, style }: TabAnimatedTitleProps) => {
+  const theme = useTheme();
+
   return (
     <View style={[styles.headerLeft, !route.params?.outsideNav && { paddingHorizontal: 16 }, style]}>
       <LottieView
-        source={defaultTabs.find((t) => t.tab === route.name)?.icon}
+        source={defaultTabs.find((curr) => curr.tab === route.name)?.icon}
         autoPlay
         loop={false}
         style={styles.lottieView}
         colorFilters={[{ keypath: "*", color: theme.colors.text }]}
       />
+
       <Text style={[styles.headerTitle, { color: theme.colors.text }]}>
-        {defaultTabs.find((t) => t.tab === route.name)?.label}
+        {defaultTabs.find((curr) => curr.tab === route.name)?.label}
       </Text>
     </View>
   );
 };
 
-const TabAnimatedTitleRight = ({ theme, route, navigation }: TabAnimatedTitleProps) => {
+const TabAnimatedTitleRight = ({ route, navigation }: TabAnimatedTitleProps) => {
+  const theme = useTheme();
+
   return (
     route.params?.outsideNav && (
       <TouchableOpacity
         style={[styles.headerRightButton, { backgroundColor: theme.colors.text + "30" }]}
-        onPress={() => navigation.goBack()}
+        onPress={() => navigation?.goBack()}
       >
-        <X size={20} strokeWidth={3} color={theme.colors.text} />
+        <X
+          size={20}
+          strokeWidth={3}
+          color={theme.colors.text}
+        />
       </TouchableOpacity>
     )
   );

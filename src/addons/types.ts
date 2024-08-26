@@ -1,4 +1,4 @@
-type AddonInfo = {
+export type AddonInfo = {
   base_path: string,
   error: boolean,
   error_message: string,

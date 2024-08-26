@@ -1,20 +1,19 @@
+import { View, Animated, Easing, type ViewStyle, type StyleProp } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "@react-navigation/native";
-import { Check } from "lucide-react-native";
-import React, { useEffect, useRef } from "react";
-import { ActivityIndicator, View, Animated, Easing } from "react-native";
 
-import { PressableScale } from "react-native-pressable-scale";
 import Reanimated, { ZoomIn, ZoomOut } from "react-native-reanimated";
-
+import { PressableScale } from "react-native-pressable-scale";
+import { Svg, Circle, G } from "react-native-svg";
+import { Check } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
-import { Path, Svg, Circle, G } from "react-native-svg";
 
 const LoaderSpinner = ({ size = 50, color = "#000000", strokeWidth = 4 }) => {
-  const animatedValue = useRef(new Animated.Value(0)).current;
+  const animatedValue = useRef(new Animated.Value(0));
 
   useEffect(() => {
     Animated.loop(
-      Animated.timing(animatedValue, {
+      Animated.timing(animatedValue.current, {
         toValue: 1,
         duration: 700,
         easing: Easing.linear,
@@ -26,7 +25,7 @@ const LoaderSpinner = ({ size = 50, color = "#000000", strokeWidth = 4 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
 
-  const spin = animatedValue.interpolate({
+  const spin = animatedValue.current.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "360deg"],
   });
@@ -54,30 +53,36 @@ const LoaderSpinner = ({ size = 50, color = "#000000", strokeWidth = 4 }) => {
 };
 
 interface CheckboxProps {
-  checked: boolean;
-  loading: boolean;
-  onPress: () => void;
-  style?: any;
-  color?: string;
-  loaded?: boolean;
+  checked?: boolean
+  loading?: boolean
+  onPress: () => unknown
+  style?: StyleProp<ViewStyle>
+  color?: string
+  loaded?: boolean
 }
 
-const PapillonCheckbox: React.FC<CheckboxProps> = ({ checked, loading, onPress, style, color, loaded=true }) => {
+const PapillonCheckbox: React.FC<CheckboxProps> = ({
+  checked,
+  loading,
+  onPress,
+  style,
+  color,
+  loaded = true
+}) => {
   const theme = useTheme();
-
   const firstRender = useRef(true);
 
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
-      return;
     }
-  });
+  }, []);
 
-  const [hasPressed, setHasPressed] = React.useState(false);
+  const [hasPressed, setHasPressed] = useState(false);
 
   const pressAction = () => {
     onPress();
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setHasPressed(true);
   };
@@ -134,17 +139,32 @@ const PapillonCheckbox: React.FC<CheckboxProps> = ({ checked, loading, onPress, 
             alignItems: "center",
             zIndex: 100,
           }}
-          entering={loaded && ZoomIn.springify().mass(1).damping(20).stiffness(300)}
+
+          entering={loaded ?
+            ZoomIn
+              .springify()
+              .mass(1)
+              .damping(20)
+              .stiffness(300)
+            : void 0}
+
           exiting={ZoomOut.duration(100)}
         >
           {checked && (
             <Reanimated.View
-              entering={loaded && ZoomIn.springify().mass(1).damping(20).stiffness(300).delay(100)}
+              entering={loaded ?
+                ZoomIn
+                  .springify()
+                  .mass(1)
+                  .damping(20)
+                  .stiffness(300)
+                  .delay(100)
+                : void 0}
             >
               <Check
                 size={18}
                 strokeWidth={3.5}
-                color={"#fff"}
+                color="#fff"
               />
             </Reanimated.View>
           )}

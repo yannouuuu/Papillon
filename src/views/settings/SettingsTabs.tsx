@@ -126,11 +126,14 @@ const SettingsTabs = () => {
 
   useLayoutEffect(() => {
     if (account.personalization.tabs) {
-      setTabs(account.personalization.tabs.map(personalizationTab => ({
-        ...tabs.find(t => t.tab === personalizationTab.name),
+      const new_tabs = account.personalization.tabs.map(personalizationTab => ({
+        ...tabs.find(t => t.tab === personalizationTab.name)!,
         enabled: personalizationTab.enabled,
-      })));
-    } else {
+      }));
+
+      setTabs(new_tabs);
+    }
+    else {
       setTabs(defaultTabs);
       mutateProperty("personalization", {
         ...account.personalization,
@@ -194,7 +197,7 @@ const SettingsTabs = () => {
                 }}
               >
                 {tabs.map((tab, index) => {
-                  const lottieRef = useRef(null);
+                  const lottieRef = useRef<LottieView>(null);
 
                   if (!tab.enabled) {
                     return null;
@@ -223,7 +226,7 @@ const SettingsTabs = () => {
                         onPress={() => {
                           setPreviewIndex(index);
                           lottieRef.current?.reset();
-                          lottieRef.current.play();
+                          lottieRef.current?.play();
                         }}
                       >
                         <Reanimated.View
@@ -349,7 +352,7 @@ const SettingsTabs = () => {
                       onLongPress={drag}
                       delayLongPress={200}
                       chevron={false}
-                      separator={getIndex() < tabs.length - 1}
+                      separator={(getIndex() ?? +Infinity) < tabs.length - 1}
                       leading={
                         <LottieView
                           source={item.icon}

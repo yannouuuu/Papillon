@@ -1,6 +1,8 @@
+import { AddonPlacementManifest } from "@/addons/types";
 import type { Chat } from "@/services/shared/Chat";
 import type { Grade } from "@/services/shared/Grade";
 import type { AccountService } from "@/stores/account/types";
+import { Log } from "@/utils/logger/logger";
 import type { CurrentPosition } from "@/utils/native/location";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type pronote from "pawnote";
@@ -58,7 +60,7 @@ export type RouteParameters = {
   GradeSubject: undefined;
   GradeDocument: {
     grade: Grade,
-    allGrades: Grade[]
+    allGrades?: Grade[]
   };
 
   Attendance: undefined;
@@ -68,7 +70,9 @@ export type RouteParameters = {
 
   // settings.index
   SettingStack: any;
-  Settings: undefined;
+  Settings?: {
+    view: keyof RouteParameters
+  };
   SettingsNotifications: undefined;
   SettingsTrophies: undefined;
   SettingsProfile: undefined;
@@ -97,12 +101,18 @@ export type RouteParameters = {
   ExternalTurboselfLogin: undefined
   ExternalArdLogin: undefined
   QrcodeAnswer: undefined
-  QrcodeScanner: undefined
+  QrcodeScanner: { accountID: string }
   PriceDetectionOnboarding: undefined
   PriceBeforeScan: undefined
 
-  AddonSettingsPage: undefined;
-  AddonLogs: undefined;
+  AddonSettingsPage: {
+    addon: AddonPlacementManifest
+    from: keyof RouteParameters
+  };
+  AddonLogs: {
+    logs: Log[],
+    name: string
+  };
   AddonPage: undefined;
 };
 

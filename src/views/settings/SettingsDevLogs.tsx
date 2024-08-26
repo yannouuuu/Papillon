@@ -1,5 +1,5 @@
 import type { Screen } from "@/router/helpers/types";
-import { Image, ScrollView, Share, ShareContent } from "react-native";
+import { ScrollView, Share, ShareContent } from "react-native";
 import {
   NativeIcon,
   NativeItem,
@@ -8,35 +8,23 @@ import {
   NativeText,
 } from "@/components/Global/NativeComponents";
 import React, { useEffect, useState } from "react";
-import { get_brute_logs, get_logs } from "@/utils/logger/logger";
+import { get_brute_logs, get_logs, Log } from "@/utils/logger/logger";
 import {
   CircleAlert,
   CircleX,
   Code,
-  Paperclip,
-  Save,
   ShareIcon,
   TriangleAlert,
 } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PressableScale } from "react-native-pressable-scale";
 
-// Define the type for the log items
-interface LogItem {
-  type: "ERROR" | "WARN" | "INFO" | "DEBUG" | string;
-  message: string;
-  date: string;
-  from: string;
-}
-
 const SettingsDevLogs: Screen<"SettingsDevLogs"> = ({ navigation }) => {
-  const [logs, setLogs] = useState<LogItem[]>([]);
+  const [logs, setLogs] = useState<Log[]>([]);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
-    get_logs().then((res) => {
-      setLogs(res);
-    });
+    get_logs().then(setLogs);
 
     navigation.setOptions({
       headerRight: (props) => (

@@ -1,10 +1,7 @@
 import React, { useEffect } from "react";
-import { StyleSheet, Dimensions, View, Text, type DimensionValue } from "react-native";
-
 import { useTheme } from "@react-navigation/native";
-
 import Svg, { G, Rect, Polygon } from "react-native-svg";
-
+import { StyleSheet, Dimensions, View, Text, type DimensionValue, type StyleProp, type ViewStyle } from "react-native";
 import Reanimated, { useSharedValue, withRepeat, withSpring, withSequence, withTiming, Easing } from "react-native-reanimated";
 
 const generatePoints = (width: number, numberOfLines: number, heightDec: number) => {
@@ -20,7 +17,7 @@ const PapillonShineBubble: React.FC<{
   numberOfLines: number,
   offsetTop?: DimensionValue,
   noFlex?: boolean,
-  style?: any,
+  style?: StyleProp<ViewStyle>
 }> = ({
   message,
   width = 230,

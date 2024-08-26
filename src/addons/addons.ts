@@ -54,7 +54,7 @@ async function get_addons_list (): Promise<AddonManifest[]> {
     let file = await FileSystem.readAsStringAsync(FileSystem.documentDirectory + "addons/" + addon + "/manifest.json");
     try {
       log("|   Parsing manifest.json...", String((new Error()).stack!));
-      let manifest: object = JSON.parse(file);
+      let manifest: Partial<AddonManifest> = JSON.parse(file);
 
       // Check if the manifest has all the required fields
       log("|   Loading addons...", String((new Error()).stack!));
@@ -205,7 +205,7 @@ async function get_home_widgets (): Promise<AddonManifest[]> {
   return addons.filter((addon) => addon.placement.some((p) => p.placement === "PLACE_HOME_WIDGET"));
 }
 
-async function get_settings_widgets (): Promise<AddonManifest[]> {
+async function get_settings_widgets (): Promise<AddonPlacementManifest[]> {
   let addons = await get_addons_list();
   var res: Array<AddonPlacementManifest> = [];
   addons.forEach((addon) => {

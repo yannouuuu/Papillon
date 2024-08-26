@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ForwardRefExoticComponent, type FunctionComponent, RefAttributes, useRef, useState } from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
 
 import { useTheme } from "@react-navigation/native";
@@ -13,24 +13,25 @@ import Reanimated, {
 import { animPapillon } from "@/utils/ui/animations";
 import { PressableScale } from "react-native-pressable-scale";
 import { NativeText } from "../Global/NativeComponents";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RouteParameters } from "@/router/helpers/types";
 
 interface WidgetContainerProps {
-  widget: React.FunctionComponent<WidgetProps>;
-  navigation?: any;
+  widget: React.ForwardRefExoticComponent<WidgetProps & RefAttributes<unknown>>
+  navigation?: NativeStackNavigationProp<RouteParameters, keyof RouteParameters>
 }
 
 export interface WidgetProps {
-  setNavigationTarget: (target: string) => void;
   setLoading: (loading: boolean) => void;
   loading: boolean;
   setHidden: (hidden: boolean) => void;
   hidden: boolean;
 }
 
-const Widget: React.FC<WidgetContainerProps> = ({ widget: W, navigation }) => {
+const Widget: React.FC<WidgetContainerProps> = ({ widget: DynamicWidget, navigation }) => {
   const theme = useTheme();
   const { colors } = theme;
-  const widgetRef = React.useRef(null);
+  const widgetRef = useRef<FunctionComponent<WidgetProps> | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [hidden, setHidden] = useState(false);
@@ -38,7 +39,7 @@ const Widget: React.FC<WidgetContainerProps> = ({ widget: W, navigation }) => {
   const handlePress = () => {
     const location = (widgetRef.current as any)?.handlePress();
     if (location) {
-      navigation.navigate(location);
+      navigation?.navigate(location);
     }
   };
 
@@ -100,7 +101,7 @@ const Widget: React.FC<WidgetContainerProps> = ({ widget: W, navigation }) => {
               }
             ]}
           >
-            <W
+            <DynamicWidget
               ref={widgetRef}
               setLoading={setLoading}
               loading={loading}

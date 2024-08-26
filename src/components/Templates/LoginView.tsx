@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ActivityIndicator, Image, KeyboardAvoidingView, ScrollView, TextInput, TouchableOpacity, View, StyleSheet } from "react-native";
+import { ActivityIndicator, Image, type ImageSourcePropType, KeyboardAvoidingView, ScrollView, TextInput, TouchableOpacity, View } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeItem, NativeList, NativeListHeader, NativeText } from "../Global/NativeComponents";
@@ -16,7 +16,7 @@ export interface LoginViewCustomInput {
 };
 
 const LoginView: React.FC<{
-  serviceIcon: any;
+  serviceIcon: ImageSourcePropType;
   serviceName: string;
   loading?: boolean;
   error?: string | null;
@@ -45,7 +45,7 @@ const LoginView: React.FC<{
 
   const actionLogin = async () => {
     const customFieldsDict = customFieldsInputs.reduce((acc, field) => {
-      acc[field.identifier] = field.value;
+      acc[field.identifier] = field.value ?? "";
       return acc;
     }, {} as Record<string, string>);
 
@@ -232,7 +232,7 @@ const LoginView: React.FC<{
           style={{
             marginTop: 24,
           }}
-          icon={loading && <ActivityIndicator />}
+          icon={loading ? <ActivityIndicator /> : void 0}
         />
 
       </ScrollView>
