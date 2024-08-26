@@ -52,7 +52,7 @@ const determinateAuthenticationView = async <ScreenName extends keyof RouteParam
   info(JSON.stringify(instance, null, 2), (new Error()).stack!);
   if(pronoteURL.includes("demo.index-education.net")) {
     showAlert({
-      title: "Instance non supporté",
+      title: "Instance non supportée",
       message: "Désolé, les instances de démonstration ne sont pas supportées, elles peuvent être instables ou ne pas fonctionner correctement.",
       actions: [
         {
