@@ -8,7 +8,7 @@ interface ColorIndicatorProps {
 
 const ColorIndicator: React.FC<ColorIndicatorProps> = ({ color, style }) => {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", ...style }}>
+    <View style={{ flex: style?.flex || 1, justifyContent: "center", alignItems: "center", ...style }}>
       <View
         style={{
           backgroundColor: color + "88",
