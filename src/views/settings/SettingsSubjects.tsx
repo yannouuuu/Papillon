@@ -1,21 +1,23 @@
-import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
+import { NativeItem, NativeList, NativeText } from "@/components/Global/NativeComponents";
 import { useCurrentAccount } from "@/stores/account";
-import React, { useEffect, useState, useCallback, useMemo, useLayoutEffect } from "react";
+import React, { useEffect, useState, useCallback, useLayoutEffect } from "react";
 import { Alert, FlatList, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@react-navigation/native";
-import Reanimated, { Easing, FadeInDown, FadeOutDown, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
+import Reanimated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import MissingItem from "@/components/Global/MissingItem";
 import BottomSheet from "@/components/Modals/PapillonBottomSheet";
 import { Trash2 } from "lucide-react-native";
 import ColorIndicator from "@/components/Lessons/ColorIndicator";
 import { COLORS_LIST } from "@/services/shared/Subject";
+import type { Screen } from "@/router/helpers/types";
 
 const MemoizedNativeItem = React.memo(NativeItem);
 const MemoizedNativeList = React.memo(NativeList);
-const MemoizedNativeListHeader = React.memo(NativeListHeader);
 const MemoizedNativeText = React.memo(NativeText);
+
+type Item = [key: string, value: { color: string; pretty: string; emoji: string; }];
 
 const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
   const account = useCurrentAccount(store => store.account!);
@@ -23,41 +25,37 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const colors = useTheme().colors;
 
-  const [subjects, setSubjects] = useState([]);
+  const [subjects, setSubjects] = useState<Array<Item>>([]);
   const [currentCourseTitle, setCurrentCourseTitle] = useState("");
-
-  const updateCourseTitle = useCallback((course, title) => {
-    setCurrentCourseTitle(title);
-  }, [subjects]);
+  const [selectedSubject, setSelectedSubject] = useState<Item | null>(null);
+  const [opened, setOpened] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
+    void async function () {
       if (subjects.length === 0 && account.personalization.subjects) {
         setSubjects(Object.entries(account.personalization.subjects));
       }
-    }, 1);
+    }();
   }, []);
 
   useEffect(() => {
-    // Simulate an asynchronous operation using setTimeout
-    setTimeout(() => {
-      if (selectedSubject && currentCourseTitle !== selectedSubject[1].pretty && currentCourseTitle.trim() !== "") {
-        setOnSubjects(
-          subjects.map((subject) => {
-            if (subject[0] === selectedSubject) {
-              return [selectedSubject, {
-                ...subject[1],
-                pretty: currentCourseTitle,
-              }];
-            }
-            return subject;
-          })
-        );
-      }
-    }, 0);
+    if (selectedSubject && currentCourseTitle !== selectedSubject[1].pretty && currentCourseTitle.trim() !== "") {
+      setOnSubjects(
+        subjects.map((subject) => {
+          if (subject[0] === selectedSubject[0]) {
+            return [selectedSubject[0], {
+              ...subject[1],
+              pretty: currentCourseTitle,
+            }];
+          }
+
+          return subject;
+        })
+      );
+    }
   }, [currentCourseTitle]);
 
-  const setOnSubjects = useCallback((newSubjects) => {
+  const setOnSubjects = useCallback((newSubjects: Item[]) => {
     setSubjects(newSubjects);
     mutateProperty("personalization", {
       ...account.personalization,
@@ -65,8 +63,8 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
     });
   }, [subjects]);
 
-  // add reset button in header
-  React.useLayoutEffect(() => {
+  // Add reset button in header.
+  useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
@@ -102,9 +100,6 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
     });
   }, [navigation]);
 
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [opened, setOpened] = useState("#000000");
-
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -137,12 +132,7 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                     gap: 14,
                   }}
                 >
-                  <ColorIndicator
-                    style={{
-                      flex: undefined,
-                    }}
-                    color={subjects.find((subject) => subject[0] === selectedSubject)[1].color}
-                  />
+                  <ColorIndicator color={subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color ?? "#ffffff"} />
                   <View
                     style={{
                       flex: 1,
@@ -155,8 +145,8 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                     <MemoizedNativeText
                       variant="subtitle"
                       style={{
-                        backgroundColor: subjects.find((subject) => subject[0] === selectedSubject)[1].color + "22",
-                        color: subjects.find((subject) => subject[0] === selectedSubject)[1].color,
+                        backgroundColor: subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color + "22",
+                        color: subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color,
                         alignSelf: "flex-start",
                         paddingHorizontal: 8,
                         paddingVertical: 2,
@@ -200,7 +190,7 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                       textAlign: "center",
                       textAlignVertical: "center",
                     }}
-                    value={subjects.find((subject) => subject[0] === selectedSubject)[1].emoji}
+                    value={subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].emoji}
                     onChangeText={(text) => {
                       var regexp = /((\ud83c[\udde6-\uddff]){2}|([\#\*0-9]\u20e3)|(\u00a9|\u00ae|[\u2000-\u3300]|[\ud83c-\ud83e][\ud000-\udfff])((\ud83c[\udffb-\udfff])?(\ud83e[\uddb0-\uddb3])?(\ufe0f?\u200d([\u2000-\u3300]|[\ud83c-\ud83e][\ud000-\udfff])\ufe0f?)?)*)/g;
 
@@ -210,8 +200,8 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                         const lastEmoji = emojiMatch[emojiMatch.length - 1];
                         setOnSubjects(
                           subjects.map((subject) => {
-                            if (subject[0] === selectedSubject) {
-                              return [selectedSubject, {
+                            if (subject[0] === selectedSubject[0]) {
+                              return [selectedSubject[0], {
                                 ...subject[1],
                                 emoji: lastEmoji,
                               }];
@@ -239,9 +229,7 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                       color: colors.text,
                     }}
                     value={currentCourseTitle}
-                    onChangeText={(text) => {
-                      updateCourseTitle(selectedSubject, text);
-                    }}
+                    onChangeText={setCurrentCourseTitle}
                   />
                 </MemoizedNativeItem>
               </MemoizedNativeList>
@@ -272,8 +260,8 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                       onPress={() => {
                         setOnSubjects(
                           subjects.map((subject) => {
-                            if (subject[0] === selectedSubject) {
-                              return [selectedSubject, {
+                            if (subject[0] === selectedSubject[0]) {
+                              return [selectedSubject[0], {
                                 ...subject[1],
                                 color: item,
                               }];
@@ -294,7 +282,7 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                           justifyContent: "center",
                         }}
                       >
-                        {subjects.find((subject) => subject[0] === selectedSubject)[1].color === item && (
+                        {subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color === item && (
                           <Reanimated.View
                             style={{
                               width: 26,
@@ -341,13 +329,14 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
             }}
           >
             {subjects.map((subject, index) => {
-              if (!subject[0] || !subject[1] || !subject[1].emoji || !subject[1].pretty || !subject[1].color) return <View key={index} />;
-              const emojiRef = React.createRef();
+              if (!subject[0] || !subject[1] || !subject[1].emoji || !subject[1].pretty || !subject[1].color)
+                return <View key={index} />;
+
               return (
                 <MemoizedNativeItem
                   key={index + subject[0] + subject[1].emoji + subject[1].pretty + subject[1].color}
                   onPress={() => {
-                    setSelectedSubject(subject[0]);
+                    setSelectedSubject(subject);
                     setCurrentCourseTitle(subject[1].pretty);
                     setOpened(true);
                   }}
