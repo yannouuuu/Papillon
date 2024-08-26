@@ -11,11 +11,11 @@ import { Page } from "./Atoms/Page";
 import InfinitePager from "react-native-infinite-pager";
 import { HeaderCalendar, LessonsDateModal } from "./LessonsHeader";
 import { AccountService } from "@/stores/account/types";
-import { Timetable } from "@/services/shared/Timetable";
+import type { Timetable as TTimetable } from "@/services/shared/Timetable";
 
 const RenderPage = React.memo(({ index, timetables, getWeekFromIndex, loadTimetableWeek, currentPageIndex } : {
   index: number
-  timetables: Record<number, Timetable>
+  timetables: Record<number, TTimetable>
   getWeekFromIndex: (index: number) => {
     weekNumber: number;
     dayNumber: number;
