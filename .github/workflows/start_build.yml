@@ -194,18 +194,18 @@ jobs:
           path: android/app/build/outputs/bundle/release/app-release.aab
 
 
-#  trigger_deployment:
-#    needs: [build_ios, build_android]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Trigger Stores Deployment
-#        uses: actions/github-script@v6
-#        with:
-#          github-token: ${{secrets.GITHUB_TOKEN}}
-#          script: |
-#            github.rest.actions.createWorkflowDispatch({
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              workflow_id: 'stores_deployment.yml',
-#              ref: 'main'
-#            })
+  trigger_deployment:
+    needs: [build_ios, build_android]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Stores Deployment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'stores_deployment.yml',
+              ref: 'main'
+            })
