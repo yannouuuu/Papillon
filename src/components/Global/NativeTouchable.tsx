@@ -3,6 +3,7 @@ import { Platform, TouchableHighlight, TouchableNativeFeedback, View } from "rea
 
 type NativeTouchableProps = {
   children: React.ReactNode;
+  underlayColor?: string;
 } & React.ComponentProps<typeof TouchableNativeFeedback>;
 
 const NativeTouchable: React.FC<NativeTouchableProps> = ({
