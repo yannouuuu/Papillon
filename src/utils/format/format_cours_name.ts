@@ -1,10 +1,10 @@
 const lesson_formats = require("../data/lesson_formats.json");
 
-String.prototype.uppercaseFirst = function () {
-  return this.charAt(0).toUpperCase() + this.slice(1);
+const uppercaseFirst = (txt: string): string => {
+  return txt.charAt(0).toUpperCase() + txt.slice(1);
 };
 
-function removeSpaces (text) {
+function removeSpaces (text: string): string {
   return text.replace(/\s+/g, "");
 }
 
@@ -47,22 +47,23 @@ function findObjectByPronoteString (pronoteString = "") {
   // Return null if no match is found
   return {
     label: removeSpaces(processedString),
-    pretty: processedString.uppercaseFirst(),
+    pretty: uppercaseFirst(processedString),
     formats: {}
   };
 }
 
-function getCourseSpeciality (pronoteString = "") {
-  let speciality = "";
+function getCourseSpeciality (pronoteString = ""): string | null {
   if (!pronoteString.includes(">")) {
     return null;
   }
 
-  let newPrnString = pronoteString.split(">").pop().trim().toLowerCase();
+  let newPrnString = pronoteString.split(">").pop()?.trim().toLowerCase();
+  if (!newPrnString) return null;
+
   newPrnString = newPrnString.replace("expression", "expr.");
   newPrnString = newPrnString.replace("compréhension", "comp.");
   newPrnString = newPrnString.replace("ecrit", "écrit");
-  newPrnString = newPrnString.uppercaseFirst();
+  newPrnString = uppercaseFirst(newPrnString);
 
   return newPrnString;
 }
