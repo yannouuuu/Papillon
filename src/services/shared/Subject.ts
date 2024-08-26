@@ -66,7 +66,7 @@ export const getSubjectData = (subject: string) => {
   const account = state.account!;
   const mutateProperty = state.mutateProperty;
 
-  if(subject.trim() === "") {
+  if (!subject.trim()) {
     return {
       color: "#888888",
       pretty: "Matière inconnue",
@@ -83,7 +83,6 @@ export const getSubjectData = (subject: string) => {
   const emoji = getClosestGradeEmoji(subject);
 
   mutateProperty("personalization", {
-    ...account.personalization,
     subjects: {
       ...account.personalization.subjects,
       [subject]: {

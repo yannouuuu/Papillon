@@ -52,7 +52,7 @@ export type RouteParameters = {
   GradeSubject: undefined;
   GradeDocument: {
     grade: Grade,
-    allGrades: Grade[]
+    allGrades?: Grade[]
   };
 
   Attendance: undefined;

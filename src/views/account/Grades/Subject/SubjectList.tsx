@@ -92,9 +92,7 @@ const SubjectItem: React.FC<SubjectItemProps> = ({
                 >
                   {typeof grade.student.value === "number"
                     ? grade.student.value.toFixed(2)
-                    : grade.student.information
-                      ? GradeInformation[grade.student.information]
-                      : "N. not"
+                    : "N. not"
                   }
                 </NativeText>
                 <NativeText
