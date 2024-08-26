@@ -62,11 +62,6 @@ jobs:
           echo "$COMMITS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Download iOS artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: ios-app
-
       - name: Download Android APK artifact
         uses: actions/download-artifact@v3
         with:
@@ -90,13 +85,11 @@ jobs:
 
       - name: Rename artifacts with version
         run: |
-          mv Papillon.ipa Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa
           mv app-release.apk Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk
           mv app-release.aab Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.aab
 
       - name: Generate checksums
         run: |
-          echo "IOS_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa | awk '{ print $1 }')" >> $GITHUB_ENV
           echo "ANDROID_APK_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.apk | awk '{ print $1 }')" >> $GITHUB_ENV
           echo "ANDROID_AAB_CHECKSUM=$(sha256sum Papillon-${{ env.FULL_RELEASE_NAME }}-signed-android.aab | awk '{ print $1 }')" >> $GITHUB_ENV
 
@@ -119,21 +112,10 @@ jobs:
             </details>
 
             Build Signatures:
-            - iOS (IPA) SHA256: ${{ env.IOS_CHECKSUM }}
             - Android (APK) SHA256: ${{ env.ANDROID_APK_CHECKSUM }}
             - Android (AAB) SHA256: ${{ env.ANDROID_AAB_CHECKSUM }}
           draft: false
           prerelease: ${{ github.event.inputs.is_beta }}
-
-      - name: Upload iOS Build
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa
-          asset_name: Papillon-${{ env.FULL_RELEASE_NAME }}-signed-ios.ipa
-          asset_content_type: application/octet-stream
 
       - name: Upload Android APK Build
         uses: actions/upload-release-asset@v1
