@@ -17,7 +17,19 @@ jobs:
           rm -rf android/app/build
           rm -rf $HOME/.gradle/caches/
 
+      - name: List available artifacts
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            console.log('Available artifacts:', artifacts.data.artifacts.map(a => a.name));
+
   build_ios:
+    needs: clean
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -83,6 +95,7 @@ jobs:
           path: ios/*.ipa
 
   build_android:
+    needs: clean
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
