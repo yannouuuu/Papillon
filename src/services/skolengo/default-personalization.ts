@@ -16,7 +16,7 @@ const defaultSkolengoTabs : typeof defaultTabs[number]["tab"][]= [
 const defaultSkolengoPersonalization = (): Partial<Personalization> => {
   return {
     color: colors[0],
-
+    magicEnabled: true,
     profilePictureB64: void 0,
 
     tabs: defaultTabs.filter(current => defaultSkolengoTabs.includes(current.tab)).map((tab, index) => ({
