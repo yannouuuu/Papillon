@@ -24,7 +24,7 @@ import type { Tab } from "@/stores/account/types";
 
 const Header: React.FC<{
   scrolled: boolean
-  navigation: NativeStackNavigationProp<RouteParameters, "HomeScreen", undefined>
+  navigation: NativeStackNavigationProp<RouteParameters, "HomeScreen">
 }> = ({
   scrolled,
   navigation,
