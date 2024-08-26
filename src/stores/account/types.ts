@@ -29,6 +29,7 @@ export interface Personalization {
   showTabBackground: boolean,
   transparentTabBar: boolean,
   hideTabBar: boolean,
+  magicEnabled?: boolean
   tabs: Tab[],
   subjects: {
     [subject: string]: {

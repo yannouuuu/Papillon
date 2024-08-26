@@ -18,6 +18,7 @@ const defaultEDTabs = [
 export default async function defaultPersonalization (account: Account): Promise<Partial<Personalization>> {
   return {
     color: colors[0],
+    magicEnabled: true,
     profilePictureB64: account.profile_picture_url
       ? await downloadAsBase64(account.profile_picture_url, {
         Referer: ".ecoledirecte.com/",

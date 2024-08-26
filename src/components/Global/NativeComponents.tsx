@@ -320,7 +320,7 @@ export const NativeItem: React.FC<NativeItemProps> = ({
 interface NativeIconProps {
   icon: ReactNode;
   color: string;
-  style: StyleProp<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
 }
 
 export const NativeIcon: React.FC<NativeIconProps> = ({ icon, color, style }) => {
