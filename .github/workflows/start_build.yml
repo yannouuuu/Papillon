@@ -112,11 +112,13 @@ jobs:
       - name: Build iOS app
         run: |
           cd ios
-          xcodebuild -workspace ios/Papillon.xcworkspace \
+          xcodebuild -workspace Papillon.xcworkspace \
                      -scheme Papillon \
                      -configuration Release \
-                     -archivePath $PWD/build/Papillon.xcarchive \
+                     -archivePath build/Papillon.xcarchive \
                      -allowProvisioningUpdates \
+                     -destination generic/platform=iOS \
+                     IPHONEOS_DEPLOYMENT_TARGET=13.4 \
                      clean archive
           xcodebuild -exportArchive -archivePath Papillon.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath ./
 
