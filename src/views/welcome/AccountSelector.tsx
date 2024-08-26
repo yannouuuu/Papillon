@@ -4,7 +4,7 @@ import { defaultProfilePicture } from "@/utils/ui/default-profile-picture";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import { PlusIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import {ActivityIndicator, Image, ScrollView, StatusBar, View} from "react-native";
+import {ActivityIndicator, Image, StatusBar, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -39,7 +39,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
 
       // If there are no accounts, redirect the user to the first installation page.
       if (accounts.length === 0) {
-      // Use the `reset` method to clear the navigation stack.
+        // Use the `reset` method to clear the navigation stack.
         navigation.reset({
           index: 0,
           routes: [{ name: "FirstInstallation" }],
@@ -48,13 +48,14 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
 
       if (accounts.filter((account) => !account.isExternal).length === 1) {
         const selectedAccount = accounts.find((account) => !account.isExternal);
-        if (currentAccount?.localID !== selectedAccount.localID)
+        if (selectedAccount && currentAccount?.localID !== selectedAccount.localID) {
           switchTo(selectedAccount);
 
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "AccountStack" }],
-        });
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "AccountStack" }],
+          });
+        }
       }
 
       SplashScreen.hideAsync();
