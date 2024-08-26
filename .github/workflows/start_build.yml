@@ -146,12 +146,19 @@ jobs:
                      OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN_PATH" \
                      clean archive
           xcodebuild -exportArchive -archivePath build/Papillon.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath ./build
+          
+          if [ -f "./build/Papillon.ipa" ]; then
+            echo "IPA file generated successfully"
+          else
+            echo "Error: IPA file not found"
+            exit 1
+          fi
 
       - name: Upload IPA
         uses: actions/upload-artifact@v3
         with:
           name: ios-app
-          path: ios/*.ipa
+          path: ios/build/*.ipa
 
   build_android:
     needs: clean
