@@ -1,4 +1,5 @@
 import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
+import { Screen } from "@/router/helpers/types";
 import { useCurrentAccount } from "@/stores/account";
 import { useTheme } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -7,7 +8,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Image, KeyboardAvoidingView, ScrollView, Switch, TextInput } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const SettingsProfile = ({ navigation }) => {
+const SettingsProfile: Screen<"SettingsProfile"> = ({ navigation }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const account = useCurrentAccount(store => store.account!);
@@ -16,8 +17,8 @@ const SettingsProfile = ({ navigation }) => {
   const [oldFirstName, setOldFirstName] = useState(account.studentName?.first ?? "");
   const [oldLastName, setOldLastName] = useState(account.studentName?.last ?? "");
 
-  const firstNameRef = useRef(null);
-  const lastNameRef = useRef(null);
+  const firstNameRef = useRef<TextInput>(null);
+  const lastNameRef = useRef<TextInput>(null);
 
   const [firstName, setFirstName] = useState(account.studentName?.first ?? "");
   const [lastName, setLastName] = useState(account.studentName?.last ?? "");
@@ -107,6 +108,7 @@ const SettingsProfile = ({ navigation }) => {
                   width: 55,
                   height: 55,
                   borderRadius: 9,
+                  // @ts-expect-error : borderCurve is not in the Image style
                   borderCurve: "continuous",
                 }}
               />
@@ -132,7 +134,7 @@ const SettingsProfile = ({ navigation }) => {
         <NativeList>
 
           <NativeItem
-            onPress={() => firstNameRef.current.focus()}
+            onPress={() => firstNameRef.current?.focus()}
             chevron={false}
             icon={<User2 />}
           >
@@ -154,7 +156,7 @@ const SettingsProfile = ({ navigation }) => {
           </NativeItem>
 
           <NativeItem
-            onPress={() => lastNameRef.current.focus()}
+            onPress={() => lastNameRef.current?.focus()}
             chevron={false}
             icon={<TextCursorInput />}
           >
