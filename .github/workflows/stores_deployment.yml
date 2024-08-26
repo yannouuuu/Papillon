@@ -29,10 +29,10 @@ jobs:
           echo "$APP_STORE_CONNECT_API_KEY_CONTENT" | base64 --decode > appstore_connect_api_key.p8
           
           # Upload to TestFlight
-          xcrun altool --upload-app -f Papillon.ipa -t ios \
-            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
-            --apiIssuer "$APP_STORE_CONNECT_API_ISSUER_ID" \
-            --verbose
+          xcrun notarytool submit Papillon.ipa --key appstore_connect_api_key.p8 \
+            --key-id "$APP_STORE_CONNECT_API_KEY_ID" \
+            --issuer "$APP_STORE_CONNECT_API_ISSUER_ID" \
+            --wait
           
           echo "iOS build uploaded to TestFlight for beta testing"
 
