@@ -100,7 +100,6 @@ const SettingsExternalServices: Screen<"SettingsExternalServices"> = ({
             leading={
               <NativeIcon
                 icon={<Utensils />}
-                size={24}
                 color={"#006B6B"}
               />}
           >
@@ -122,7 +121,6 @@ const SettingsExternalServices: Screen<"SettingsExternalServices"> = ({
                 leading={
                   <NativeIcon
                     icon={getServiceIcon(account.service)}
-                    size={24}
                     color={"#006B6B"}
                   />
                 }
@@ -138,22 +136,6 @@ const SettingsExternalServices: Screen<"SettingsExternalServices"> = ({
           </NativeList>
         </View>
       )}
-
-      <NativeList>
-        <NativeItem
-          onPress={() => {
-            navigation.navigate("QrcodeScanner", { accountID: "bcd9e1fb-3f3d-4ca9-be68-bab8bb2df9ea", service: AccountService.ARD });
-          }}
-          leading={
-            <NativeIcon
-              icon={<Building />}
-              size={24}
-              color={"#006B6B"}
-            />}
-        >
-          <NativeText variant="title">Scanner un QR-Code</NativeText>
-        </NativeItem>
-      </NativeList>
     </ScrollView>
   );
 };
