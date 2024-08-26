@@ -7,28 +7,17 @@ jobs:
   clean:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - uses: AutoModality/action-clean@v1
+      - uses: actions/checkout@v3
 
       - name: Clean environment
         run: |
           rm -rf node_modules
           rm -rf ios/build
           rm -rf ~/Library/Developer/Xcode/DerivedData
-          rm -rf android/app/build
+          rm -rf android/app/build/
           rm -rf $HOME/.gradle/caches/
-
-      - name: List available artifacts
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const artifacts = await github.rest.actions.listArtifactsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            console.log('Available artifacts:', artifacts.data.artifacts.map(a => a.name));
-
+        
   build_ios:
     needs: clean
     runs-on: macos-latest
@@ -158,7 +147,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ios-app
-          path: ios/build/*.ipa
+          path: ios/build/ios-app/
+          if-no-files-found: error
 
   build_android:
     needs: clean
@@ -193,17 +183,6 @@ jobs:
           cd android
           ./gradlew assembleRelease
           ./gradlew bundleRelease
-
-      - name: List available artifacts
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const artifacts = await github.rest.actions.listArtifactsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            });
-            console.log('Available artifacts:', artifacts.data.artifacts.map(a => a.name));
 
       - name: Upload APK
         uses: actions/upload-artifact@v3
