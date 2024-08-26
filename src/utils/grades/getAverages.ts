@@ -1,6 +1,6 @@
 import type { Grade } from "@/services/shared/Grade";
 
-type GradeHistory = {
+export interface GradeHistory {
   value: number;
   date: string;
 };

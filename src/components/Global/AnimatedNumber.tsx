@@ -20,12 +20,12 @@ interface AnimatedNumberProps {
   /**
    * Style du texte du nombre.
    */
-  style: StyleProp<TextStyle>
+  style?: StyleProp<TextStyle>
 
   /**
    * Style du conteneur du texte qui contient chaque chiffre.
    */
-  contentContainerStyle: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>
+  contentContainerStyle?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>
 }
 
 /**
