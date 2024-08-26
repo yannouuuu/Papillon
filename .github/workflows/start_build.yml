@@ -101,15 +101,14 @@ jobs:
         env:
           PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
         run: |
-          # Create variables
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
-
-          # Import provisioning profile from secrets
-          echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --decode --output $PP_PATH
+          # Decode the provisioning profile
+          echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --decode > $RUNNER_TEMP/profile.mobileprovision
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $RUNNER_TEMP/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Build iOS app
+        env:
+          KEYCHAIN_PATH: $RUNNER_TEMP/app-signing.keychain
         run: |
           cd ios
           xcodebuild -workspace Papillon.xcworkspace \
@@ -119,6 +118,10 @@ jobs:
                      -allowProvisioningUpdates \
                      -destination generic/platform=iOS \
                      IPHONEOS_DEPLOYMENT_TARGET=13.4 \
+                     CODE_SIGN_STYLE=Manual \
+                     PROVISIONING_PROFILE_SPECIFIER="Papillon" \
+                     CODE_SIGN_IDENTITY="iPhone Distribution" \
+                     OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN_PATH" \
                      clean archive
           xcodebuild -exportArchive -archivePath Papillon.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath ./
 
