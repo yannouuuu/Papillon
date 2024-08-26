@@ -149,9 +149,6 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
             onPress={() => UnsupportedAlert()}
           />
         </Reanimated.View>
-        <Text style={[styles.coming_soon_text, { color: colors.text + "79" }]}>
-          Et encore plus de services à venir !
-        </Text>
       </Reanimated.View>
 
       <View style={styles.buttons}>
@@ -193,14 +190,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 9,
     marginBottom: 16,
-  },
-
-  coming_soon_text: {
-    fontSize: 16,
-    textAlign: "center",
-    fontFamily: "medium",
-    marginHorizontal: 20,
-    marginTop: 15,
   },
 
   image: {
