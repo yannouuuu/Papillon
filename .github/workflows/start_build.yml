@@ -129,6 +129,17 @@ jobs:
           ./gradlew assembleRelease
           ./gradlew bundleRelease
 
+      - name: List available artifacts
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            console.log('Available artifacts:', artifacts.data.artifacts.map(a => a.name));
+
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
@@ -140,6 +151,7 @@ jobs:
         with:
           name: android-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
+
 
   trigger_deployment:
     needs: [build_ios, build_android]
