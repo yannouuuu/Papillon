@@ -1,16 +1,20 @@
-import React from "react";
-import { Text, View } from "react-native";
+import Reanimated, { AnimatedStyle, FadeInUp, FadeOutDown, LinearTransition } from "react-native-reanimated";
+import { type StyleProp, Text, type ViewStyle } from "react-native";
 import { NativeText } from "./NativeComponents";
-import Reanimated, { FadeInUp, FadeOutDown, LinearTransition } from "react-native-reanimated";
 
 interface MissingItemProps {
-  style?: any;
+  style?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>;
   emoji: string;
   title: string;
   description: string;
 }
 
-const MissingItem: React.FC<MissingItemProps> = ({ style, emoji, title, description }) => {
+const MissingItem: React.FC<MissingItemProps> = ({
+  style,
+  emoji,
+  title,
+  description
+}) => {
   return (
     <Reanimated.View
       layout={LinearTransition.springify().mass(1).damping(20).stiffness(300)}
