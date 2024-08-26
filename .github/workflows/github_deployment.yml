@@ -62,15 +62,28 @@ jobs:
           echo "$COMMITS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: List available artifacts
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            console.log('Available artifacts:', artifacts.data.artifacts.map(a => a.name));
+
       - name: Download Android APK artifact
         uses: actions/download-artifact@v3
         with:
           name: android-apk
+          path: ./android-apk
 
       - name: Download Android AAB artifact
         uses: actions/download-artifact@v3
         with:
           name: android-aab
+          path: ./android-aab
 
       - name: Set beta suffix
         run: |
