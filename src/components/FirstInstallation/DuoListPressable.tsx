@@ -5,7 +5,7 @@ import { useTheme } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { Audio } from "expo-av";
 
-import Reanimated, { Easing, useSharedValue, withTiming, withSpring } from "react-native-reanimated";
+import Reanimated, { Easing, useSharedValue, withTiming } from "react-native-reanimated";
 
 const DuoListPressable: React.FC<{
   children?: JSX.Element,
