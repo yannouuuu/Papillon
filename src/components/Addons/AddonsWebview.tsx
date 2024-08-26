@@ -1,16 +1,44 @@
-import {ActivityIndicator, Dimensions, Image, View} from "react-native";
-import {WebView} from "react-native-webview";
-import {NativeText} from "@/components/Global/NativeComponents";
+import { Dimensions, Image, View } from "react-native";
+import { WebView } from "react-native-webview";
+import { NativeText } from "@/components/Global/NativeComponents";
 import React from "react";
-import {Frown, MapPin} from "lucide-react-native";
+import { Frown, MapPin } from "lucide-react-native";
 import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
 import BottomSheet from "@/components/Modals/PapillonBottomSheet";
 import ButtonCta from "@/components/FirstInstallation/ButtonCta";
-import {useTheme} from "@react-navigation/native";
-import Reanimated, {Easing, useSharedValue, withTiming} from "react-native-reanimated";
+import { useTheme } from "@react-navigation/native";
+import Reanimated, { Easing, useSharedValue, withTiming } from "react-native-reanimated";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RouteParameters } from "@/router/helpers/types";
 
-const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, scrollEnabled = false, inset = {top: 0, left: 0, right: 0, bottom: 0}, requestNavigate = (to: string, params: object) => {}, data}) => {
+export type AddonHomePageInfo = {
+  name: string,
+  icon?: string,
+  url: string
+};
+
+interface AddonsWebviewProps {
+  setTitle?: (message: string) => unknown,
+  addon: AddonHomePageInfo
+  url: string
+  navigation: NativeStackNavigationProp<RouteParameters, "HomeScreen">
+  scrollEnabled?: boolean
+  inset?: Record<"top" | "left"| "bottom" | "right", number>
+  requestNavigate?: (to: string, params: unknown) => unknown
+  data?: unknown
+}
+
+const AddonsWebview: React.FC<AddonsWebviewProps> = ({
+  setTitle = (msg: string) => {},
+  addon,
+  url,
+  navigation,
+  scrollEnabled = false,
+  inset = { top: 0, left: 0, right: 0, bottom: 0 },
+  requestNavigate = (to: string, params: object) => {},
+  data
+}) => {
   const theme = useTheme();
   const { colors } = theme;
   let [ error, setError ] = React.useState(false);
