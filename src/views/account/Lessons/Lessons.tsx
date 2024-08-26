@@ -1,27 +1,28 @@
 import { useTheme } from "@react-navigation/native";
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from "react";
-import { Modal, Platform, RefreshControl as RNRefreshControl, Text, View } from "react-native";
-import { createNativeWrapper } from "react-native-gesture-handler";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Platform, View } from "react-native";
 
 import { Screen } from "@/router/helpers/types";
 import { updateTimetableForWeekInCache } from "@/services/timetable";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
-
 import { Page } from "./Atoms/Page";
 
 import InfinitePager from "react-native-infinite-pager";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { HeaderCalendar, LessonsDateModal } from "./LessonsHeader";
 import { AccountService } from "@/stores/account/types";
-import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
+import { Timetable } from "@/services/shared/Timetable";
 
-const RefreshControl = createNativeWrapper(RNRefreshControl, {
-  disallowInterruption: true,
-  shouldCancelWhenOutside: false,
-});
-
-const RenderPage = React.memo(({ index, isActive, timetables, getWeekFromIndex, loadTimetableWeek, currentPageIndex }) => (
+const RenderPage = React.memo(({ index, timetables, getWeekFromIndex, loadTimetableWeek, currentPageIndex } : {
+  index: number
+  timetables: Record<number, Timetable>
+  getWeekFromIndex: (index: number) => {
+    weekNumber: number;
+    dayNumber: number;
+  }
+  loadTimetableWeek: (weekNumber: number) => Promise<void>
+  currentPageIndex: number
+}) => (
   <View>
     <Page
       index={index}
@@ -35,7 +36,6 @@ const RenderPage = React.memo(({ index, isActive, timetables, getWeekFromIndex, 
 
 const Timetable: Screen<"Lessons"> = ({ navigation }) => {
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const account = useCurrentAccount(store => store.account!);
   const timetables = useTimetableStore(store => store.timetables);
 
@@ -44,7 +44,8 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
   const [loadedWeeks, setLoadedWeeks] = useState<Set<number>>(new Set());
   const [currentlyLoadingWeeks, setCurrentlyLoadingWeeks] = useState<Set<number>>(new Set());
 
-  const PagerRef = useRef<typeof InfinitePager | null>(null);
+  // Too hard to type, please send help :D
+  const PagerRef = useRef<any>(null);
 
   const today = useMemo(() => new Date(), []);
   const defaultDate = useMemo(() => new Date(today), [today]);
@@ -105,10 +106,6 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
     }
   }, [timetables]);
 
-  const handleShowDatePicker = useCallback(() => {
-    setShowDatePicker(true);
-  }, []);
-
   useEffect(() => {
     const { weekNumber } = getWeekFromIndex(currentPageIndex);
     const weekLoadStatus = getWeekLoadStatus(weekNumber);
@@ -122,8 +119,6 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
       headerTitle: () => (
         <HeaderCalendar
           index={currentPageIndex}
-          oldPageIndex={currentPageIndex}
-          showPicker={() => handleShowDatePicker()}
           changeIndex={(index) => PagerRef.current?.setPage(index)}
           getDateFromIndex={getDateFromIndex}
         />
@@ -147,9 +142,8 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
       <InfinitePager
         onPageChange={setCurrentPageIndex}
         ref={PagerRef}
-        renderPage={({ index, isActive }) => <RenderPage
+        renderPage={({ index }) => <RenderPage
           index={index}
-          isActive={isActive}
           timetables={timetables}
           getWeekFromIndex={getWeekFromIndex}
           loadTimetableWeek={loadTimetableWeek}
