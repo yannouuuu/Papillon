@@ -2,6 +2,8 @@ import type pronote from "pawnote";
 import type { Account as PawdirecteAccount, Session as PawdirecteSession } from "pawdirecte";
 import type { Session as TSSession, Authentication as TSAuthentication } from "turbawself";
 import type { Client as ARDClient } from "pawrd";
+import type ScolengoAPI from "scolengo-api";
+import { SkolengoAuthConfig } from "scolengo-api/types/models/Common/Auth";
 
 export interface Tab {
   name: string
@@ -107,6 +109,12 @@ export interface EcoleDirecteAccount extends BaseAccount {
   }
 }
 
+export interface SkolengoAccount extends BaseAccount {
+  service: AccountService.Skolengo
+  instance: ScolengoAPI.Skolengo
+  authentication: SkolengoAuthConfig
+}
+
 export interface TurboselfAccount extends BaseExternalAccount {
   service: AccountService.Turboself
   instance: undefined
@@ -130,6 +138,7 @@ export interface ARDAccount extends BaseExternalAccount {
 export type PrimaryAccount = (
   | PronoteAccount
   | EcoleDirecteAccount
+  | SkolengoAccount
 );
 export type ExternalAccount = (
   | TurboselfAccount
