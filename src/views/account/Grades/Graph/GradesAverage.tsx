@@ -32,7 +32,7 @@ import { PressableScale } from "react-native-pressable-scale";
 
 import ReanimatedGraph, { ReanimatedGraphPublicMethods } from "@birdwingo/react-native-reanimated-graph";
 import { useCurrentAccount } from "@/stores/account";
-import AnimatedNbr from "@/components/Global/AnimatedNumber";
+import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { G } from "react-native-svg";
 
 const GradesAverageGraph = ({ grades, overall }) => {
@@ -208,7 +208,7 @@ const GradesAverageGraph = ({ grades, overall }) => {
                   style={[styles.gradeValue]}
                   layout={animPapillon(LinearTransition)}
                 >
-                  <AnimatedNbr value={currentAvg.toFixed(2)} style={styles.gradeNumber} contentContainerStyle={{ marginLeft: -2 }} />
+                  <AnimatedNumber value={currentAvg.toFixed(2)} style={styles.gradeNumber} contentContainerStyle={{ marginLeft: -2 }} />
 
                   <Reanimated.View
                     layout={animPapillon(LinearTransition)}
@@ -227,7 +227,7 @@ const GradesAverageGraph = ({ grades, overall }) => {
                   style={[styles.gradeValue]}
                   layout={animPapillon(LinearTransition)}
                 >
-                  <AnimatedNbr value={classAvg.toFixed(2)} style={styles.gradeNumberClass} />
+                  <AnimatedNumber value={classAvg.toFixed(2)} style={styles.gradeNumberClass} />
                   <Reanimated.View
                     layout={animPapillon(LinearTransition)}
                   >

@@ -6,7 +6,7 @@ import Reanimated, {
   LinearTransition
 } from "react-native-reanimated";
 
-import AnimatedNbr from "@/components/Global/AnimatedNumber";
+import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { WidgetProps } from "@/components/Home/Widget";
 import { updateGradesAndAveragesInCache, updateGradesPeriodsInCache } from "@/services/grades";
 import { useCurrentAccount } from "@/stores/account";
@@ -113,7 +113,7 @@ const GeneralAverageWidget = forwardRef(({
             gap: 4,
           }}
         >
-          <AnimatedNbr
+          <AnimatedNumber
             value={average?.toFixed(2) ?? ""}
             style={{
               fontSize: 24,
