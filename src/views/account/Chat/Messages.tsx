@@ -65,14 +65,17 @@ const Messages: Screen<"Messages"> = ({
       </TouchableOpacity>
       <NativeList>
         {!chats ? (
-          <NativeText>
-            En cours de chargement
-          </NativeText>
-
+          <NativeItem>
+            <NativeText>
+              En cours de chargement
+            </NativeText>
+          </NativeItem>
         ) : chats.length === 0 ? (
-          <NativeText>
-            Aucune discussion !
-          </NativeText>
+          <NativeItem>
+            <NativeText>
+              Aucune discussion !
+            </NativeText>
+          </NativeItem>
         ) : chats.map((chat) => (
           <NativeItem
             key={chat.id}
