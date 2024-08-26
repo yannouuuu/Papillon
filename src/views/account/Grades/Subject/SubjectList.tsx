@@ -5,9 +5,21 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Reanimated, { FadeInDown, FadeInUp, FadeOutUp } from "react-native-reanimated";
 import SubjectTitle from "./SubjectTitle";
-import type { Grade } from "@/services/shared/Grade";
+import { GradeInformation, type Grade, type GradesPerSubject } from "@/services/shared/Grade";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RouteParameters } from "@/router/helpers/types";
 
-const SubjectItem: ({ subject: any, allGrades: any, navigation: any }) = ({ subject, allGrades, navigation }) => {
+interface SubjectItemProps {
+  subject: GradesPerSubject
+  allGrades: Grade[]
+  navigation: NativeStackNavigationProp<RouteParameters, keyof RouteParameters>
+}
+
+const SubjectItem: React.FC<SubjectItemProps> = ({
+  subject,
+  allGrades,
+  navigation
+}) => {
   const [subjectData, setSubjectData] = useState({
     color: "#888888", pretty: "Matière inconnue", emoji: "❓",
   });
@@ -78,7 +90,12 @@ const SubjectItem: ({ subject: any, allGrades: any, navigation: any }) = ({ subj
                     fontFamily: "medium",
                   }}
                 >
-                  {!grade.student.disabled && parseFloat(grade.student.value).toFixed(2) || "N. not"}
+                  {typeof grade.student.value === "number"
+                    ? grade.student.value.toFixed(2)
+                    : grade.student.information
+                      ? GradeInformation[grade.student.information]
+                      : "N. not"
+                  }
                 </NativeText>
                 <NativeText
                   style={{
@@ -87,7 +104,7 @@ const SubjectItem: ({ subject: any, allGrades: any, navigation: any }) = ({ subj
                     opacity: 0.6,
                   }}
                 >
-                  /{parseFloat(grade.outOf.value).toFixed(0)}
+                  /{grade.outOf.value?.toFixed(0) ?? "??"}
                 </NativeText>
               </View>
             </View>
