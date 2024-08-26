@@ -1,6 +1,8 @@
 import { BottomTabView } from "@react-navigation/bottom-tabs";
 import {
   createNavigatorFactory,
+  ParamListBase,
+  TabNavigationState,
   TabRouter,
   useNavigationBuilder,
 } from "@react-navigation/native";
@@ -24,7 +26,17 @@ import Reanimated, {
   withTiming,
 } from "react-native-reanimated";
 
-export function BasePapillonBar ({ state, descriptors, navigation }) {
+type DescriptorOptions = {
+  tabBarLabel?: string;
+  title?: string;
+  tabBarIcon?: any;
+  tabBarLottie?: any;
+  tabEnabled?: boolean
+  tabBarAccessibilityLabel?: string;
+  tabBarTestID?: string
+};
+
+const BasePapillonBar: React.FC<Omit<ReturnType<typeof useNavigationBuilder>, "NavigationContent">> = ({ state, descriptors, navigation }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -89,7 +101,10 @@ export function BasePapillonBar ({ state, descriptors, navigation }) {
         ]}
       >
         {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
+          const { options } = descriptors[route.key] as {
+            options: DescriptorOptions
+          };
+
           const label =
             options.tabBarLabel !== undefined
               ? options.tabBarLabel
@@ -101,18 +116,18 @@ export function BasePapillonBar ({ state, descriptors, navigation }) {
 
           const isFocused = state.index === index;
 
-          const lottie = useRef(null);
+          const lottie = useRef<LottieView>(null);
 
           const onPress = () => {
             lottie.current?.play();
 
-            const event = navigation.emit({
+            navigation.emit({
               type: "tabPress",
               target: route.key,
               canPreventDefault: true,
             });
 
-            if (!isFocused && !event.defaultPrevented) {
+            if (!isFocused) {
               navigation.navigate(route.name, route.params);
             }
           };
@@ -218,9 +233,9 @@ export function BasePapillonBar ({ state, descriptors, navigation }) {
       </Reanimated.View>
     </Reanimated.View>
   );
-}
+};
 
-export function LargePapillonBar ({ state, descriptors, navigation }) {
+export const LargePapillonBar: React.FC<Omit<ReturnType<typeof useNavigationBuilder>, "NavigationContent">> = ({ state, descriptors, navigation }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -234,9 +249,9 @@ export function LargePapillonBar ({ state, descriptors, navigation }) {
 
   useEffect(() => {
     setShouldShowLabel(!account.personalization.hideTabTitles);
-    setShowTabBackground(account.personalization.showTabBackground);
-    setTransparentTabBar(account.personalization.transparentTabBar);
-    setHideTabBar(account.personalization.hideTabBar);
+    setShowTabBackground(account.personalization.showTabBackground ?? false);
+    setTransparentTabBar(account.personalization.transparentTabBar ?? false);
+    setHideTabBar(account.personalization.hideTabBar ?? false);
   }, [account.personalization]);
 
   const bottomAnim = useSharedValue(1);
@@ -297,7 +312,10 @@ export function LargePapillonBar ({ state, descriptors, navigation }) {
           }}
         >
           {state.routes.map((route, index) => {
-            const { options } = descriptors[route.key];
+            const { options } = descriptors[route.key] as {
+              options: DescriptorOptions
+            };
+
             const label =
             options.tabBarLabel !== undefined
               ? options.tabBarLabel
@@ -309,18 +327,18 @@ export function LargePapillonBar ({ state, descriptors, navigation }) {
 
             const isFocused = state.index === index;
 
-            const lottie = useRef(null);
+            const lottie = useRef<LottieView>(null);
 
             const onPress = () => {
               lottie.current?.play();
 
-              const event = navigation.emit({
+              navigation.emit({
                 type: "tabPress",
                 target: route.key,
                 canPreventDefault: true,
               });
 
-              if (!isFocused && !event.defaultPrevented) {
+              if (!isFocused) {
                 navigation.navigate(route.name, route.params);
               }
             };
@@ -404,15 +422,15 @@ export function LargePapillonBar ({ state, descriptors, navigation }) {
       </Reanimated.View>
     </Reanimated.View>
   );
-}
+};
 
-function BottomTabNavigator ({
+const BottomTabNavigator: React.ComponentType<any> = ({
   initialRouteName,
   backBehavior,
   children,
   screenOptions,
   ...rest
-}) {
+}) => {
   const dims = Dimensions.get("window");
   const tablet = dims.width > 600;
 
@@ -450,6 +468,6 @@ function BottomTabNavigator ({
       </View>
     </NavigationContent>
   );
-}
+};
 
 export default createNavigatorFactory(BottomTabNavigator);
