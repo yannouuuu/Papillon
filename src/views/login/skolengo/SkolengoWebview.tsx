@@ -218,7 +218,7 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                   setLoginStep("Initialisation du compte...");
                   setShowWebView(false);
                   const newTok = authTokenToSkolengoTokenSet(token);
-                  setLoginStep("Obtension du compte...");
+                  setLoginStep("Obtention du compte...");
                   const skolengoAccount = await getSkolengoAccount({
                     school: route.params.school,
                     tokenSet: newTok,
