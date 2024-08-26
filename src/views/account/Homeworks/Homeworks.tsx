@@ -135,17 +135,13 @@ const HomeworksPage: React.FC<HomeworksPageProps> = React.memo(({ index, isActiv
   );
 });
 
-// Types pour le composant HomeworksScreen
-type HomeworksScreenProps = {
-  navigation: any; // Typiquement, on utiliserait un type spécifique pour la navigation si on a un typage strict
-};
-
-const HomeworksScreen: Screen<"Homeworks"> = ({ navigation }: HomeworksScreenProps) => {
+const HomeworksScreen: Screen<"Homeworks"> = ({ navigation }) => {
   const theme = useTheme();
   const account = useCurrentAccount(store => store.account!);
   const homeworks = useHomeworkStore(store => store.homeworks);
 
-  const PagerRef = useRef<typeof InfinitePager>(null);
+  // NOTE: PagerRef is a pain to type, please help me...
+  const PagerRef = useRef<any>(null);
 
   const [weekNumber, setWeekNumber] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
