@@ -14,10 +14,10 @@ jobs:
         with:
           name: ios-app
 
-      - name: Download Android artifact
+      - name: Download Android AAB artifact
         uses: actions/download-artifact@v3
         with:
-          name: android-app
+          name: android-aab
 
       - name: Deploy to App Store
         env:
@@ -25,12 +25,12 @@ jobs:
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
         run: |
-          # Use App Store Connect API to upload and submit the app
-          # You'll need to implement this part using a script or a custom action
+          # Use App Store Connect API to upload and submit the IPA
+          #WIP
 
       - name: Deploy to Play Store
         env:
           PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_JSON_KEY }}
         run: |
-          # Use Google Play Developer API to upload and release the app
-          # You'll need to implement this part using a script or a custom action
+          # Use Google Play Developer API to upload and release the AAB
+          #WIP

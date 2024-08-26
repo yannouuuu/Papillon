@@ -33,15 +33,22 @@ jobs:
           # Decode keystore
           echo $KEYSTORE_BASE64 | base64 --decode > android/app/release.keystore
           
-          # Build APK
+          # Build APK and AAB
           cd android
           ./gradlew assembleRelease
+          ./gradlew bundleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
-          name: android-app
+          name: android-apk
           path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
 
       - name: Trigger Stores Deployment
         if: success()
