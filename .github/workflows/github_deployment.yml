@@ -6,11 +6,11 @@ on:
       release_name:
         description: 'Nom de la release (ex: v7.0.0)'
         required: true
-        default: 'v${{ github.run_number }}'
+        default: 'v'
       release_details:
         description: 'Body de la release'
         required: false
-        default: 'Mise en garde, ou autre information importante par rapport à la release'
+        default: ''
       is_beta:
         description: 'Est-ce une version beta? (Cochez pour oui, décochez pour non)'
         required: true
