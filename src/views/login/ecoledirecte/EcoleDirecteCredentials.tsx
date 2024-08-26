@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { Screen } from "@/router/helpers/types";
-import {Image, StyleSheet, Text, TextInput, View, ActivityIndicator, ScrollView, Dimensions} from "react-native";
+import { View, ActivityIndicator, ScrollView, Dimensions } from "react-native";
 
 import { type DoubleAuthChallenge, DoubleAuthRequired, initDoubleAuth, login, type Session, checkDoubleAuth } from "pawdirecte";
 import uuid from "@/utils/uuid-v4";
@@ -9,7 +9,6 @@ import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { AccountService, type EcoleDirecteAccount } from "@/stores/account/types";
 import defaultPersonalization from "@/services/ecoledirecte/default-personalization";
 import { useTheme } from "@react-navigation/native";
-import {Eye, EyeOff, KeyRound, User2} from "lucide-react-native";
 import ButtonCta from "@/components/FirstInstallation/ButtonCta";
 import BottomSheet from "@/components/Modals/PapillonBottomSheet";
 import {NativeText} from "@/components/Global/NativeComponents";
@@ -20,8 +19,6 @@ import Reanimated, {
 } from "react-native-reanimated";
 import DuoListPressable from "@/components/FirstInstallation/DuoListPressable";
 import {SvgFromXml} from "react-native-svg";
-import {PressableScale} from "react-native-pressable-scale";
-import * as Haptics from "expo-haptics";
 import LoginView from "@/components/Templates/LoginView";
 
 const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation }) => {
@@ -30,7 +27,6 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
   const scrollY = useSharedValue(0);
 
   const theme = useTheme();
@@ -38,7 +34,7 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
   const createStoredAccount = useAccounts(store => store.create);
   const switchTo = useCurrentAccount(store => store.switchTo);
 
-  const handleLogin = async (username:string, password:string, currentSession = session) => {
+  const handleLogin = async (username: string, password: string, currentSession = session) => {
     try {
       setLoading(true);
       setError(null);
@@ -64,6 +60,10 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
         linkedExternalLocalIDs: [],
 
         name: account.last_name + " " + account.first_name,
+        studentName: {
+          first: account.first_name,
+          last: account.last_name,
+        },
         className: "", // TODO ?
         schoolName: account.school_name,
 
@@ -97,7 +97,6 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
         }).finally(() => setLoading(false));
 
         setDoubleAuthChallenge(challenge);
-        console.log(challenge);
         setSession(currentSession);
         return;
       }
@@ -130,7 +129,9 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
       return;
     }
 
-    queueMicrotask(() => void handleLogin(currentSession));
+    // username et password n'ont pas besoin d'être défini ici
+    // car ils sont liés par la session directement.
+    queueMicrotask(() => void handleLogin("", "", currentSession));
   };
 
   return (
@@ -219,7 +220,7 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
                 value="Valider"
                 onPress={() => void handleChallenge(selectedAnswer!)}
                 primary={!loading}
-                icon={loading && <ActivityIndicator />}
+                icon={loading ? <ActivityIndicator /> : void 0}
                 disabled={selectedAnswer === null}
               />
             </View>
@@ -229,58 +230,5 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    alignItems: "center",
-  },
-
-  serviceContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-    gap: 4,
-  },
-
-  serviceLogo: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    borderCurve: "continuous",
-    marginBottom: 10,
-  },
-
-  serviceName: {
-    fontSize: 15,
-    fontFamily: "medium",
-    opacity: 0.6,
-    textAlign: "center",
-  },
-
-  serviceSchool: {
-    fontSize: 18,
-    fontFamily: "semibold",
-    textAlign: "center",
-  },
-
-  textInputContainer: {
-    width: "100%",
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    borderCurve: "continuous",
-    marginBottom: 9,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-  },
-
-  textInput: {
-    fontFamily: "medium",
-    fontSize: 16,
-    flex: 1,
-  },
-});
 
 export default EcoleDirecteCredentials;
