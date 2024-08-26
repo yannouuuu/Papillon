@@ -21,7 +21,7 @@ import {
   NativeText,
 } from "@/components/Global/NativeComponents";
 import parse_news_resume from "@/utils/format/format_pronote_news";
-import parse_news_initials from "@/utils/format/format_pronote_initials";
+import parse_initials from "@/utils/format/format_pronote_initials";
 import important_json from "@/utils/magic/regex/important.json";
 import formatDate from "@/utils/format/format_date_complets";
 import InitialIndicator from "@/components/News/InitialIndicator";
@@ -44,7 +44,7 @@ const NewsListItem = ({ index, message, navigation, parentMessages }) => {
       chevron={false}
       leading={
         <InitialIndicator
-          initial={parse_news_initials(message.author)}
+          initial={parse_initials(message.author)}
           color={theme.colors.primary}
         />
       }
