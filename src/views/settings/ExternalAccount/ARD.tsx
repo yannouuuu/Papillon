@@ -23,6 +23,7 @@ const ExternalArdLogin: Screen<"ExternalArdLogin"> = ({ navigation }) => {
       const new_account: ARDAccount = {
         instance: client,
         service: AccountService.ARD,
+        username,
         authentication: {
           schoolID,
           username,

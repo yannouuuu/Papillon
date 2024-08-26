@@ -42,7 +42,7 @@
       "\\b(?:cantine|restaurant scolaire|repas|menu|restaurant|alimentation)\\b"
   ],
   "Grèves et Manifestations": [
-      "\\b(?:grève|manifestation|protestation|mobilisation|désobéissance|conflit social|suspension)\\b"
+      "\\b(?:grève|manifestation|protestation|mobilisation|désobéissance|conflit social|suspension|cgt|force ouvrière|se-unsa|sgen-cfdt|snalc|sud education|fep-cfdt|spelc|snec-cftc)\\b"
   ],
   "Argent": [
       "\\b(?:argent|paye|paiement|frais|coût|contribution|versement|cotisation)\\b"

@@ -15,6 +15,8 @@ import { useCurrentAccount } from "@/stores/account";
 import TabAnimatedTitle from "@/components/Global/TabAnimatedTitle";
 import { Chat } from "@/services/shared/Chat";
 import { getChats } from "@/services/chats";
+import InitialIndicator from "@/components/News/InitialIndicator";
+import parse_initials from "@/utils/format/format_pronote_initials";
 
 // Voir la documentation de `react-navigation`.
 //
@@ -72,12 +74,21 @@ const Messages: Screen<"Messages"> = ({
             Aucune discussion !
           </NativeText>
         ) : chats.map((chat) => (
-          <NativeItem key={chat.id} onPress={() => navigation.navigate("Chat", { handle: chat })}>
+          <NativeItem
+            key={chat.id}
+            onPress={() => navigation.navigate("Chat", { handle: chat })}
+            leading={<InitialIndicator
+              initial={parse_initials(chat.recipient)}
+              color={theme.colors.primary}
+            />}
+
+
+          >
             <NativeText>
-              {chat.subject}
+              {chat.recipient}
             </NativeText>
             <NativeText>
-              De {chat.creator} à {chat.recipient}
+              {chat.subject}
             </NativeText>
           </NativeItem>
         ))}
