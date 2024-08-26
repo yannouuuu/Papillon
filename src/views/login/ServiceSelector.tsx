@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import { Image, View, StyleSheet, StatusBar } from "react-native";
+import { Image, View, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Reanimated, { LinearTransition, FlipInXDown } from "react-native-reanimated";
 
@@ -15,6 +15,8 @@ import { useTheme } from "@react-navigation/native";
 import GetV6Data from "@/utils/login/GetV6Data";
 
 const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
+  const theme = useTheme();
+  const { colors } = theme;
   const [sound, setSound] = useState<Audio.Sound | null>(null);
 
   const { showAlert } = useAlert();
@@ -28,7 +30,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
     setTimeout(async () => {
       const v6Data = await GetV6Data();
       setV6Data(v6Data);
-      if(v6Data.restore && !v6Data.imported) {
+      if (v6Data.restore && !v6Data.imported) {
         navigation.navigate("PronoteV6Import", { data: v6Data.data });
       }
     }, 1);
@@ -45,11 +47,15 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
         playSound();
         break;
       default:
-        showAlert({
-          title: "Service non supporté",
-          message: "Désolé, ce service n'est pas encore supporté. Veuillez réessayer dans une prochaine version."
-        });
+        UnsupportedAlert();
     }
+  };
+
+  const UnsupportedAlert = () => {
+    showAlert({
+      title: "Service non supporté",
+      message: "Désolé, ce service n'est pas encore supporté. Veuillez réessayer dans une prochaine version."
+    });
   };
 
   useEffect(() => {
@@ -140,7 +146,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
             }
             text="Skolengo"
             enabled={service === "skolengo"}
-            onPress={() => setService("skolengo")}
+            onPress={() => UnsupportedAlert()}
           />
         </Reanimated.View>
       </Reanimated.View>

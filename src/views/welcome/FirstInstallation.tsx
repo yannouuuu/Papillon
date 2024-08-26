@@ -63,13 +63,13 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
       <View
         style={styles.presentation}
       >
+
         <Image
           source={require("../../../assets/images/mask_logotype.png")}
           style={styles.logotype}
           tintColor={colors.primary}
           resizeMode="contain"
         />
-
         <Text
           style={[styles.presentation_text, { color: colors.text + "79" }]}
         >
@@ -88,6 +88,7 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
 
         <ButtonCta
           value="Besoin d'aide ?"
+          onPress={() => openUrl("https://github.com/PapillonApp/Papillon/issues")}
         />
       </View>
 
