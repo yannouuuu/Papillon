@@ -18,6 +18,8 @@ interface AttendanceItemProps {
   missed?: { hours: number, minutes: number }
 }
 
+const NO_JUSTICATION = "Sans justification";
+
 const AttendanceItem: React.FC<AttendanceItemProps> = ({
   title,
   icon,
@@ -80,7 +82,7 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
 
         const timestamp = "fromTimestamp" in item ? item.fromTimestamp : item.timestamp;
         const not_justified = "justified" in item && !item.justified;
-        const justification = "reasons" in item ? item.reasons : "reason" in item ? item.reason.text : "Sans justification";
+        const justification = "reasons" in item ? item.reasons || NO_JUSTICATION : "reason" in item ? item.reason.text : NO_JUSTICATION;
 
         return (
           <NativeItem
