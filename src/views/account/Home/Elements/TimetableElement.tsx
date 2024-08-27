@@ -4,19 +4,16 @@ import { useCurrentAccount } from "@/stores/account";
 import { AccountService } from "@/stores/account/types";
 import { useTimetableStore } from "@/stores/timetable";
 import { animPapillon } from "@/utils/ui/animations";
-import { useTheme } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import Reanimated, {
   LinearTransition
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TimetableItem } from "../../Lessons/Atoms/Item";
 import { PapillonNavigation } from "@/router/refs";
 import RedirectButton from "@/components/Home/RedirectButton";
+import { TimetableClass } from "@/services/shared/Timetable";
 
 const TimetableElement = () => {
-  const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
   const account = useCurrentAccount(store => store.account!);
   const timetables = useTimetableStore(store => store.timetables);
 
@@ -25,13 +22,13 @@ const TimetableElement = () => {
   const currentDay = new Date(/*"2024-04-19"*/);
   const [firstDate, setFirstDate] = useState(new Date("2023-09-01"));
 
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useState<TimetableClass[]>([]);
   const [nextCourseIndex, setNextCourseIndex] = useState(0);
 
   useEffect(() => {
     if (account.instance) {
       if (account.service === AccountService.Pronote) {
-        setFirstDate(new Date(account.instance.firstDate));
+        setFirstDate(new Date(account.instance.instance.firstDate));
       }
     }
   }, [account]);
@@ -47,7 +44,7 @@ const TimetableElement = () => {
   useEffect(() => {
     setCurrentWeek(getWeekNumber(currentDay));
 
-    if(!timetables[currentWeek] && !currentlyUpdating && account.instance) {
+    if (!timetables[currentWeek] && !currentlyUpdating && account.instance) {
       setCurrentlyUpdating(true);
       updateTimetableForWeekInCache(account, currentWeek);
     }
