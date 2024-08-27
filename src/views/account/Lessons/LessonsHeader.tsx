@@ -20,12 +20,14 @@ interface HeaderCalendarProps {
   index: number,
   changeIndex: (index: number) => unknown,
   getDateFromIndex: (index: number) => Date
+  showPicker: () => void
 }
 
 const HeaderCalendar: React.FC<HeaderCalendarProps> = ({
   index,
   changeIndex,
-  getDateFromIndex
+  getDateFromIndex,
+  showPicker
 }) => {
   const dims = Dimensions.get("window");
   const tablet = dims.width > 600;
@@ -52,7 +54,7 @@ const HeaderCalendar: React.FC<HeaderCalendarProps> = ({
             key={index + offsetIndex}
             active={offsetIndex === 0}
             date={getDateFromIndex(index + offsetIndex)}
-            onPress={() => changeIndex(index + offsetIndex)}
+            onPress={() => offsetIndex === 0 ? showPicker() : changeIndex(index + offsetIndex)}
           />
         ))}
       </Reanimated.View>
