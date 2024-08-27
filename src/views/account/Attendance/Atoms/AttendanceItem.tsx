@@ -1,4 +1,4 @@
-import type { ReactNode, Dispatch, SetStateAction } from "react";
+import { type ReactNode, type Dispatch, type SetStateAction, useState } from "react";
 import type { Attendance } from "@/services/shared/Attendance";
 import type { Absence } from "@/services/shared/Absence";
 
@@ -13,8 +13,6 @@ interface AttendanceItemProps {
   title: string
   icon: ReactNode
   attendances: Attendance[keyof Attendance]
-  showMore: boolean
-  setShowMore: Dispatch<SetStateAction<boolean>>
   missed?: { hours: number, minutes: number }
 }
 
@@ -24,10 +22,10 @@ const AttendanceItem: React.FC<AttendanceItemProps> = ({
   title,
   icon,
   attendances,
-  showMore,
-  setShowMore,
   missed
 }) => {
+  const [showMore, setShowMore] = useState(false);
+
   const sorted = attendances.sort((a, b) => {
     if ("timestamp" in b && "timestamp" in a)
       return b.timestamp - a.timestamp;

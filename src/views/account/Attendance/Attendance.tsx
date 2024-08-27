@@ -17,6 +17,7 @@ import { getAbsenceTime } from "@/utils/format/attendance_time";
 import TotalMissed from "./Atoms/TotalMissed";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
 import { protectScreenComponent } from "@/router/helpers/protected-screen";
+import { Observation } from "@/services/shared/Observation";
 
 const Attendance: Screen<"Attendance"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -25,6 +26,8 @@ const Attendance: Screen<"Attendance"> = ({ route, navigation }) => {
   const defaultPeriod = useAttendanceStore(store => store.defaultPeriod);
   const periods = useAttendanceStore(store => store.periods);
   const attendances = useAttendanceStore(store => store.attendances);
+
+
 
   const [isRefreshing] = useState(false);
   const [isLoading, setLoading] = useState(true);
@@ -46,10 +49,20 @@ const Attendance: Screen<"Attendance"> = ({ route, navigation }) => {
     }();
   }, [selectedPeriod]);
 
-  const [showMoreAbsences, setShowMoreAbsences] = useState(false);
-  const [showMoreDelays, setShowMoreDelays] = useState(false);
-  const [showMoreObservations, setShowMoreObservations] = useState(false);
-  const [showMorePunishments, setShowMorePunishments] = useState(false);
+  const attendances_observations_details = useMemo(() => {
+    if (!attendances[selectedPeriod]) return {};
+
+    return attendances[selectedPeriod].observations.reduce((acc, observation) => {
+      if (observation.sectionName in acc) {
+        acc[observation.sectionName].push(observation);
+      }
+      else {
+        acc[observation.sectionName] = [observation];
+      }
+
+      return acc;
+    }, {} as Record<string, Observation[]>);
+  }, [attendances, selectedPeriod]);
 
   const [totalMissed, setTotalMissed] = useState({
     total: {
@@ -215,7 +228,6 @@ const Attendance: Screen<"Attendance"> = ({ route, navigation }) => {
             title="Absences"
             icon={<UserX />}
             attendances={attendances[selectedPeriod].absences}
-            showMore={showMoreAbsences} setShowMore={setShowMoreAbsences}
             missed={totalMissed.absence}
           />
         )}
@@ -225,29 +237,24 @@ const Attendance: Screen<"Attendance"> = ({ route, navigation }) => {
             title="Retards"
             icon={<Timer />}
             attendances={attendances[selectedPeriod].delays}
-            showMore={showMoreDelays}
-            setShowMore={setShowMoreDelays}
             missed={totalMissed.delay}
           />
         )}
 
-        {attendances[selectedPeriod] && attendances[selectedPeriod].observations.length > 0 && (
+        {Object.keys(attendances_observations_details).map(sectionName => (
           <AttendanceItem
-            title="Observations"
+            key={sectionName}
+            title={sectionName}
             icon={<Eye />}
-            attendances={attendances[selectedPeriod].observations}
-            showMore={showMoreObservations}
-            setShowMore={setShowMoreObservations}
+            attendances={attendances_observations_details[sectionName]}
           />
-        )}
+        ))}
 
         {attendances[selectedPeriod] && attendances[selectedPeriod].punishments.length > 0 && (
           <AttendanceItem
             title="Punitions"
             icon={<Scale />}
             attendances={attendances[selectedPeriod].punishments}
-            showMore={showMorePunishments}
-            setShowMore={setShowMorePunishments}
           />
         )}
 
