@@ -12,6 +12,7 @@ import { Trash2 } from "lucide-react-native";
 import ColorIndicator from "@/components/Lessons/ColorIndicator";
 import { COLORS_LIST } from "@/services/shared/Subject";
 import type { Screen } from "@/router/helpers/types";
+import SubjectContainerCard from "@/components/Settings/SubjectContainerCard";
 
 const MemoizedNativeItem = React.memo(NativeItem);
 const MemoizedNativeList = React.memo(NativeList);
@@ -334,22 +335,7 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
           </BottomSheet>
         )}
 
-        <MemoizedNativeList>
-          <View
-            style={{
-              height: 120,
-              backgroundColor: colors.primary + "22",
-            }}
-          />
-          <MemoizedNativeItem>
-            <MemoizedNativeText variant="title">
-              Personnalisez vos matières
-            </MemoizedNativeText>
-            <MemoizedNativeText variant="subtitle">
-              Personnalisez le nom, l'émoji et la couleur des matières de votre emploi du temps
-            </MemoizedNativeText>
-          </MemoizedNativeItem>
-        </MemoizedNativeList>
+        <SubjectContainerCard theme={{ colors }} />
 
         {subjects.length > 0 && (
           <MemoizedNativeList
