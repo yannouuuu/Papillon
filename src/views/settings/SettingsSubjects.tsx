@@ -132,7 +132,7 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                     gap: 14,
                   }}
                 >
-                  <ColorIndicator color={subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color ?? "#ffffff"} />
+                  <ColorIndicator style={{ flex: 0 }} color={subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color ?? "#ffffff"} />
                   <View
                     style={{
                       flex: 1,
