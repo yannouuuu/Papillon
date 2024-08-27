@@ -29,23 +29,14 @@ export const TimetableItem: React.FC<{
   index: number
   small?: boolean
 }> = ({ item, index, small }) => {
-  const start = useMemo(() => new Date(item.startTimestamp), [item.startTimestamp]);
-  const end = useMemo(() => new Date(item.endTimestamp), [item.endTimestamp]);
   const { colors } = useTheme();
 
-  const durationMinutes = useMemo(() => Math.round((item.endTimestamp - item.startTimestamp) / 60000), [item.startTimestamp, item.endTimestamp]);
-
-  const [subjectData, setSubjectData] = useState({ color: "#888888", pretty: "Matière inconnue" });
-
-  const fetchSubjectData = () => {
-    const data = getSubjectData(item.title);
-    setSubjectData(data);
-  };
-
-  fetchSubjectData();
-
-  const formattedStartTime = useMemo(() => start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }), [start]);
-  const formattedEndTime = useMemo(() => end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }), [end]);
+  const start = useMemo(() => new Date(item.startTimestamp), [item]);
+  const end = useMemo(() => new Date(item.endTimestamp), [item]);
+  const durationMinutes = useMemo(() => Math.round((item.endTimestamp - item.startTimestamp) / 60000), [item]);
+  const subjectData = useMemo(() => getSubjectData(item.title), [item]);
+  const formattedStartTime = useMemo(() => start.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }), [start]);
+  const formattedEndTime = useMemo(() => end.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }), [end]);
 
   return (
     <Reanimated.View
