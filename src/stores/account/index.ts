@@ -17,6 +17,7 @@ import { useHomeworkStore } from "../homework";
 import { useGradesStore } from "../grades";
 import { useNewsStore } from "../news";
 import { useAttendanceStore } from "../attendance";
+import { info, log } from "@/utils/logger/logger";
 
 /**
  * Store for the currently selected account.
@@ -27,7 +28,7 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
   linkedAccounts: [],
 
   mutateProperty: (key, value) => {
-    console.log(`[current:update]: mutate property ${key} in storage`);
+    log(`mutate property ${key} in storage`, "current:update");
 
     // Since "instance" is a runtime only key,
     // we mutate the property only in this memory store and not in the persisted one.
@@ -56,23 +57,23 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
       } });
     }
 
-    console.log(`[current:update]: done mutating property ${key} in storage`);
+    log(`done mutating property ${key} in storage`, "[current:update]");
   },
 
   switchTo: async (account) => {
-    console.log("[switchTo]: reading", account.name);
+    log(`reading ${account.name}`, "switchTo");
 
     set({ account });
     useAccounts.setState({ lastOpenedAccountID: account.localID });
 
     // Account is currently not authenticated,
     if (typeof account.instance === "undefined") {
-      console.log("[switchTo]: instance undefined, reloading...");
+      log("instance undefined, reloading...", "[switchTo]");
       // Automatically reconnect the main instance.
       const { instance, authentication } = await reload(account);
       get().mutateProperty("authentication", authentication);
       get().mutateProperty("instance", instance);
-      console.log("[switchTo]: instance reload done !");
+      log("instance reload done !", "[switchTo]");
     }
 
     // Rehydrate every store that needs it.
@@ -87,7 +88,7 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
         name: `${account.localID}-${storageName}-storage`
       });
 
-      console.info("[switchTo]: rehydrating", storageName);
+      info(`rehydrating ${storageName}`, "switchTo");
       return store.persist.rehydrate();
     }));
 
@@ -96,23 +97,23 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
       return {...accounts.find((acc) => acc.localID === linkedID)};
     }).filter(Boolean) as ExternalAccount[] ?? [];
 
-    console.info(`[switchTo]: found ${linkedAccounts.length} external accounts`);
+    info(`found ${linkedAccounts.length} external accounts`, "switchTo");
 
     for (const linkedAccount of linkedAccounts) {
       const { instance, authentication } = await reload(linkedAccount);
       linkedAccount.instance = instance;
       linkedAccount.authentication = authentication;
-      console.log("[switchTo]: reloaded external");
+      log("reloaded external", "[switchTo]");
     }
 
-    console.log("[switchTo]: reloaded all external accounts");
+    log("reloaded all external accounts", "[switchTo]");
 
     set({ linkedAccounts });
-    console.log("[switchTo]: done reading", account.name, "and rehydrating stores.");
+    log(`done reading ${account.name}and rehydrating stores.`, "[switchTo]");
   },
 
   linkExistingExternalAccount: (account) => {
-    console.log("[linkExistingExternalAccount]: linking");
+    log("linking", "linkExistingExternalAccount");
 
     set((state) => ({
       linkedAccounts: [...state.linkedAccounts, account]
@@ -123,17 +124,17 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
       account.localID
     ]);
 
-    console.log("[linkExistingExternalAccount]: linked");
+    log("linked", "linkExistingExternalAccount");
   },
 
   logout: () => {
     const account = get().account;
-    console.log("[current:logout]: logging out", account?.name);
+    log(`logging out ${account?.name}`, "current:logout");
 
     // When using PRONOTE, we should make sure to stop the background interval.
     if (account && account.service === AccountService.Pronote && account.instance) {
       pronote.clearPresenceInterval(account.instance);
-      console.log("[current:logout]: stopped pronote presence");
+      log("stopped pronote presence", "current:logout");
     }
 
     set({ account: null, linkedAccounts: [] });
@@ -156,17 +157,17 @@ export const useAccounts = create<AccountsStore>()(
 
       // When creating, we don't want the "instance" to be stored.
       create: ({ instance, ...account }) => {
-        console.log(`[create]: storing ${account.localID} (${"name" in account ? account.name : "no name"})`);
+        log(`storing ${account.localID} (${"name" in account ? account.name : "no name"})`, "accounts:create");
 
         set((state) => ({
           accounts: [...state.accounts, account as Account]
         }));
 
-        console.log("[create]: stored", account.localID);
+        log(`stored ${account.localID}`, "accounts:create");
       },
 
       remove: (localID) => {
-        console.log("[remove]: removing", localID);
+        log(`removing ${localID}`, "accounts:remove");
 
         set((state) => ({
           accounts: state.accounts.filter(
@@ -174,7 +175,7 @@ export const useAccounts = create<AccountsStore>()(
           )
         }));
 
-        console.log("[remove]: removed", localID);
+        log(`removed ${localID}`, "accounts:remove");
       },
 
       /**

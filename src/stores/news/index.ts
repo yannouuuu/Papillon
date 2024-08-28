@@ -3,15 +3,16 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { create } from "zustand";
 
 import type { NewsStore } from "@/stores/news/types";
+import { log } from "@/utils/logger/logger";
 
 export const useNewsStore = create<NewsStore>()(
   persist(
     (set) => ({
       informations: [],
       updateInformations: (informations) => {
-        console.log("[news:updateInformations]: updating store...");
+        log("updating store...", "news:updateInformations");
         set(() => ({ informations }));
-        console.log("[news:updateInformations]: updated store.");
+        log("updated store.", "news:updateInformations");
       }
     }),
     {

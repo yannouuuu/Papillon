@@ -8,11 +8,12 @@ import {
   NativeText,
 } from "@/components/Global/NativeComponents";
 import React, { useEffect, useState } from "react";
-import { get_brute_logs, get_logs, Log } from "@/utils/logger/logger";
+import { get_brute_logs, get_logs, Log, delete_logs } from "@/utils/logger/logger";
 import {
   CircleAlert,
   CircleX,
   Code,
+  Delete,
   ShareIcon,
   TriangleAlert,
 } from "lucide-react-native";
@@ -29,17 +30,9 @@ const SettingsDevLogs: Screen<"SettingsDevLogs"> = ({ navigation }) => {
     navigation.setOptions({
       headerRight: (props) => (
         <PressableScale
-          onPress={() => {
-            get_brute_logs().then((logs) => {
-              const shareContent: ShareContent = {
-                message: "Hello",
-                title: "Partager vos logs",
-              };
-              Share.share(shareContent);
-            });
-          }}
+          onPress={() => delete_logs()}
         >
-          <ShareIcon />
+          <Delete />
         </PressableScale>
       ),
     });

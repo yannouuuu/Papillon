@@ -3,13 +3,14 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { create } from "zustand";
 
 import type { HomeworkStore } from "@/stores/homework/types";
+import { log } from "@/utils/logger/logger";
 
 export const useHomeworkStore = create<HomeworkStore>()(
   persist(
     (set) => ({
       homeworks: {},
       updateHomeworks: (weekNumber, homeworks) => {
-        console.log(`[homework:updateHomeworks]: updating classes for week ${weekNumber}`);
+        log(`updating classes for week ${weekNumber}`, "homework:updateHomeworks");
 
         set((state) => {
           return {
@@ -20,7 +21,7 @@ export const useHomeworkStore = create<HomeworkStore>()(
           };
         });
 
-        console.log(`[homework:updateHomeworks]: updated classes for week ${weekNumber}`);
+        log(`updated classes for week ${weekNumber}`, "homework:updateHomeworks");
       }
     }),
     {

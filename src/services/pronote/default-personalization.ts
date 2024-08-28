@@ -13,6 +13,7 @@ const defaultPronoteTabs = [
   "News",
   "Attendance",
   "Messages",
+  "Menu"
 ] as typeof defaultTabs[number]["tab"][];
 
 const defaultPersonalization = async (instance: pronote.SessionHandle): Promise<Partial<Personalization>> => {

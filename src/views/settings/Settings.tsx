@@ -24,6 +24,7 @@ import {
   Paperclip,
   Puzzle,
   Route,
+  Scroll,
   Settings as SettingsLucide,
   Sparkles,
   SwatchBook,
@@ -160,7 +161,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           color: "#58A3C3",
           label: "Papillon Magic",
           onPress: () => navigation.navigate("SettingsMagic"),
-        }
+        },
       ],
     },
     {
