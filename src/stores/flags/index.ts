@@ -9,7 +9,7 @@ export const useFlagsStore = create<{
   flags: Array<string>;
 }>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       flags: [],
 
       set (flag) {
@@ -26,7 +26,7 @@ export const useFlagsStore = create<{
       },
 
       defined (flag) {
-        return this.flags.includes(flag);
+        return get().flags.includes(flag);
       }
     }),
     {
