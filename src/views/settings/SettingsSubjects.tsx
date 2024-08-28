@@ -217,7 +217,7 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                           emoji = emojiMatch[emojiMatch.length - 1];
                         }
                       }
-                      
+
                       setOnSubjects(
                         subjects.map((subject) => {
                           if (subject[0] === selectedSubject[0]) {
