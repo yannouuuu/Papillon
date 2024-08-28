@@ -11,14 +11,14 @@ export async function getContributors (): Promise<Contributor[]> {
   try {
     const { data: allContributors } = await axios.get<Contributor[]>("https://api.github.com/repos/PapillonApp/Papillon/contributors");
 
-    const teamGithubUrls = new Set(
+    const teamGithubUsernames = new Set(
       teams
         .filter((team): team is { name: string; description: string; link: string; ppimage: string; github: string } => Boolean(team.github))
-        .map(({ github }) => github?.toLowerCase() ?? "")
+        .map(({ github }) => github.split("/").pop()?.toLowerCase() ?? "")
     );
 
-    return allContributors.filter(({ html_url }) =>
-      !teamGithubUrls.has(new URL(html_url).hostname.replace("www.", ""))
+    return allContributors.filter(({ login }) =>
+      !teamGithubUsernames.has(login.toLowerCase())
     );
   } catch (error) {
     console.error("Erreur lors de la récupération des contributeurs:", error);
