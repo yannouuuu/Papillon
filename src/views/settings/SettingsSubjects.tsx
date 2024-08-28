@@ -207,39 +207,28 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                     }}
                     value={subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].emoji}
                     onChangeText={(text) => {
-                      if (text.length < 1) {
-                        setOnSubjects(
-                          subjects.map((subject) => {
-                            if (subject[0] === selectedSubject[0]) {
-                              return [selectedSubject[0], {
-                                ...subject[1],
-                                emoji: "",
-                              }];
-                            }
-                            return subject;
-                          })
-                        );
-                        return;
-                      } else {
+                      let emoji = "";
+                      if(text.length >= 1) {
                         var regexp = /((\ud83c[\udde6-\uddff]){2}|([#*0-9]\u20e3)|(\u00a9|\u00ae|[\u2000-\u3300]|[\ud83c-\ud83e][\ud000-\udfff])((\ud83c[\udffb-\udfff])?(\ud83e[\uddb0-\uddb3])?(\ufe0f?\u200d([\u2000-\u3300]|[\ud83c-\ud83e][\ud000-\udfff])\ufe0f?)?)*)/g;
 
                         const emojiMatch = text.match(regexp);
 
-                        if (emojiMatch) {
-                          const lastEmoji = emojiMatch[emojiMatch.length - 1];
-                          setOnSubjects(
-                            subjects.map((subject) => {
-                              if (subject[0] === selectedSubject[0]) {
-                                return [selectedSubject[0], {
-                                  ...subject[1],
-                                  emoji: lastEmoji,
-                                }];
-                              }
-                              return subject;
-                            })
-                          );
+                        if(emojiMatch) {
+                          emoji = emojiMatch[emojiMatch.length - 1];
                         }
                       }
+                      
+                      setOnSubjects(
+                        subjects.map((subject) => {
+                          if (subject[0] === selectedSubject[0]) {
+                            return [selectedSubject[0], {
+                              ...subject[1],
+                              emoji: emoji,
+                            }];
+                          }
+                          return subject;
+                        })
+                      );
                     }}
                   />
                 </MemoizedNativeItem>
