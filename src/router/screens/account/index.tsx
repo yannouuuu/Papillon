@@ -7,6 +7,7 @@ import NewsScreen from "@/views/account/News/News";
 import Grades from "@/views/account/Grades/Grades";
 import Attendance from "@/views/account/Attendance/Attendance";
 import Messages from "@/views/account/Chat/Messages";
+import PlaceholderScreen from "@/views/account/Home/PlaceholderScreen";
 
 export const screens = [
   createScreen("Home", () => <HomeStackScreen accountScreens={screens} />, {
@@ -41,7 +42,7 @@ export const screens = [
     tabBarLabel: "Vie sco.",
     tabBarLottie: require("@/../assets/lottie/tab_check.json"),
   }),
-  createScreen("Messages", Messages, {
+  createScreen("Messages", PlaceholderScreen, {
     headerTitle: "Messages",
     tabBarLabel: "Messages",
     tabBarLottie: require("@/../assets/lottie/tab_chat.json"),
