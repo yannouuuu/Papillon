@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Build and Deploy to Beta Channels
 
 on:
   workflow_dispatch:
@@ -182,6 +182,26 @@ jobs:
         with:
           name: ios-app
           path: ios-app
+
+      - name: Check iOS artifact content
+        run: |
+          ls -R ios-app
+          echo "Content of ios-app directory:"
+          cat ios-app/*
+
+      - name: Extract or Move iOS IPA
+        run: |
+          if [ -f ios-app/*.ipa ]; then
+            echo "IPA file found, moving it"
+            mv ios-app/*.ipa Papillon.ipa
+          elif [ -f ios-app/*.zip ]; then
+            echo "ZIP file found, extracting it"
+            unzip ios-app/*.zip -d ios-app
+            mv ios-app/*.ipa Papillon.ipa
+          else
+            echo "No IPA or ZIP file found in ios-app directory"
+            exit 1
+          fi
 
       - name: Extract iOS IPA
         run: |
