@@ -50,6 +50,7 @@ const SettingsDevLogs: Screen<"SettingsDevLogs"> = ({ navigation }) => {
       contentContainerStyle={{
         padding: 16,
         paddingBottom: 16 + insets.bottom,
+        paddingTop: 0,
       }}
     >
       <NativeListHeader animated label={"Logs"} />
