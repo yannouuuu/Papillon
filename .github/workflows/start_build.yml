@@ -1,4 +1,4 @@
-name: Start Build Process
+name: Build and Deploy
 
 on:
   workflow_dispatch:
@@ -171,18 +171,62 @@ jobs:
           name: android-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
 
-  trigger_deployment:
+  deploy_to_beta_channels:
     needs: [build_ios, build_android]
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
-      - name: Trigger Stores Deployment
-        uses: actions/github-script@v6
+      - uses: actions/checkout@v3
+
+      - name: Download iOS artifact
+        uses: actions/download-artifact@v3
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'stores_deployment.yml',
-              ref: 'main'
-            })
+          name: ios-app
+          path: ios-app
+
+      - name: Extract iOS IPA
+        run: |
+          unzip ios-app/*.zip -d ios-app
+          mv ios-app/*.ipa Papillon.ipa
+
+      - name: Download Android AAB artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: android-aab
+          path: android-aab
+
+      - name: Extract Android AAB
+        run: |
+          unzip android-aab/*.zip -d android-aab
+          mv android-aab/*.aab Papillon.aab
+
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+        run: |
+          echo "$APP_STORE_CONNECT_API_KEY_CONTENT" | base64 --decode > appstore_connect_api_key.p8
+          
+          xcrun notarytool submit Papillon.ipa --key appstore_connect_api_key.p8 \
+            --key-id "$APP_STORE_CONNECT_API_KEY_ID" \
+            --issuer "$APP_STORE_CONNECT_API_ISSUER_ID" \
+            --wait
+          
+          echo "iOS build uploaded to TestFlight for beta testing"
+
+      - name: Upload Android Release to Play Store Beta
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
+          packageName: xyz.getpapillon.app
+          releaseFiles: Papillon.aab
+          track: beta
+          status: completed
+          changesNotSentForReview: false
+
+      - name: Notify successful beta deployment
+        run: |
+          echo "Both iOS and Android builds have been successfully uploaded to their respective beta channels (TestFlight and Play Store Beta)."
+          echo "To release to production:"
+          echo "- For iOS: Go to App Store Connect, test the build in TestFlight, then submit for App Store review when ready (Vince will do this)."
+          echo "- For Android: Go to the Google Play Console, test the build in the beta track, then promote to production when ready (Vince will do this)."
