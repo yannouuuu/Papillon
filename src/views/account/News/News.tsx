@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Image, StyleSheet, FlatList } from "react-native";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { Image, StyleSheet, FlatList, ListRenderItem, View } from "react-native";
 import { Screen } from "@/router/helpers/types";
 import { updateNewsInCache } from "@/services/news";
 import { useNewsStore } from "@/stores/news";
 import { useCurrentAccount } from "@/stores/account";
-import { NativeList, NativeListHeader } from "@/components/Global/NativeComponents";
+import { NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
 import { RefreshControl } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 import BetaIndicator from "@/components/News/Beta";
@@ -15,6 +15,11 @@ import { animPapillon } from "@/utils/ui/animations";
 import { categorizeMessages } from "@/utils/magic/categorizeMessages";
 import TabAnimatedTitle from "@/components/Global/TabAnimatedTitle";
 import { protectScreenComponent } from "@/router/helpers/protected-screen";
+import MissingItem from "@/components/Global/MissingItem";
+
+type NewsItem = {
+  date: string;
+};
 
 const NewsScreen: Screen<"News"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -22,8 +27,8 @@ const NewsScreen: Screen<"News"> = ({ route, navigation }) => {
   const informations = useNewsStore((store) => store.informations);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [importantMessages, setImportantMessages] = useState<any[]>([]);
-  const [sortedMessages, setSortedMessages] = useState<any[]>([]);
+  const [importantMessages, setImportantMessages] = useState<NewsItem[]>([]);
+  const [sortedMessages, setSortedMessages] = useState<NewsItem[]>([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -34,39 +39,27 @@ const NewsScreen: Screen<"News"> = ({ route, navigation }) => {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     await updateNewsInCache(account);
-  }, [account.instance]);
+    setIsLoading(false);
+  }, [account]);
 
   useEffect(() => {
     fetchData();
   }, [account.instance]);
 
-
   useEffect(() => {
-    setTimeout(() => {
-      if (informations) {
-        if (account.personalization?.magicEnabled === true) {
-          const { importantMessages, normalMessages } = categorizeMessages(informations);
-          const nsmsg = [...normalMessages].sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          );
-
-          setImportantMessages(importantMessages);
-          setSortedMessages(nsmsg);
-          setIsLoading(false);
-        } else {
-          const nsmsg = [...informations].sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          );
-
-          setImportantMessages([]);
-          setSortedMessages(nsmsg);
-          setIsLoading(false);
-        }
+    if (informations) {
+      if (account.personalization?.magicEnabled) {
+        const { importantMessages, normalMessages } = categorizeMessages(informations);
+        setImportantMessages(importantMessages.map(message => ({ ...message, date: message.date.toString() })));
+        setSortedMessages(normalMessages.map(message => ({ ...message, date: message.date.toString() })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+      } else {
+        setImportantMessages([]);
+        setSortedMessages(informations.map(info => ({ ...info, date: info.date.toString(), title: info.title || "" })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
       }
-    }, 1);
-  }, [informations]);
+    }
+  }, [informations, account.personalization?.magicEnabled]);
 
-  const renderItem = useCallback(({ item, index }) => (
+  const renderItem: ListRenderItem<NewsItem> = useCallback(({ item, index }) => (
     <NewsListItem
       key={index}
       index={index}
@@ -75,6 +68,20 @@ const NewsScreen: Screen<"News"> = ({ route, navigation }) => {
       parentMessages={sortedMessages}
     />
   ), [navigation, sortedMessages]);
+
+  const NoNewsMessage = () => (
+    <View
+      style={{
+        marginTop: 20,
+      }}
+    >
+      <MissingItem
+        emoji={"🥱"}
+        title={"Aucune actualité disponible"}
+        description={"Malheureusement, il n'y a aucune actualité à afficher pour le moment."}
+      />
+    </View>
+  );
 
   return (
     <Reanimated.ScrollView
@@ -111,14 +118,14 @@ const NewsScreen: Screen<"News"> = ({ route, navigation }) => {
               <FlatList
                 data={importantMessages}
                 renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(_, index) => `important-${index}`}
               />
             </LinearGradient>
           </NativeList>
         </Reanimated.View>
       )}
 
-      {sortedMessages.length > 0 && (
+      {sortedMessages.length > 0 ? (
         <Reanimated.View
           entering={animPapillon(FadeInUp)}
           exiting={animPapillon(FadeOut)}
@@ -128,10 +135,12 @@ const NewsScreen: Screen<"News"> = ({ route, navigation }) => {
             <FlatList
               data={sortedMessages}
               renderItem={renderItem}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(_, index) => `sorted-${index}`}
             />
           </NativeList>
         </Reanimated.View>
+      ) : (
+        !isLoading && <NoNewsMessage />
       )}
     </Reanimated.ScrollView>
   );
@@ -146,6 +155,11 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     marginRight: 4
+  },
+  noNewsText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
   },
 });
 
