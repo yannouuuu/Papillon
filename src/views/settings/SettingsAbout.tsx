@@ -1,42 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { Text, ScrollView, View, TouchableOpacity, StyleSheet, Image, Switch } from "react-native";
+import { ScrollView, Image, StyleSheet } from "react-native";
 import type { Screen } from "@/router/helpers/types";
 import { useTheme } from "@react-navigation/native";
-import { ChevronLeft, Euro, MegaphoneOff, MessageCircle } from "lucide-react-native";
+import { Euro, MessageCircle } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeList, NativeItem, NativeListHeader } from "@/components/Global/NativeComponents";
 import { NativeIcon } from "@/components/Global/NativeComponents";
 import { NativeText } from "@/components/Global/NativeComponents";
-import { LinearGradient } from "expo-linear-gradient";
 import AppJSON from "../../../app.json";
 import PackageJSON from "../../../package.json";
 import AboutContainerCard from "@/components/Settings/AboutContainerCard";
 import * as Linking from "expo-linking";
 import teams from "@/utils/data/teams.json";
 import Constants from "expo-constants";
-import { getContributors } from '@/utils/GetRessources/GetContribs';
+import { getContributors, Contributor } from "@/utils/GetRessources/GetContribs";
 
 const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
   const theme = useTheme();
-  const { colors } = theme;
   const insets = useSafeAreaInsets();
 
   const [clickedOnVersion, setClickedOnVersion] = React.useState<number>(0);
-  const [contributors, setContributors] = useState([]);
-
-  useEffect(() => {
-    if (clickedOnVersion == 7) {
-      navigation.navigate("SettingsFlags");
-      setClickedOnVersion(0);
-    }
-    fetchContributors();
-  }, []);
+  const [contributors, setContributors] = useState<Contributor[]>([]);
 
   const fetchContributors = async () => {
     const fetchedContributors = await getContributors();
     setContributors(fetchedContributors);
   };
 
+  useEffect(() => {
+    fetchContributors();
+  }, []);
+
+  useEffect(() => {
+    if (clickedOnVersion >= 7) {
+      navigation.navigate("SettingsFlags");
+      setClickedOnVersion(0);
+    }
+  }, [clickedOnVersion, navigation]);
   return (
     <ScrollView
       contentContainerStyle={{
