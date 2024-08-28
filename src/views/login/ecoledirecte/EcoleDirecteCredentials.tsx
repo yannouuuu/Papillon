@@ -23,6 +23,7 @@ import LoginView from "@/components/Templates/LoginView";
 
 const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation }) => {
   const [session, setSession] = useState<Session | null>(null);
+  const [cachedPassword, setCachedPassword] = useState<string>("");
   const [doubleAuthChallenge, setDoubleAuthChallenge] = useState<DoubleAuthChallenge | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,9 +46,10 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
       if (currentSession === null) {
         const accountID = uuid();
         currentSession = { username, device_uuid: accountID };
+        setCachedPassword(password);
       }
 
-      const accounts = await login(currentSession, password);
+      const accounts = await login(currentSession, password ? password : cachedPassword);
       const account = accounts[0]; // NOTE: We only support single accounts for now. //TODO: Support multiple accounts in ED
 
       const local_account: EcoleDirecteAccount = {
