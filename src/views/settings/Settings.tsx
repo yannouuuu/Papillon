@@ -37,6 +37,7 @@ import { useTheme } from "@react-navigation/native";
 import {get_settings_widgets} from "@/addons/addons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AddonPlacementManifest} from "@/addons/types";
+import { useFlagsStore } from "@/stores/flags";
 
 const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -45,6 +46,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
   const [ addons, setAddons ] = useState<Array<AddonPlacementManifest>>([]);
   const [devModeEnabled, setDevModeEnabled] = useState(false);
+  const defined = useFlagsStore(state => state.defined);
 
   const removeAccount = useAccounts((store) => store.remove);
 
@@ -87,14 +89,14 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           color: "#CF0029",
           label: "Notifications",
           onPress: () => navigation.navigate("SettingsNotifications"),
-          disabled: true,
+          disabled: !defined("enable_notifications"),
         },
         {
           icon: <Cable />,
           color: "#D79400",
           label: "Services externes",
           onPress: () => navigation.navigate("SettingsExternalServices"),
-          disabled: true,
+          disabled: !defined("enable_external_services"),
         },
       ],
     },
@@ -153,7 +155,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           label: "Extensions",
           description: "Disponible prochainement",
           onPress: () => navigation.navigate("SettingsAddons"),
-          disabled: true,
+          disabled: !defined("enable_addons"),
         },
         {
           icon: <WandSparkles />,
