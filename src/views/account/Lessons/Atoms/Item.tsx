@@ -18,36 +18,31 @@ import { animPapillon } from "@/utils/ui/animations";
 
 const lz = (num: number) => (num < 10 ? `0${num}` : num);
 
-const getDuration = (minutes) => {
+const getDuration = (minutes: number): string => {
   const durationHours = Math.floor(minutes / 60);
   const durationRemainingMinutes = minutes % 60;
   return `${durationHours} h ${lz(durationRemainingMinutes)} min`;
 };
 
-export const TimetableItem: React.FC<{ item: TimetableClass, index: number, small: boolean }> = ({ item, index, small }) => {
-  const start = useMemo(() => new Date(item.startTimestamp), [item.startTimestamp]);
-  const end = useMemo(() => new Date(item.endTimestamp), [item.endTimestamp]);
+export const TimetableItem: React.FC<{
+  item: TimetableClass
+  index: number
+  small?: boolean
+}> = ({ item, index, small }) => {
   const { colors } = useTheme();
 
-  const durationMinutes = useMemo(() => Math.round((item.endTimestamp - item.startTimestamp) / 60000), [item.startTimestamp, item.endTimestamp]);
-
-  const [subjectData, setSubjectData] = useState({ color: "#888888", pretty: "Matière inconnue" });
-
-  const fetchSubjectData = async () => {
-    const data = await getSubjectData(item.title);
-    setSubjectData(data);
-  };
-
-  fetchSubjectData();
-
-  const formattedStartTime = useMemo(() => start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }), [start]);
-  const formattedEndTime = useMemo(() => end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }), [end]);
+  const start = useMemo(() => new Date(item.startTimestamp), [item]);
+  const end = useMemo(() => new Date(item.endTimestamp), [item]);
+  const durationMinutes = useMemo(() => Math.round((item.endTimestamp - item.startTimestamp) / 60000), [item]);
+  const subjectData = useMemo(() => getSubjectData(item.title), [item]);
+  const formattedStartTime = useMemo(() => start.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }), [start]);
+  const formattedEndTime = useMemo(() => end.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }), [end]);
 
   return (
     <Reanimated.View
       style={styles.itemContainer}
-      entering={Platform.OS === "ios" && FadeInDown.delay((50 * index)).springify().mass(1).damping(20).stiffness(300)}
-      exiting={Platform.OS === "ios" && FadeOut.duration(300)}
+      entering={Platform.OS === "ios" ? FadeInDown.delay((50 * index)).springify().mass(1).damping(20).stiffness(300) : void 0}
+      exiting={Platform.OS === "ios" ? FadeOut.duration(300) : void 0}
       key={item.title + item.startTimestamp}
       layout={animPapillon(LinearTransition)}
     >
@@ -59,7 +54,6 @@ export const TimetableItem: React.FC<{ item: TimetableClass, index: number, smal
       <NativeTouchable
         style={[styles.detailsContainer, { backgroundColor: colors.card, borderColor: colors.text + "33" }]}
         underlayColor={colors.text + "11"}
-        onPress={() => { }}
       >
         <View style={[{ flex: 1, flexDirection: "column", overflow: "hidden", borderRadius: 10 }]}>
           {item.status && (

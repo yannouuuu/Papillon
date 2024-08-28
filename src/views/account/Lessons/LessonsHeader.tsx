@@ -6,9 +6,7 @@ import { Calendar, X } from "lucide-react-native";
 
 import Reanimated, {
   Easing,
-  FadeIn,
   FadeInDown,
-  FadeOut,
   FadeOutDown,
   LinearTransition,
   ZoomIn,
@@ -18,9 +16,19 @@ import Reanimated, {
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const HeaderCalendar: React.FC<{ index: Number, oldPageIndex: Number, showPicker: () => void, changeIndex: (index: number) => void, getDateFromIndex: (index: number) => Date }> = ({ index, oldPageIndex, showPicker, changeIndex, getDateFromIndex }) => {
-  const { colors } = useTheme();
+interface HeaderCalendarProps {
+  index: number,
+  changeIndex: (index: number) => unknown,
+  getDateFromIndex: (index: number) => Date
+  showPicker: () => void
+}
 
+const HeaderCalendar: React.FC<HeaderCalendarProps> = ({
+  index,
+  changeIndex,
+  getDateFromIndex,
+  showPicker
+}) => {
   const dims = Dimensions.get("window");
   const tablet = dims.width > 600;
 
@@ -41,55 +49,38 @@ const HeaderCalendar: React.FC<{ index: Number, oldPageIndex: Number, showPicker
           gap: 0,
         }}
       >
-        <HeaderDateComponent
-          date={getDateFromIndex(index - 2)}
-          active={false}
-          key={index - 2}
-          location="left"
-          onPress={() => changeIndex(index - 2)}
-        />
-        <HeaderDateComponent
-          date={getDateFromIndex(index - 1)}
-          active={false}
-          key={index - 1}
-          location="left"
-          onPress={() => changeIndex(index - 1)}
-        />
-        <HeaderDateComponent
-          date={getDateFromIndex(index)}
-          active={true}
-          key={index}
-          onPress={showPicker}
-        />
-        <HeaderDateComponent
-          date={getDateFromIndex(index + 1)}
-          active={false}
-          key={index + 1}
-          location="right"
-          onPress={() => changeIndex(index + 1)}
-        />
-        <HeaderDateComponent
-          date={getDateFromIndex(index + 2)}
-          active={false}
-          key={index + 2}
-          location="right"
-          onPress={() => changeIndex(index + 2)}
-        />
+        {[-2, -1, 0, 1, 2].map((offsetIndex) => (
+          <HeaderDateComponent
+            key={index + offsetIndex}
+            active={offsetIndex === 0}
+            date={getDateFromIndex(index + offsetIndex)}
+            onPress={() => offsetIndex === 0 ? showPicker() : changeIndex(index + offsetIndex)}
+          />
+        ))}
       </Reanimated.View>
     </Reanimated.View>
   );
 };
 
-const HeaderDateComponent: React.FC<{ date: Date, active: Boolean, location: String, onPress?: () => void }> = ({ date, active, location, onPress }) => {
+interface HeaderDateComponentProps {
+  date: Date,
+  active: boolean,
+  onPress?: () => unknown
+}
+
+const HeaderDateComponent: React.FC<HeaderDateComponentProps> = ({
+  date,
+  active,
+  onPress
+}) => {
   const { colors } = useTheme();
 
   return (
     <Reanimated.View
+      // @ts-expect-error : average reanimated issue.
       layout={LinearTransition.duration(300).easing(Easing.bezier(0.5, 0, 0, 1))}
     >
-      <TouchableOpacity
-        onPress={onPress}
-      >
+      <TouchableOpacity onPress={onPress}>
         <Reanimated.View
           style={[
             {
@@ -103,14 +94,10 @@ const HeaderDateComponent: React.FC<{ date: Date, active: Boolean, location: Str
               paddingHorizontal: 10,
               overflow: "hidden",
             },
-            active ? {
-            } : {
+            !active && {
               width: 120,
               opacity: 0.4,
-            },
-            location === "left" ? {
-            } : location === "right" ? {
-            } : {},
+            }
           ]}
         >
           {active &&
@@ -159,7 +146,24 @@ const HeaderDateComponent: React.FC<{ date: Date, active: Boolean, location: Str
   );
 };
 
-const LessonsDateModal = ({ showDatePicker, setShowDatePicker, currentPageIndex, defaultDate, PagerRef, getDateFromIndex }) => {
+interface LessonsDateModalProps {
+  showDatePicker: boolean,
+  setShowDatePicker: (show: boolean) => unknown,
+  currentPageIndex: number,
+  defaultDate: Date,
+  // NOTE: PagerRef is hard to type, may need help on this ?
+  PagerRef: React.RefObject<any>,
+  getDateFromIndex: (index: number) => Date
+}
+
+const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
+  showDatePicker,
+  setShowDatePicker,
+  currentPageIndex,
+  defaultDate,
+  PagerRef,
+  getDateFromIndex
+}) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -176,10 +180,10 @@ const LessonsDateModal = ({ showDatePicker, setShowDatePicker, currentPageIndex,
         mode="date"
         onChange={(event, selectedDate) => {
           if (selectedDate) {
-            const newDate = new Date(selectedDate);
-            const newPageIndex = Math.round((newDate - defaultDate) / 86400000);
+            const newPageIndex = Math.round((selectedDate.getTime() - defaultDate.getTime()) / 86400000);
             PagerRef.current?.setPage(newPageIndex);
           }
+
           setShowDatePicker(false);
         }}
         onError={() => {
@@ -285,8 +289,7 @@ const LessonsDateModal = ({ showDatePicker, setShowDatePicker, currentPageIndex,
               accentColor={colors.primary}
               onChange={(event, selectedDate) => {
                 if (selectedDate) {
-                  const newDate = new Date(selectedDate);
-                  const newPageIndex = Math.round((newDate - defaultDate) / 86400000);
+                  const newPageIndex = Math.round((selectedDate.getTime() - defaultDate.getTime()) / 86400000);
                   PagerRef.current?.setPage(newPageIndex);
                 }
               }}

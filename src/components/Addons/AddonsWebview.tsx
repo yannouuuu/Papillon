@@ -1,24 +1,53 @@
-import {ActivityIndicator, Dimensions, Image, View} from "react-native";
-import {WebView} from "react-native-webview";
-import {NativeText} from "@/components/Global/NativeComponents";
-import React from "react";
-import {Frown, MapPin} from "lucide-react-native";
+import { Dimensions, Image, View } from "react-native";
+import { WebView } from "react-native-webview";
+import { NativeText } from "@/components/Global/NativeComponents";
+import React, { useEffect } from "react";
+import { Frown, MapPin } from "lucide-react-native";
 import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
 import BottomSheet from "@/components/Modals/PapillonBottomSheet";
 import ButtonCta from "@/components/FirstInstallation/ButtonCta";
-import {useTheme} from "@react-navigation/native";
-import Reanimated, {Easing, useSharedValue, withTiming} from "react-native-reanimated";
+import { useTheme } from "@react-navigation/native";
+import Reanimated, { Easing, useSharedValue, withTiming } from "react-native-reanimated";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RouteParameters } from "@/router/helpers/types";
+import { get_iso_date, Log } from "@/utils/logger/logger";
 
-const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, scrollEnabled = false, inset = {top: 0, left: 0, right: 0, bottom: 0}, requestNavigate = (to: string, params: object) => {}, data}) => {
+export type AddonHomePageInfo = {
+  name: string,
+  icon?: string,
+  url: string
+};
+
+interface AddonsWebviewProps {
+  setTitle?: (message: string) => unknown,
+  addon: AddonHomePageInfo
+  url: string
+  navigation: NativeStackNavigationProp<RouteParameters, "HomeScreen">
+  scrollEnabled?: boolean
+  inset?: Record<"top" | "left"| "bottom" | "right", number>
+  requestNavigate?: (to: string, params: unknown) => unknown
+  data?: unknown
+}
+
+const AddonsWebview: React.FC<AddonsWebviewProps> = ({
+  setTitle,
+  addon,
+  url,
+  navigation,
+  scrollEnabled = false,
+  inset = { top: 0, left: 0, right: 0, bottom: 0 },
+  requestNavigate,
+  data
+}) => {
   const theme = useTheme();
   const { colors } = theme;
   let [ error, setError ] = React.useState(false);
   let [ content, setContent] = React.useState("");
   let [ injectedJS, setInjectedJS ] = React.useState("");
-  let [ logs, setLogs ] = React.useState([]);
+  let [ logs, setLogs ] = React.useState<Log[]>([]);
   let [ showAuthorizations, setShowAuthorizations ] = React.useState(false);
-  let webview = React.useRef(null);
+  let webview = React.useRef<WebView | null>(null);
   let title = "";
 
   //animation opacity
@@ -99,6 +128,7 @@ const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, 
     let css = load_css();
     let js = load_js();
     let content = load_content();
+
     Promise.all([fonts, css, js, content]).then((values) => {
       let css = inject_css(values[1], values[0]);
       let js = inject_js(values[2], css);
@@ -109,25 +139,7 @@ const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, 
     });
   }
 
-  function parse_all_urls (content: string): {base: string, url: string} {
-    var requested_files = [];
-    let regex = /<img[^>]+src="([^">]+)"/g;
-    var match = regex.exec(content);
-    while (match != null) {
-      var res = {base: match[1]};
-      if (res.base.startsWith("http") || res.base.startsWith("https") || res.base.startsWith("data:"))
-        continue;
-      if (res.base.startsWith("/"))
-      {
-        res.url = encodeURI(get_plugin_path() + res.base.slice(1, res.base.length));
-      }
-      requested_files.push(res);
-      match = regex.exec(content);
-    }
-    return requested_files;
-  }
-
-  React.useEffect(() => {
+  useEffect(() => {
     load_addon();
   }, [content, injectedJS, error, logs, showAuthorizations]);
 
@@ -204,13 +216,13 @@ const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, 
               onError={() => setError(true)}
               injectedJavaScript={injectedJS}
               originWhitelist={[get_plugin_path()]}
-              onMessage={(event) => {
+              onMessage={(event): void => {
                 let data = JSON.parse(event.nativeEvent.data);
                 // CHANGE TITLE
                 if (data.type == "title") {
                   if (data.title != "" && data.title != title)
                   {
-                    setTitle(data.title);
+                    setTitle?.(data.title);
                   }
                 }
 
@@ -220,8 +232,8 @@ const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, 
                   let log = {
                     message: data.message,
                     type: "log",
-                    date: new Date()
-                  };
+                    date: get_iso_date()
+                  } satisfies Log;
                   setLogs([...logs, log]);
                 }
                 if (data.type == "error") {
@@ -229,8 +241,8 @@ const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, 
                   let log = {
                     message: data.message,
                     type: "error",
-                    date: new Date()
-                  };
+                    date: get_iso_date()
+                  } satisfies Log;
                   setLogs([...logs, log]);
                 }
                 if (data.type == "warn") {
@@ -238,8 +250,8 @@ const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, 
                   let log = {
                     message: data.message,
                     type: "warn",
-                    date: new Date()
-                  };
+                    date: get_iso_date()
+                  } satisfies Log;
                   setLogs([...logs, log]);
                 }
                 if (data.type == "info") {
@@ -247,14 +259,15 @@ const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, 
                   let log = {
                     message: data.message,
                     type: "info",
-                    date: new Date()
-                  };
+                    date: get_iso_date()
+                  } satisfies Log;
                   setLogs([...logs, log]);
                 }
 
                 if (data.type == "open_logs") {
+
                   navigation.navigate("AddonLogs", {
-                    logs: logs,
+                    logs,
                     name: addon.name
                   });
                 }
@@ -264,11 +277,11 @@ const AddonsWebview = ({setTitle = (msg: string) => {}, addon, url, navigation, 
                 }
 
                 if (data.type == "navigation_navigate") {
-                  requestNavigate(data.to, {addon, data: data.params});
+                  requestNavigate?.(data.to, {addon, data: data.params});
                 }
 
                 if (data.type == "get_user_location") {
-                  webview.current.postMessage("Hello from React Native!");
+                  webview.current?.postMessage("Hello from React Native!");
                 }
               }}
             />

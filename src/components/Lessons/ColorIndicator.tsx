@@ -1,9 +1,14 @@
 import React from "react";
-import { View, Image } from "react-native";
+import { View, Image, type ViewStyle } from "react-native";
 
-const ColorIndicator = React.memo(({ color, style }) => {
+interface ColorIndicatorProps {
+  style?: ViewStyle
+  color: string
+}
+
+const ColorIndicator: React.FC<ColorIndicatorProps> = ({ color, style }) => {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", ...style }}>
+    <View style={{ flex: style?.flex || 1, justifyContent: "center", alignItems: "center", ...style }}>
       <View
         style={{
           backgroundColor: color + "88",
@@ -21,6 +26,6 @@ const ColorIndicator = React.memo(({ color, style }) => {
       </View>
     </View>
   );
-});
+};
 
-export default ColorIndicator;
+export default React.memo(ColorIndicator);

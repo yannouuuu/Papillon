@@ -1,29 +1,15 @@
 import { NativeItem, NativeList, NativeText } from "@/components/Global/NativeComponents";
-import { getAveragesHistory, getPronoteAverage } from "@/utils/grades/getAverages";
+import { getAveragesHistory, getPronoteAverage, GradeHistory } from "@/utils/grades/getAverages";
 import { useTheme } from "@react-navigation/native";
-import React, { useRef, useCallback, useEffect, useMemo, useState } from "react";
-import { Dimensions, View, StyleSheet, ActivityIndicator, Platform } from "react-native";
-
-import LineChart from "react-native-simple-line-chart";
+import React, { useRef, useCallback, useEffect, useState } from "react";
+import { View, StyleSheet, Platform } from "react-native";
 
 import Reanimated, {
   FadeIn,
   FadeInDown,
-  FadeInLeft,
-  FadeInRight,
-  FadeInUp,
   FadeOut,
-  FadeOutDown,
-  FadeOutLeft,
   FadeOutUp,
-  FlipInXDown,
   LinearTransition,
-  runOnJS,
-  StretchInY,
-  StretchOutY,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
 } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 
@@ -32,29 +18,33 @@ import { PressableScale } from "react-native-pressable-scale";
 
 import ReanimatedGraph, { ReanimatedGraphPublicMethods } from "@birdwingo/react-native-reanimated-graph";
 import { useCurrentAccount } from "@/stores/account";
-import AnimatedNbr from "@/components/Global/AnimatedNumber";
-import { G } from "react-native-svg";
+import AnimatedNumber from "@/components/Global/AnimatedNumber";
+import type { Grade } from "@/services/shared/Grade";
 
-const GradesAverageGraph = ({ grades, overall }) => {
+interface GradesAverageGraphProps {
+  grades: Grade[]
+  overall: number | null
+}
+
+const GradesAverageGraph: React.FC<GradesAverageGraphProps> = ({ grades, overall }) => {
   const theme = useTheme();
   const account = useCurrentAccount(store => store.account!);
 
-  const [GradesHistory, setGradesHistory] = useState([]);
-  const GradesHistoryRef = useRef(GradesHistory);
+  const [gradesHistory, setGradesHistory] = useState<GradeHistory[]>([]);
   const [hLength, setHLength] = useState(0);
 
   const [currentAvg, setCurrentAvg] = useState(0);
   const [originalCurrentAvg, setOriginalCurrentAvg] = useState(0);
-
-  const originalCurrentAvgRef = useRef(originalCurrentAvg);
-
   const [classAvg, setClassAvg] = useState(0);
-
   const [maxAvg, setMaxAvg] = useState(0);
   const [minAvg, setMinAvg] = useState(0);
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+
+  const originalCurrentAvgRef = useRef(originalCurrentAvg);
+  const graphRef = useRef<ReanimatedGraphPublicMethods>(null);
+  const gradesHistoryRef = useRef(gradesHistory);
 
   useEffect(() => {
     if (currentAvg !== originalCurrentAvg) {
@@ -72,12 +62,9 @@ const GradesAverageGraph = ({ grades, overall }) => {
     setSelectedDate(null);
   }, [grades]);
 
-  const [graphLoading, setGraphLoading] = useState(true);
-
-  const GraphRef = useRef<ReanimatedGraphPublicMethods>(null);
 
   useEffect(() => {
-    let hst = getAveragesHistory(grades, "student", overall);
+    let hst = getAveragesHistory(grades, "student", overall ?? void 0);
     if (hst.length === 0) return;
 
     let cla = getAveragesHistory(grades, "average");
@@ -88,7 +75,7 @@ const GradesAverageGraph = ({ grades, overall }) => {
     setGradesHistory(hst);
     setHLength(hst.length);
 
-    GradesHistoryRef.current = hst;
+    gradesHistoryRef.current = hst;
 
     setCurrentAvg(hst[hst.length - 1].value);
     setOriginalCurrentAvg(hst[hst.length - 1].value);
@@ -100,19 +87,19 @@ const GradesAverageGraph = ({ grades, overall }) => {
     setMaxAvg(maxAvg);
     setMinAvg(minAvg);
 
-    GraphRef.current?.updateData({
+    graphRef.current?.updateData({
       xAxis: hst.map((p, i) => (new Date(p.date).getTime())),
       yAxis: hst.map((p) => (p.value)),
     });
   }, [grades, account.instance]);
 
-  const updateTo = useCallback((index) => {
-    if (index < 0 || index > GradesHistoryRef.current.length - 1) return;
-    if (!GradesHistoryRef.current[index]?.value) return;
+  const updateTo = useCallback((index: number) => {
+    if (index < 0 || index > gradesHistoryRef.current.length - 1) return;
+    if (!gradesHistoryRef.current[index]?.value) return;
 
-    setSelectedDate(GradesHistoryRef.current[index].date);
-    setCurrentAvg(GradesHistoryRef.current[index].value);
-  }, [GradesHistoryRef]);
+    setSelectedDate(gradesHistoryRef.current[index].date);
+    setCurrentAvg(gradesHistoryRef.current[index].value);
+  }, [gradesHistoryRef]);
 
   const resetToOriginal = useCallback(() => {
     setSelectedDate(null);
@@ -146,8 +133,8 @@ const GradesAverageGraph = ({ grades, overall }) => {
                 }}
               >
                 <ReanimatedGraph
-                  xAxis={GradesHistory.map((p, i) => (new Date(p.date).getTime()))}
-                  yAxis={GradesHistory.map((p) => (p.value))}
+                  xAxis={gradesHistory.map((p, i) => (new Date(p.date).getTime()))}
+                  yAxis={gradesHistory.map((p) => (p.value))}
                   color={theme.colors.primary}
                   showXAxisLegend={false}
                   showYAxisLegend={false}
@@ -156,11 +143,11 @@ const GradesAverageGraph = ({ grades, overall }) => {
                   height={120}
                   showBlinkingDot={true}
                   selectionLines={"none"}
-                  ref={GraphRef}
+                  ref={graphRef}
                   animationDuration={400}
                   onGestureUpdate={(x, y, index) => {
-                    if (index < 0 || index > GradesHistory.length - 1) return;
-                    if (!GradesHistory[index]?.value) return;
+                    if (index < 0 || index > gradesHistory.length - 1) return;
+                    if (!gradesHistory[index]?.value) return;
 
                     updateTo(index);
                   }}
@@ -188,7 +175,7 @@ const GradesAverageGraph = ({ grades, overall }) => {
                     entering={animPapillon(FadeInDown)}
                     exiting={animPapillon(FadeOutUp)}
                   >
-                    <NativeText style={[styles.gradeTitle, { color: theme.colors.primary }]} numberOfLines={1}>
+                    <NativeText style={{ color: theme.colors.primary }} numberOfLines={1}>
                       au {new Date(selectedDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
                     </NativeText>
                   </Reanimated.View>
@@ -198,7 +185,7 @@ const GradesAverageGraph = ({ grades, overall }) => {
                     entering={animPapillon(FadeInDown)}
                     exiting={animPapillon(FadeOutUp)}
                   >
-                    <NativeText style={[styles.gradeTitle]} numberOfLines={1}>
+                    <NativeText numberOfLines={1}>
                       Moyenne gén.
                     </NativeText>
                   </Reanimated.View>
@@ -208,7 +195,7 @@ const GradesAverageGraph = ({ grades, overall }) => {
                   style={[styles.gradeValue]}
                   layout={animPapillon(LinearTransition)}
                 >
-                  <AnimatedNbr value={currentAvg.toFixed(2)} style={styles.gradeNumber} contentContainerStyle={{ marginLeft: -2 }} />
+                  <AnimatedNumber value={currentAvg.toFixed(2)} style={styles.gradeNumber} contentContainerStyle={{ marginLeft: -2 }} />
 
                   <Reanimated.View
                     layout={animPapillon(LinearTransition)}
@@ -220,17 +207,18 @@ const GradesAverageGraph = ({ grades, overall }) => {
                 </Reanimated.View>
               </View>
               <View style={[styles.gradeInfo, styles.gradeRight]}>
-                <NativeText style={[styles.gradeTitle]} numberOfLines={1}>
+                <NativeText numberOfLines={1}>
                   Moyenne classe
                 </NativeText>
                 <Reanimated.View
                   style={[styles.gradeValue]}
                   layout={animPapillon(LinearTransition)}
                 >
-                  <AnimatedNbr value={classAvg.toFixed(2)} style={styles.gradeNumberClass} />
-                  <Reanimated.View
-                    layout={animPapillon(LinearTransition)}
-                  >
+                  <AnimatedNumber
+                    value={classAvg.toFixed(2)}
+                    style={styles.gradeNumberClass}
+                  />
+                  <Reanimated.View layout={animPapillon(LinearTransition)}>
                     <NativeText style={[styles.gradeOutOf]}>
                       /20
                     </NativeText>

@@ -1,19 +1,14 @@
 import type { Grade } from "@/services/shared/Grade";
 
-type TargetGrade = {
+export interface GradeHistory {
   value: number;
-  disabled: boolean;
-};
-
-type GradeHistory = {
-  value: number;
-  date: number;
+  date: string;
 };
 
 type Target = "student" | "average" | "min" | "max";
 
-export type getAverageDiffGradeReturn = {
-  difference: number;
+export type AverageDiffGrade = {
+  difference?: number;
   with: number;
   without: number;
 };
@@ -59,7 +54,7 @@ const getSubjectAverage = (subject: Grade[], target: Target = "student"): number
     const targetGrade = grade[target];
 
     // If targetGrade is undefined or disabled, skip
-    if (!targetGrade || targetGrade.disabled) return;
+    if (!targetGrade || targetGrade.disabled || targetGrade.value === null) return;
 
     // If coefficient is 0, skip
     if (grade.coefficient === 0) return;
@@ -69,7 +64,7 @@ const getSubjectAverage = (subject: Grade[], target: Target = "student"): number
       // (grade [/20] / outOf) / (20 * coefficient)
 
       // Calculate the grade on 20 (grade / outOf * 20)
-      let gradeOn20 = (targetGrade.value / grade.outOf.value) * 20;
+      let gradeOn20 = (targetGrade.value / grade.outOf.value!) * 20;
 
       // Push the grade and outOf
       calcGradesList.push(gradeOn20 * grade.coefficient);
@@ -78,7 +73,7 @@ const getSubjectAverage = (subject: Grade[], target: Target = "student"): number
       // Else, push the grade and outOf
       // (grade / outOf) * (outOf * coefficient)
       calcGradesList.push(targetGrade.value * grade.coefficient);
-      calcOutOfList.push(grade.outOf.value * grade.coefficient);
+      calcOutOfList.push(grade.outOf.value! * grade.coefficient);
     }
   });
 
@@ -96,7 +91,7 @@ const getSubjectAverage = (subject: Grade[], target: Target = "student"): number
 };
 
 // Get the average difference of a grade in a list
-const getAverageDiffGrade = (grades: Grade[], list: Grade[], target: Target = "student"): getAverageDiffGradeReturn => {
+const getAverageDiffGrade = (grades: Grade[], list: Grade[], target: Target = "student"): AverageDiffGrade => {
   // Get grades list
   const baseList = list;
   // remove each grade from the list

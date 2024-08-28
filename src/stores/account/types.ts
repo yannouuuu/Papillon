@@ -3,7 +3,7 @@ import type { Account as PawdirecteAccount, Session as PawdirecteSession } from 
 import type { Session as TSSession, Authentication as TSAuthentication } from "turbawself";
 import type { Client as ARDClient } from "pawrd";
 import type ScolengoAPI from "scolengo-api";
-import { SkolengoAuthConfig } from "scolengo-api/types/models/Common/Auth";
+import { SkolengoAuthConfig } from "@/services/skolengo/skolengo-types";
 
 export interface Tab {
   name: string
@@ -31,6 +31,7 @@ export interface Personalization {
   showTabBackground: boolean,
   transparentTabBar: boolean,
   hideTabBar: boolean,
+  magicEnabled?: boolean
   tabs: Tab[],
   subjects: {
     [subject: string]: {
@@ -110,7 +111,7 @@ export interface EcoleDirecteAccount extends BaseAccount {
 
 export interface SkolengoAccount extends BaseAccount {
   service: AccountService.Skolengo
-  instance: ScolengoAPI.Skolengo
+  instance?: ScolengoAPI.Skolengo
   authentication: SkolengoAuthConfig
 }
 

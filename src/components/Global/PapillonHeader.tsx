@@ -1,15 +1,28 @@
 import React from "react";
-import { Platform, Touchable, View } from "react-native";
-import { NativeText } from "./NativeComponents";
-import TabAnimatedTitle, { TabAnimatedTitleLeft, TabAnimatedTitleRight } from "./TabAnimatedTitle";
+import { Platform, View } from "react-native";
+import { TabAnimatedTitleLeft, TabAnimatedTitleRight } from "./TabAnimatedTitle";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ArrowLeft } from "lucide-react-native";
+import { type RouteProp, useTheme } from "@react-navigation/native";
+import type { RouteParameters } from "@/router/helpers/types";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const PapillonHeader = ({ children, theme, route, navigation }) => {
+interface PapillonHeaderProps {
+  children: React.ReactNode
+  route: RouteProp<RouteParameters, keyof RouteParameters>
+  navigation: NativeStackNavigationProp<RouteParameters, keyof RouteParameters>
+}
+
+const PapillonHeader: React.FC<PapillonHeaderProps> = ({
+  children,
+  route,
+  navigation
+}) => {
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const topPadding = (Platform.OS === "ios" && route.params?.outsideNav) ? 0 : insets.top;
 
+  const topPadding = (Platform.OS === "ios" && route.params?.outsideNav) ? 0 : insets.top;
   const largeHeader = route.params?.outsideNav || Platform.OS !== "ios";
 
   return (
@@ -40,7 +53,6 @@ const PapillonHeader = ({ children, theme, route, navigation }) => {
       )}
 
       <TabAnimatedTitleLeft
-        theme={theme}
         route={route}
         navigation={navigation}
         style={{ paddingHorizontal: 0 }}
@@ -56,10 +68,13 @@ const PapillonHeader = ({ children, theme, route, navigation }) => {
           marginRight: Platform.OS !== "ios" ? -16 : 0,
         }}
       >
-        {children && children}
+        {children}
 
         {Platform.OS === "ios" && (
-          <TabAnimatedTitleRight theme={theme} route={route} navigation={navigation} />
+          <TabAnimatedTitleRight
+            route={route}
+            navigation={navigation}
+          />
         )}
       </View>
     </View>

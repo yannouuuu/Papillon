@@ -72,12 +72,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
               }
             ]
           });
-        } else {
-          showAlert({
-            title: "Service non supporté",
-            message: "Désolé, ce service n'est pas encore supporté. Veuillez réessayer dans une prochaine version."
-          });
-        }
+        } else UnsupportedAlert();
         break;
       default:
         UnsupportedAlert();
@@ -179,7 +174,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
             }
             text="Skolengo"
             enabled={service === "skolengo"}
-            onPress={() => UnsupportedAlert()}
+            onPress={() => setService("skolengo")}
           />
         </Reanimated.View>
       </Reanimated.View>

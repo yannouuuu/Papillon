@@ -215,20 +215,31 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                   },
                   discovery!
                 ).then(async (token) => {
-                  setShowWebView(false);
                   setLoginStep("Initialisation du compte...");
-                  console.log(token);
+                  setShowWebView(false);
                   const newTok = authTokenToSkolengoTokenSet(token);
-                  console.log(newTok);
-                  setLoginStep("Connexion en cours...");
-                  const skolengoAccount = await getSkolengoAccount(route.params.school, newTok, discovery!);
-                  console.log("skoaccount");
-                  setLoginStep("Obtension du compte...");
-                  await skolengoAccount.instance.getUserInfo().then((info) => {
+                  setLoginStep("Obtention du compte...");
+                  const skolengoAccount = await getSkolengoAccount({
+                    school: route.params.school,
+                    tokenSet: newTok,
+                    discovery: discovery!
+                  });
+                  setLoginStep("Finalisation du compte...");
+                  /* await skolengoAccount.instance!.getUserInfo().then((info) => {
                     console.log("info", info);
-                  }).catch(console.log);
-                  // TODO : save the account and switch to it
-                  return;
+                  }).catch(console.log); */
+                  createStoredAccount(skolengoAccount);
+                  switchTo(skolengoAccount);
+
+                  // We need to wait a tick to make sure the account is set before navigating.
+                  queueMicrotask(() => {
+                    // Reset the navigation stack to the "Home" screen.
+                    // Prevents the user from going back to the login screen.
+                    navigation.reset({
+                      index: 0,
+                      routes: [{ name: "AccountCreated" }],
+                    });
+                  });
                 });
               } else {
                 setShowWebView(true);

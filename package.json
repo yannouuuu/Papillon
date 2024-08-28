@@ -53,10 +53,11 @@
     "expo-web-browser": "~13.0.3",
     "html-react-parser": "^5.1.12",
     "html-to-text": "^9.0.5",
+    "js-base64": "^3.7.7",
     "lottie-react-native": "^6.7.0",
     "lucide-react-native": "^0.378.0",
     "pawdirecte": "^1.0.6",
-    "pawnote": "^1.0.2",
+    "pawnote": "^1.0.3",
     "pawrd": "^0.4.0",
     "react": "18.2.0",
     "react-native": "^0.74.3",
@@ -96,8 +97,7 @@
     "eslint-plugin-react-native": "^4.1.0",
     "expo": "~51.0.17",
     "react-native-svg-transformer": "^1.5.0",
-    "typescript": "~5.3.3"
+    "typescript": "^5.5.4"
   },
-  "private": true,
-  "packageManager": "yarn@3.5.0+sha512.2dc70be5fce9f66756d25b00a888f3ca66f86b502b76750e72ba54cec89da767b938c54124595e26f868825688e0fe3552c26c76a330673343057acadd5cfcf2"
+  "private": true
 }

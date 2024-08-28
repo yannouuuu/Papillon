@@ -1,29 +1,23 @@
-import { ChevronDown } from "lucide-react-native";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
+import { useTheme } from "@react-navigation/native";
+import { ChevronDown } from "lucide-react-native";
 
 import Reanimated, {
   FadeIn,
   FadeOut,
-  type SharedValue
 } from "react-native-reanimated";
 
 import { useCurrentAccount } from "@/stores/account";
-
 import { defaultProfilePicture } from "@/utils/ui/default-profile-picture";
-import { useTheme } from "@react-navigation/native";
 
 const AccountSwitcher: React.FC<{
-  translationY: SharedValue<number>
-  scrolled: boolean
-  onPress?: () => void
   small?: boolean
-}> = ({ translationY, scrolled, onPress = () => void 0, small }) => {
+}> = ({ small }) => {
   const theme = useTheme();
   const { colors } = theme;
 
   const account = useCurrentAccount(store => store.account!);
-  const switchTo = useCurrentAccount(store => store.switchTo);
 
   const shouldHideName = account.personalization.hideNameOnHomeScreen || false;
   const shouldHidePicture = account.personalization.hideProfilePicOnHomeScreen || false;

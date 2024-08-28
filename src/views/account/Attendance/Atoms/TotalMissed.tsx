@@ -6,6 +6,19 @@ import { animPapillon } from "@/utils/ui/animations";
 import { FadeIn, FadeOut } from "react-native-reanimated";
 import { useTheme } from "@react-navigation/native";
 
+interface TotalMissedProps {
+  totalMissed: {
+    total: {
+      hours: number;
+      minutes: number;
+    };
+    unJustified: {
+      hours: number;
+      minutes: number;
+    };
+  };
+}
+
 const TotalMissed = ({ totalMissed }: TotalMissedProps) => {
   const theme = useTheme();
 

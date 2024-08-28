@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
-import type { Screen } from "@/router/helpers/types";
+import type React from "react";
+import { Text, View } from "react-native";
+import { NativeText } from "../Global/NativeComponents";
+import { useTheme } from "@react-navigation/native";
 
-import { ScrollView, Image, Text, View } from "react-native";
-import LottieView from "lottie-react-native";
-import { NativeItem, NativeList, NativeText } from "../Global/NativeComponents";
-import { PressableScale } from "react-native-pressable-scale";
+interface RestaurantCardProps {
+  solde: number
+  repas: number
+}
 
-const RestaurantCard = ({ theme, solde, repas }: { theme: any, solde: number, repas: number }) => {
+const RestaurantCard: React.FC<RestaurantCardProps> = ({ solde, repas }) => {
+  const theme = useTheme();
   const { colors } = theme;
 
   return (
@@ -31,7 +34,9 @@ const RestaurantCard = ({ theme, solde, repas }: { theme: any, solde: number, re
           style={{
             textAlign: "left",
           }}
-        >Solde actuel</NativeText>
+        >
+          Solde actuel
+        </NativeText>
         <Text
           style={{
             textAlign: "left",
@@ -39,8 +44,11 @@ const RestaurantCard = ({ theme, solde, repas }: { theme: any, solde: number, re
             color: solde < 0 ? "D10000" : "#5CB21F",
             fontSize: 30,
           }}
-        >{solde} €</Text>
+        >
+          {solde} €
+        </Text>
       </View>
+
       <View
         style={{
           flex: 1,
@@ -52,7 +60,9 @@ const RestaurantCard = ({ theme, solde, repas }: { theme: any, solde: number, re
             textAlign: "right",
             color: colors.text + "50",
           }}
-        >Repas restants</NativeText>
+        >
+          Repas restants
+        </NativeText>
         <Text
           style={{
             textAlign: "right",
@@ -60,10 +70,10 @@ const RestaurantCard = ({ theme, solde, repas }: { theme: any, solde: number, re
             color: colors.text + "50",
             fontSize: 30,
           }}
-        >{repas} €</Text>
-
+        >
+          {repas} €
+        </Text>
       </View>
-
     </View>
   );
 };

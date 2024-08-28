@@ -2,22 +2,22 @@ import MissingItem from "@/components/Global/MissingItem";
 import { NativeText } from "@/components/Global/NativeComponents";
 import PapillonHeader from "@/components/Global/PapillonHeader";
 import PapillonPicker from "@/components/Global/PapillonPicker";
-import TabAnimatedTitle from "@/components/Global/TabAnimatedTitle";
 import { Screen } from "@/router/helpers/types";
 import { updateGradesAndAveragesInCache, updateGradesPeriodsInCache } from "@/services/grades";
+import type { GradesPerSubject } from "@/services/shared/Grade";
 import { useCurrentAccount } from "@/stores/account";
 import { useGradesStore } from "@/stores/grades";
 import { animPapillon } from "@/utils/ui/animations";
 import { useTheme } from "@react-navigation/native";
 import { ChevronDown } from "lucide-react-native";
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Platform, RefreshControl, ScrollView, View } from "react-native";
 import Reanimated, { FadeIn, FadeInUp, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const GradesAverageGraph = React.lazy(() => import("./Graph/GradesAverage"));
-const GradesLatestList = React.lazy(() => import("./Latest/LatestGrades"));
-const GradesSubjectsList = React.lazy(() => import("./Subject/Subject"));
+const GradesAverageGraph = lazy(() => import("./Graph/GradesAverage"));
+const GradesLatestList = lazy(() => import("./Latest/LatestGrades"));
+const Subject = lazy(() => import("./Subject/Subject"));
 
 const Grades: Screen<"Grades"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -32,7 +32,7 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
   const [userSelectedPeriod, setUserSelectedPeriod] = useState<string | null>(null);
   const selectedPeriod = useMemo(() => userSelectedPeriod ?? defaultPeriod, [userSelectedPeriod, defaultPeriod]);
 
-  const [gradesPerSubject, setGradesPerSubject] = useState<any[]>([]);
+  const [gradesPerSubject, setGradesPerSubject] = useState<GradesPerSubject[]>([]);
   const latestGradesRef = useRef<any[]>([]);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -72,7 +72,7 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
     setTimeout(() => {
       if (selectedPeriod === "") return;
 
-      const gradesPerSubject: any[] = [];
+      const gradesPerSubject: GradesPerSubject[] = [];
 
       for (const average of (averages[selectedPeriod] || { subjects: [] }).subjects) {
         const newGrades = (grades[selectedPeriod] || []).filter(grade => grade.subjectName === average.subjectName).sort((a, b) => b.timestamp - a.timestamp);
@@ -84,7 +84,6 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
       }
 
       gradesPerSubject.sort((a, b) => a.average.subjectName.localeCompare(b.average.subjectName));
-
       setGradesPerSubject(gradesPerSubject);
     }, 1);
   }, [selectedPeriod, averages, grades]);
@@ -101,7 +100,7 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
 
   return (
     <>
-      <PapillonHeader theme={theme} route={route} navigation={navigation}>
+      <PapillonHeader route={route} navigation={navigation}>
         <Reanimated.View
           style={{
             flexDirection: "row",
@@ -136,7 +135,7 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
               layout={LinearTransition}
               style={{ marginRight: 6 }}
             >
-              <ActivityIndicator color={Platform.OS === "android" && theme.colors.primary} />
+              <ActivityIndicator color={Platform.OS === "android" ? theme.colors.primary : void 0} />
             </Reanimated.View>
           }
         </Reanimated.View>
@@ -147,11 +146,11 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
           <RefreshControl
             refreshing={isRefreshing}
             onRefresh={() => setIsRefreshing(true)}
-            colors={[Platform.OS === "android" && theme.colors.primary]}
+            colors={Platform.OS === "android" ? [theme.colors.primary] : void 0}
           />
         }
       >
-        <React.Suspense fallback={<ActivityIndicator />}>
+        <Suspense fallback={<ActivityIndicator />}>
           <View style={{ padding: 16, overflow: "visible", paddingTop: 0, paddingBottom: 16 + insets.bottom }}>
             {(!grades[selectedPeriod] || grades[selectedPeriod].length === 0) && !isLoading && !isRefreshing && (
               <MissingItem
@@ -164,7 +163,10 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
 
             {grades[selectedPeriod] && grades[selectedPeriod].length > 2 && (
               <Reanimated.View layout={animPapillon(LinearTransition)} entering={FadeInUp.duration(200)} exiting={FadeOut.duration(100)} key={account.instance + "graph"}>
-                <GradesAverageGraph grades={grades[selectedPeriod] ?? []} overall={!averages[selectedPeriod]?.overall.disabled && averages[selectedPeriod]?.overall.value} />
+                <GradesAverageGraph
+                  grades={grades[selectedPeriod] ?? []}
+                  overall={averages[selectedPeriod]?.overall.value}
+                />
               </Reanimated.View>
             )}
 
@@ -173,10 +175,14 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
             )}
 
             {gradesPerSubject.length > 0 && (
-              <GradesSubjectsList gradesPerSubject={gradesPerSubject} navigation={navigation} allGrades={grades[selectedPeriod] || []} />
+              <Subject
+                navigation={navigation}
+                gradesPerSubject={gradesPerSubject}
+                allGrades={grades[selectedPeriod] || []}
+              />
             )}
           </View>
-        </React.Suspense>
+        </Suspense>
       </ScrollView>
     </>
   );

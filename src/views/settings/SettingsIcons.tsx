@@ -15,6 +15,18 @@ import { getIconName, setIconName } from "@candlefinance/app-icon";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
 import { alertExpoGo, expoGoWrapper, isExpoGo } from "@/utils/native/expoGoAlert";
 
+type Icon = {
+  id: string;
+  name: string;
+  icon: number; // require ".png" files returns `number`
+  author: string;
+  isSpecial: boolean;
+  isPremium: boolean;
+} & (
+  | { isVariable: false }
+  | { isVariable: true, dynamic: Record<string, number> }
+);
+
 export const removeColor = (icon: string) => {
   let newName = icon;
 
@@ -29,7 +41,7 @@ const SettingsIcons: Screen<"SettingsIcons"> = ({ navigation }) => {
   const theme = useTheme();
   const { colors } = theme;
   const insets = useSafeAreaInsets();
-  const data: { [key: string]: { id: string; name: string; icon: any; author: string; isVariable: boolean; isSpecial: boolean; isPremium: boolean; }[] } = icones;
+  const data = icones as { [key: string]: Icon[] };
 
   const [currentIcon, setIcon] = React.useState("default");
 
@@ -41,8 +53,8 @@ const SettingsIcons: Screen<"SettingsIcons"> = ({ navigation }) => {
     });
   }, []);
 
-  const setNewIcon = (icon: string) => {
-    if(icon.isVariable) {
+  const setNewIcon = (icon: Icon) => {
+    if (icon.isVariable) {
       const mainColor = theme.colors.primary;
       const colorItem = colorsList.find((color) => color.hex.primary === mainColor);
 
@@ -114,7 +126,7 @@ const SettingsIcons: Screen<"SettingsIcons"> = ({ navigation }) => {
             )}
           />
           <NativeList>
-            {data[key].map((icon, index) => (
+            {data[key as keyof typeof data].map((icon, index) => (
               <NativeItem
                 key={index}
                 chevron={false}
@@ -125,8 +137,7 @@ const SettingsIcons: Screen<"SettingsIcons"> = ({ navigation }) => {
                   source={
                     icon.isVariable
                       ? icon.dynamic[colorsList.find((color) => color.hex.primary === colors.primary)?.id || "green"]
-                      :
-                      icon.icon
+                      : icon.icon
                   }
                   style={{
                     width: 50,

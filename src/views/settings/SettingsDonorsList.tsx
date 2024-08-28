@@ -9,7 +9,11 @@ import InsetsBottomView from "@/components/Global/InsetsBottomView";
 
 const SettingsDonorsList = () => {
   const [loading, setLoading] = React.useState(true);
-  const [donors, setDonors] = React.useState<string[]>([]);
+  const [donors, setDonors] = React.useState<Array<{
+    Total: string
+    Name: string
+    DiscordUsername: string
+  }>>([]);
 
   useEffect(() => {
     fetch(datasets["kofi-supporters"])
@@ -17,7 +21,6 @@ const SettingsDonorsList = () => {
       .then((data) => {
         setDonors(data.sort((a: any, b: any) => parseInt(b.Total) - parseInt(a.Total)));
         setLoading(false);
-        console.log(data[0]);
       });
   }, []);
 
@@ -28,7 +31,6 @@ const SettingsDonorsList = () => {
         paddingTop: 0,
       }}
     >
-
       <NativeList inline animated>
         <View
           style={{

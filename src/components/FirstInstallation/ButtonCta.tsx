@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
-import Reanimated, { Easing, useSharedValue, withTiming, withSpring } from "react-native-reanimated";
-
+import { Text, Pressable, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
+import Reanimated, { Easing, useSharedValue, withTiming } from "react-native-reanimated";
 import { useTheme } from "@react-navigation/native";
-
 import * as Haptics from "expo-haptics";
 
 const ButtonCta: React.FC<{
@@ -13,7 +11,7 @@ const ButtonCta: React.FC<{
   onPress?: () => void,
   style?: StyleProp<ViewStyle>,
   backgroundColor?: string,
-  icon?: any
+  icon?: React.ReactElement
 }> = ({
   value,
   primary,

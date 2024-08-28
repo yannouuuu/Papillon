@@ -9,7 +9,7 @@ const type_list = [
   "NAV"
 ];
 
-function get_iso_date () {
+export function get_iso_date () {
   let now = new Date();
   return now.toISOString();
 }
@@ -91,12 +91,20 @@ async function get_brute_logs (): Promise<string> {
   return value.join("\n");
 }
 
-async function get_logs () {
-  let returned = [];
+export interface Log {
+  type: string;
+  date: string;
+  from?: string;
+  message: string;
+}
+
+async function get_logs (): Promise<Log[]> {
+  let returned: Log[] = [];
+  let value: string[] = [];
+
   let res = await AsyncStorage.getItem("logs");
-  let value = [];
-  if (res)
-    value = JSON.parse(res);
+  if (res) value = JSON.parse(res);
+
   value.forEach((item) => {
     let arr = item.split("]");
     returned.push({
@@ -106,6 +114,7 @@ async function get_logs () {
       message: arr[3].trim()
     });
   });
+
   return returned;
 }
 
