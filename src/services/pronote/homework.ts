@@ -3,7 +3,7 @@ import { type Homework, HomeworkReturnType } from "@/services/shared/Homework";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import { decodeAttachment } from "./attachment";
 import pronote from "pawnote";
-import {log} from "@/utils/logger/logger";
+import {info, log} from "@/utils/logger/logger";
 
 const decodeHomework = (h: pronote.Assignment): Homework => {
   return {
@@ -25,12 +25,12 @@ export const getHomeworkForWeek = async (account: PronoteAccount, weekNumber: nu
     throw new ErrorServiceUnauthenticated("pronote");
 
   if (weekNumber < 1 || weekNumber > 62) {
-    console.info("PRONOTE->getHomeworkForWeek(): Le numéro de semaine est en dehors des bornes (1<>62), une liste vide est retournée.");
+    info("PRONOTE->getHomeworkForWeek(): Le numéro de semaine est en dehors des bornes (1<>62), une liste vide est retournée.", "pronote");
     return [];
   }
 
   const homeworks = await pronote.assignmentsFromWeek(account.instance, weekNumber);
-  console.info(`PRONOTE->getHomeworkForWeek(): OK pour la semaine ${weekNumber}.`);
+  info(`PRONOTE->getHomeworkForWeek(): OK pour la semaine ${weekNumber}.`, "pronote");
 
   return homeworks.map(decodeHomework);
 };

@@ -4,13 +4,14 @@ import pronote from "pawnote";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import { decodeAttachment } from "./attachment";
 import { Recipient } from "../shared/Recipient";
+import { info } from "@/utils/logger/logger";
 
 export const getChats = async (account: PronoteAccount): Promise<Array<Chat>> => {
   if (!account.instance)
     throw new ErrorServiceUnauthenticated("pronote");
 
   const chats = await pronote.discussions(account.instance);
-  console.info("PRONOTE->getChats(): OK");
+  info("PRONOTE->getChats(): OK", "pronote");
 
   const studentName = account.instance.user.resources[0].name;
 
@@ -30,7 +31,7 @@ export const getChatMessages = async (account: PronoteAccount, chat: Chat): Prom
     throw new ErrorServiceUnauthenticated("pronote");
 
   const messages = await pronote.discussionMessages(account.instance, <pronote.Discussion>chat._handle);
-  console.info("PRONOTE->getChatMessages(): OK");
+  info("PRONOTE->getChatMessages(): OK", "pronote");
 
   const studentName = account.instance.user.resources[0].name;
 
@@ -56,7 +57,7 @@ export const createDiscussionRecipients = async (account: PronoteAccount): Promi
   ].map(kind => pronote.newDiscussionRecipients(account.instance!, user, kind)));
 
   const recipients = recipientsALL.flat();
-  console.info("PRONOTE->createDiscussionRecipients(): OK");
+  info("PRONOTE->createDiscussionRecipients(): OK", "pronote");
 
   return recipients.map((recipient) => ({
     name: recipient.name,
@@ -69,5 +70,5 @@ export const createDiscussion = async (account: PronoteAccount, subject: string,
     throw new ErrorServiceUnauthenticated("pronote");
 
   await pronote.newDiscussion(account.instance, subject, content, recipients.map(r => r._handle));
-  console.info("PRONOTE->createDiscussion(): OK");
+  info("PRONOTE->createDiscussion(): OK", "pronote");
 };

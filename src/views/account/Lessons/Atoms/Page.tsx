@@ -57,6 +57,7 @@ export const Page: React.FC<Props> = ({
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await loadTimetableWeek(weekNumber);
+    console.log("Refreshed");
     setIsRefreshing(false);
   };
 

@@ -118,4 +118,8 @@ async function get_logs (): Promise<Log[]> {
   return returned;
 }
 
-export { log, error, warn, info, navigate, get_logs, get_brute_logs };
+const delete_logs = async () => {
+  await AsyncStorage.removeItem("logs");
+};
+
+export { log, error, warn, info, navigate, get_logs, get_brute_logs, delete_logs };
