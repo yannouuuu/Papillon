@@ -45,15 +45,25 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
         playSound();
         break;
       case "ed":
-        navigation.navigate("EcoleDirecteCredentials");
-        playSound();
+        showAlert({
+          title: "Service en développement",
+          message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
+          actions: [
+            {
+              title: "Retour",
+              onPress: () => {},
+              icon: <Undo2 />,
+              primary: false,
+            },
+          ]
+        });
         break;
       case "skolengo":
         // TODO : Remove this alert when Skolengo is fully supported
         if(__DEV__) {
           showAlert({
             title: "[DEBUG] Service en développement",
-            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponible.",
+            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
             actions: [
               {
                 title: "Annuler",
