@@ -13,7 +13,7 @@ import { HeaderCalendar, LessonsDateModal } from "./LessonsHeader";
 import { AccountService } from "@/stores/account/types";
 import type { Timetable as TTimetable } from "@/services/shared/Timetable";
 
-const RenderPage = React.memo(({ index, timetables, getWeekFromIndex, loadTimetableWeek, currentPageIndex } : {
+const RenderPage = ({ index, timetables, getWeekFromIndex, loadTimetableWeek, currentPageIndex } : {
   index: number
   timetables: Record<number, TTimetable>
   getWeekFromIndex: (index: number) => {
@@ -32,17 +32,17 @@ const RenderPage = React.memo(({ index, timetables, getWeekFromIndex, loadTimeta
       current={Platform.OS === "ios" ? currentPageIndex === index : true}
     />
   </View>
-));
+);
 
 const Timetable: Screen<"Lessons"> = ({ navigation }) => {
   const { colors } = useTheme();
   const account = useCurrentAccount(store => store.account!);
   const timetables = useTimetableStore(store => store.timetables);
 
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [currentPageIndex, setCurrentPageIndex] = useState(1);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [loadedWeeks, setLoadedWeeks] = useState<Set<number>>(new Set());
-  const [currentlyLoadingWeeks, setCurrentlyLoadingWeeks] = useState<Set<number>>(new Set());
+  let loadedWeeks = useRef<Set<number>>(new Set());
+  let currentlyLoadingWeeks = useRef<Set<number>>(new Set());
 
   // Too hard to type, please send help :D
   const PagerRef = useRef<any>(null);
@@ -75,44 +75,31 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
     return { weekNumber, dayNumber };
   };
 
-  const getWeekLoadStatus = useCallback((weekNumber: number) => ({
-    loaded: loadedWeeks.has(weekNumber),
-    loading: currentlyLoadingWeeks.has(weekNumber),
-  }), [loadedWeeks, currentlyLoadingWeeks]);
+  const loadTimetableWeek = async (weekNumber: number, force = false) => {
+    if (currentlyLoadingWeeks.current.has(weekNumber)) return;
+    if (loadedWeeks.current.has(weekNumber) && !force) return;
+    currentlyLoadingWeeks.current.add(weekNumber);
 
-  const loadTimetableWeek = useCallback(async (weekNumber: number) => {
-    const { loaded, loading } = getWeekLoadStatus(weekNumber);
-    if (loaded || loading) return;
-
-    setCurrentlyLoadingWeeks(prev => new Set([...prev, weekNumber]));
     try {
       await updateTimetableForWeekInCache(account, weekNumber);
-      setLoadedWeeks(prev => new Set([...prev, weekNumber]));
+      loadedWeeks.current.add(weekNumber);
     } catch (error) {
       console.error(error);
     } finally {
-      setCurrentlyLoadingWeeks(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(weekNumber);
-        return newSet;
-      });
+      currentlyLoadingWeeks.current.delete(weekNumber);
     }
-  }, [account, getWeekLoadStatus]);
+  };
 
   useEffect(() => {
-    const newLoadedWeeks = new Set(Object.keys(timetables).map(Number));
-    if (!loadedWeeks.size || newLoadedWeeks.size !== loadedWeeks.size) {
-      setLoadedWeeks(newLoadedWeeks);
+    for (const key of Object.keys(timetables)) {
+      loadedWeeks.current.add(Number(key));
     }
   }, [timetables]);
 
   useEffect(() => {
     const { weekNumber } = getWeekFromIndex(currentPageIndex);
-    const weekLoadStatus = getWeekLoadStatus(weekNumber);
-    if (!weekLoadStatus.loaded && !weekLoadStatus.loading) {
-      loadTimetableWeek(weekNumber);
-    }
-  }, [currentPageIndex, getWeekFromIndex, getWeekLoadStatus, loadTimetableWeek]);
+    loadTimetableWeek(weekNumber);
+  }, [currentPageIndex]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -125,7 +112,7 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
         />
       ),
     });
-  }, [navigation, currentPageIndex, getDateFromIndex]);
+  }, [navigation, currentPageIndex]);
 
   return (
     <View style={{ backgroundColor: colors.background }}>
@@ -143,6 +130,7 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
       <InfinitePager
         onPageChange={setCurrentPageIndex}
         ref={PagerRef}
+        minIndex={1}
         renderPage={({ index }) => <RenderPage
           index={index}
           timetables={timetables}
