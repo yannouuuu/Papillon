@@ -10,7 +10,7 @@ export const useHomeworkStore = create<HomeworkStore>()(
     (set) => ({
       homeworks: {},
       updateHomeworks: (weekNumber, homeworks) => {
-        log(`updating classes for week ${weekNumber}`, "homework:updateHomeworks");
+        log(`updating homeworks for week ${weekNumber}`, "homework:updateHomeworks");
 
         set((state) => {
           return {
@@ -21,7 +21,7 @@ export const useHomeworkStore = create<HomeworkStore>()(
           };
         });
 
-        log(`updated classes for week ${weekNumber}`, "homework:updateHomeworks");
+        log(`updated homeworks for week ${weekNumber}`, "homework:updateHomeworks");
       }
     }),
     {
