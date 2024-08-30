@@ -20,7 +20,7 @@ const TimetableElement = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
 
   const currentDay = new Date(/*"2024-04-19"*/);
-  const [firstDate, setFirstDate] = useState(new Date("2023-09-01"));
+  const [firstDate, setFirstDate] = useState(new Date("2024-09-01"));
 
   const [courses, setCourses] = useState<TimetableClass[]>([]);
   const [nextCourseIndex, setNextCourseIndex] = useState(0);

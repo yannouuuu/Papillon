@@ -150,7 +150,7 @@ const HomeworksScreen: Screen<"Homeworks"> = ({ navigation }) => {
   useEffect(() => {
     console.log("[Homeworks]: account instance changed");
     if (account.instance) {
-      const firstDate = account.service === AccountService.Pronote ? account.instance.instance.firstDate : new Date("2023-09-01");
+      const firstDate = account.service === AccountService.Pronote ? account.instance.instance.firstDate : new Date("2024-09-01");
       const today = new Date();
 
       // get week number

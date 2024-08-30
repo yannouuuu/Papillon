@@ -21,7 +21,7 @@ const HomeworksElement = () => {
   const [currentWeek, setCurrentWeek] = useState(0);
 
   const currentDay = new Date(/* "2024-05-27" */);
-  const [firstDate, setFirstDate] = useState(new Date("2023-09-01"));
+  const [firstDate, setFirstDate] = useState(new Date("2024-09-01"));
 
   const [hwList, setHwList] = useState([]);
 

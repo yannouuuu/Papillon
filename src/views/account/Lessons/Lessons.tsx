@@ -50,7 +50,7 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
   const today = useMemo(() => new Date(), []);
   const defaultDate = useMemo(() => new Date(today), [today]);
 
-  const [firstDate, setFirstDate] = useState(new Date("2023-09-01"));
+  const [firstDate, setFirstDate] = useState(new Date("2024-09-01"));
 
   useEffect(() => {
     if (account.instance) {
