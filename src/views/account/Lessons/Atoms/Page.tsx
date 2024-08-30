@@ -29,7 +29,7 @@ const lz = (num: number) => (num < 10 ? `0${num}` : num);
 interface Props {
   index: number
   timetables: Record<number, Timetable>
-  loadTimetableWeek: (weekNumber: number) => Promise<void>
+  loadTimetableWeek: (weekNumber: number, force?: boolean) => Promise<void>
   getWeekFromIndex: (index: number) => {
     weekNumber: number;
     dayNumber: number;
@@ -56,8 +56,7 @@ export const Page: React.FC<Props> = ({
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await loadTimetableWeek(weekNumber);
-    console.log("Refreshed");
+    await loadTimetableWeek(weekNumber, true);
     setIsRefreshing(false);
   };
 
