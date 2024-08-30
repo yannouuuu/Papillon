@@ -47,7 +47,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
       case "ed":
         showAlert({
           title: "Service en développement",
-          message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponible.",
+          message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
           actions: [
             {
               title: "Retour",
@@ -63,7 +63,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
         if(__DEV__) {
           showAlert({
             title: "[DEBUG] Service en développement",
-            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponible.",
+            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
             actions: [
               {
                 title: "Annuler",
