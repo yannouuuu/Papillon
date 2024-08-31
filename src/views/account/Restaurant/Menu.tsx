@@ -27,7 +27,6 @@ import {
   NativeListHeader,
   NativeText,
 } from "@/components/Global/NativeComponents";
-import { generatePass } from "@/utils/external/generate-pass";
 import { useCurrentAccount } from "@/stores/account";
 import { AccountService } from "@/stores/account/types";
 import TabAnimatedTitle from "@/components/Global/TabAnimatedTitle";
@@ -49,33 +48,6 @@ const Menu: Screen<"Menu"> = ({
       ...TabAnimatedTitle({ theme, route, navigation }),
     });
   }, [navigation, route.params, theme.colors.text]);
-
-  // Fonction pour générer et afficher un pass pour Apple Wallet
-  const generateWalletPass = async (): Promise<void> => {
-    const data = {
-      name: account?.name ?? "",
-      classe: account?.className ?? "",
-      service: AccountService[account?.service ?? AccountService.Pronote],
-      data: "123456789",
-      type: "PKBarcodeFormatQR",
-      encoding: "iso-8859-1",
-    };
-
-    try {
-      console.log("Generating wallet pass...");
-      console.log(data);
-      const response = await generatePass(data);
-      if (response) {
-        WebBrowser.openBrowserAsync(response.url, {
-          enableBarCollapsing: true,
-          presentationStyle:
-            WebBrowser.WebBrowserPresentationStyle.AUTOMATIC,
-        });
-      }
-    } catch (error) {
-      console.error("Error generating wallet pass:", error);
-    }
-  };
 
   const [balances, setBalances] = useState<Balance[] | null>(null);
 
