@@ -92,6 +92,8 @@ const AccountCreated: Screen<"AccountCreated"> = ({ navigation }) => {
     return unsubscribe;
   }, [navigation]);
 
+  const nameBubbleRows = name ? 3 : 1;
+
   return (
     <SafeAreaView style={styles.container}>
       <MaskStars />
@@ -115,7 +117,7 @@ const AccountCreated: Screen<"AccountCreated"> = ({ navigation }) => {
 
       <PapillonShineBubble
         message={name ? `Enchanté, ${name} ! On va personnaliser ton expérience !` : "Bienvenue sur Papillon !"}
-        numberOfLines={2}
+        numberOfLines={nameBubbleRows}
         width={260}
         style={{
           zIndex: 10,
