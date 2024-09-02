@@ -97,14 +97,14 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
         En continuant, vous acceptez les&nbsp;
         <Text
           style={{ textDecorationLine: "underline" }}
-          onPress={() => openUrl("https://safety.getpapillon.xyz/documents/privacy-policy")}
+          onPress={() => openUrl("https://safety.getpapillon.xyz/documents/terms-of-service")}
         >
           conditions d'utilisation
         </Text>
         &nbsp;et la&nbsp;
         <Text
           style={{ textDecorationLine: "underline" }}
-          onPress={() => openUrl("https://safety.getpapillon.xyz/documents/terms-of-service")}
+          onPress={() => openUrl("https://safety.getpapillon.xyz/documents/privacy-policy")}
         >
           politique de confidentialité
         </Text>.
