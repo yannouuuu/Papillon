@@ -4,6 +4,7 @@ import pronote from "./pronote";
 import ecoledirecte from "./ecoledirecte";
 import ServiceSelector from "@/views/login/ServiceSelector";
 import skolengo from "./skolengo";
+import identityProvider from "./identityProvider";
 
 export default [
   createScreen("ServiceSelector", ServiceSelector, {
@@ -15,4 +16,5 @@ export default [
   ...pronote,
   ...ecoledirecte,
   ...skolengo,
+  ...identityProvider
 ] as const;

@@ -167,6 +167,19 @@ const AccountContainerCard = ({ account, onPress }: {
                 {account.schoolName}
               </Text>
             )}
+            {account.identityProvider &&
+              <Text
+                style={{
+                  color: colors.text + "70",
+                  fontSize: 14,
+                  fontFamily: "medium",
+                }}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {account.identityProvider.name}
+              </Text>
+            }
           </View>
         </View>
       </View>
