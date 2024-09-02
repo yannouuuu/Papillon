@@ -12,7 +12,7 @@ const defaultLocalTabs = [
   "Menu"
 ] as typeof defaultTabs[number]["tab"][];
 
-export default async function defaultPersonalization (): Promise<Partial<Personalization>> {
+export default async function defaultPersonalization (customDefaults?: Partial<Personalization>): Promise<Partial<Personalization>> {
   return {
     color: colors[0],
     magicEnabled: true,
@@ -20,6 +20,7 @@ export default async function defaultPersonalization (): Promise<Partial<Persona
     tabs: defaultTabs.filter(current => defaultLocalTabs.includes(current.tab)).map((tab, index) => ({
       name: tab.tab,
       enabled: index <= 4
-    }))
+    })),
+    ...customDefaults
   };
 }
