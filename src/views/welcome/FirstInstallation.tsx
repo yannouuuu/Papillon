@@ -88,6 +88,7 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
 
         <ButtonCta
           value="Besoin d'aide ?"
+          onPress={() => alert("Besoin d'aide ?")}
         />
       </View>
 
