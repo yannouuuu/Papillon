@@ -18,6 +18,7 @@ import TotalMissed from "./Atoms/TotalMissed";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
 import { protectScreenComponent } from "@/router/helpers/protected-screen";
 import { Observation } from "@/services/shared/Observation";
+import MissingItem from "@/components/Global/MissingItem";
 
 const Attendance: Screen<"Attendance"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -167,6 +168,7 @@ const Attendance: Screen<"Attendance"> = ({ route, navigation }) => {
     });
   }, [attendances, selectedPeriod]);
 
+
   return (
     <>
       <PapillonHeader route={route} navigation={navigation}>
@@ -219,6 +221,15 @@ const Attendance: Screen<"Attendance"> = ({ route, navigation }) => {
           paddingTop: 0,
         }}
       >
+        {attendances[selectedPeriod].absences.length === 0 && attendances[selectedPeriod].delays.length === 0 && attendances[selectedPeriod].punishments.length === 0 && Object.keys(attendances_observations_details).length === 0 &&(
+          <MissingItem
+            title="Aucune absence"
+            description="Vous n'avez pas d'absences ni de retards pour cette période."
+            emoji="🎉"
+            style={{ marginTop: 16 }}
+          />
+        )}
+
         {(totalMissed.total.hours > 0 || totalMissed.total.minutes > 0) && (
           <TotalMissed totalMissed={totalMissed} />
         )}
