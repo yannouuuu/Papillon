@@ -57,6 +57,7 @@ export enum AccountService {
   // For the future...
   EcoleDirecte,
   Skolengo,
+  Local,
   WebResto,
   Turboself,
   ARD,
@@ -115,6 +116,16 @@ export interface SkolengoAccount extends BaseAccount {
   authentication: SkolengoAuthConfig
 }
 
+export interface LocalAccount extends BaseAccount {
+  service: AccountService.Local
+  instance: undefined,
+  identityProvider: {
+    identifier: string
+    name: string,
+    rawData: Record<string, unknown>
+  }
+}
+
 export interface TurboselfAccount extends BaseExternalAccount {
   service: AccountService.Turboself
   instance: undefined
@@ -139,6 +150,7 @@ export type PrimaryAccount = (
   | PronoteAccount
   | EcoleDirecteAccount
   | SkolengoAccount
+  | LocalAccount
 );
 export type ExternalAccount = (
   | TurboselfAccount

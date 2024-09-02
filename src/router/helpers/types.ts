@@ -41,6 +41,10 @@ export type RouteParameters = {
   // login.ecoledirecte
   EcoleDirecteCredentials: undefined;
 
+  // login.identityProvider
+  IdentityProviderSelector: undefined;
+  UnivRennes1_Login: undefined;
+
   // login.skolengo
   SkolengoAuthenticationSelector: undefined;
   SkolengoGeolocation: undefined;

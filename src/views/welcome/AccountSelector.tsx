@@ -19,6 +19,7 @@ import Reanimated, {
 import { LinearGradient } from "expo-linear-gradient";
 import { animPapillon } from "@/utils/ui/animations";
 import { Screen } from "@/router/helpers/types";
+import { AccountService } from "@/stores/account/types";
 
 const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
   const theme = useTheme();
@@ -159,7 +160,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                     <PapillonAvatar
                       source={account.personalization.profilePictureB64 ? { uri: account.personalization.profilePictureB64 } : defaultProfilePicture(account.service)}
                       badgeOffset={4}
-                      badge={
+                      badge={account.service !== AccountService.Local &&
                         <Image
                           source={defaultProfilePicture(account.service)}
                           style={{
@@ -190,7 +191,12 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                     {account.name}
                   </NativeText>
                   <NativeText variant="subtitle" numberOfLines={1}>
-                    {account.schoolName}
+                    {account.schoolName ?
+                      account.schoolName :
+                      account.identityProvider ?
+                        account.identityProvider.name :
+                        "Compte local"
+                    }
                   </NativeText>
                 </NativeItem>
               );
