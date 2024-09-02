@@ -383,25 +383,18 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           style={{
             height: 300,
             width: "80%",
-            backgroundColor: "#ffffff",
+            backgroundColor: colors.card,
             borderRadius: 30,
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
             justifyContent: "space-between",
-            shadowOpacity: 0.22,
-            shadowRadius: 2.22,
-            elevation: 3,
+            elevation: 5,
             padding: 20,
           }}
           entering={FadeInDown}
           exiting={FadeOutDown}
         >
           <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ fontSize: 24 }}>Se déconnecter</Text>
-            <Text style={{ textAlign: "center", marginTop: 20 }}>
+            <Text style={{ fontSize: 24, color: colors.text }}>Se déconnecter</Text>
+            <Text style={{ textAlign: "center", marginTop: 20, color: colors.text }}>
               Êtes-vous sûr de vouloir vous déconnecter ?
             </Text>
           </View>
