@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, ScrollView, View, TouchableOpacity, StyleSheet, Image, Switch } from "react-native";
 import type { Screen } from "@/router/helpers/types";
 import { useTheme } from "@react-navigation/native";
@@ -10,11 +10,9 @@ import NotificationContainerCard from "@/components/Settings/NotificationContain
 import { requestNotificationPermission } from "@/background/Notifications";
 import { alertExpoGo, isExpoGo } from "@/utils/native/expoGoAlert";
 
-const SettingsNotifications: Screen<"SettingsNotifications"> = ({ navigation }) => {
+const SettingsNotifications: Screen<"SettingsNotifications"> = () => {
   const theme = useTheme();
-  const { colors } = theme;
-  const insets = useSafeAreaInsets();
-  const [enabled, setEnabled] = React.useState<boolean>(false);
+  const [enabled, setEnabled] = useState(false);
 
   // Animation states
   const opacity = useSharedValue(0);
@@ -26,7 +24,7 @@ const SettingsNotifications: Screen<"SettingsNotifications"> = ({ navigation }) 
   const invertedOpacity = useSharedValue(1);
 
   // Animation effects
-  React.useEffect(() => {
+  useEffect(() => {
     opacity.value = withTiming(enabled ? 1 : 0, { duration: 200 });
     invertedOpacity.value = withTiming(enabled ? 0 : 1, { duration: 200 });
     borderRadius.value = withTiming(enabled ? 20 : 13, { duration: 200 });
@@ -34,39 +32,18 @@ const SettingsNotifications: Screen<"SettingsNotifications"> = ({ navigation }) 
     marginBottom.value = withTiming(enabled ? 0 : -10, { duration: 200 });
   }, [enabled]);
 
-  const askEnabled = async (enabled) => {
+  const askEnabled = async (enabled: boolean) => {
     if (isExpoGo()) {
       alertExpoGo();
       return;
     }
 
-    if(enabled) {
+    if (enabled) {
       await requestNotificationPermission();
     }
 
     setEnabled(enabled);
   };
-
-  const containerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      borderRadius: borderRadius.value,
-      width: width.value,
-      marginBottom: marginBottom.value,
-    };
-  });
-
-  const textAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-    };
-  });
-
-  // New animated style for inverted opacity
-  const invertedTextAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: invertedOpacity.value,
-    };
-  });
 
   return (
     <ScrollView
@@ -78,7 +55,7 @@ const SettingsNotifications: Screen<"SettingsNotifications"> = ({ navigation }) 
       <NotificationContainerCard
         theme={theme}
         isEnable={enabled}
-        setEnabled={(enabled) => askEnabled(enabled)}
+        setEnabled={askEnabled}
       />
 
       {/*

@@ -1,34 +1,42 @@
-import React, { useEffect } from "react";
-import { Text, ScrollView, View, TouchableOpacity, StyleSheet, Image, Switch } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, Image, StyleSheet } from "react-native";
 import type { Screen } from "@/router/helpers/types";
 import { useTheme } from "@react-navigation/native";
-import { ChevronLeft, Euro, MegaphoneOff, MessageCircle } from "lucide-react-native";
+import { Euro, MessageCircle } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeList, NativeItem, NativeListHeader } from "@/components/Global/NativeComponents";
 import { NativeIcon } from "@/components/Global/NativeComponents";
 import { NativeText } from "@/components/Global/NativeComponents";
-import { LinearGradient } from "expo-linear-gradient";
 import AppJSON from "../../../app.json";
 import PackageJSON from "../../../package.json";
 import AboutContainerCard from "@/components/Settings/AboutContainerCard";
 import * as Linking from "expo-linking";
 import teams from "@/utils/data/teams.json";
 import Constants from "expo-constants";
+import { getContributors, Contributor } from "@/utils/GetRessources/GetContribs";
 
 const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
   const theme = useTheme();
-  const { colors } = theme;
   const insets = useSafeAreaInsets();
 
-  const [clickedOnVersion, setClickedOnVersion] = React.useState<number>(0);
+  const [clickedOnVersion, setClickedOnVersion] = useState<number>(0);
+  const [contributors, setContributors] = useState<Contributor[]>([]);
+
+  const fetchContributors = async () => {
+    const fetchedContributors = await getContributors();
+    setContributors(fetchedContributors);
+  };
 
   useEffect(() => {
-    if (clickedOnVersion == 7) {
+    fetchContributors();
+  }, []);
+
+  useEffect(() => {
+    if (clickedOnVersion >= 7) {
       navigation.navigate("SettingsFlags");
       setClickedOnVersion(0);
     }
-  }, [clickedOnVersion]);
-
+  }, [clickedOnVersion, navigation]);
   return (
     <ScrollView
       contentContainerStyle={{
@@ -88,6 +96,29 @@ const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
       </NativeList>
 
       <NativeListHeader
+        label="Contributeurs GitHub"
+      />
+      <NativeList>
+        {contributors.map((contributor, index) => (
+          <NativeItem
+            onPress={() => Linking.openURL(contributor.html_url)}
+            chevron={true}
+            key={index}
+            leading={<Image
+              source={{ uri: contributor.avatar_url }}
+              style={{
+                width: 35,
+                height: 35,
+                borderRadius: 10,
+              }}
+            />}
+          >
+            <NativeText variant="title">{contributor.login}</NativeText>
+          </NativeItem>
+        ))}
+      </NativeList>
+
+      <NativeListHeader
         label="Informations"
       />
 
@@ -103,7 +134,10 @@ const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
             ver. {AppJSON.expo.version} {Constants.appOwnership === "expo" ? "(Expo Go)" : ""} {__DEV__ ? "(debug)" : ""}
           </NativeText>
         </NativeItem>
-        <NativeItem>
+        <NativeItem
+          onPress={() => navigation.navigate("SettingsDevLogs")}
+          chevron={false}
+        >
           <NativeText variant="title">
             Version des dépendances
           </NativeText>

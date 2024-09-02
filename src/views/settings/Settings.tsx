@@ -1,12 +1,8 @@
 import type { Screen } from "@/router/helpers/types";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-
-import {Alert, Image, Platform, Text, View} from "react-native";
-
+import { Alert, Image, Platform, Text, View } from "react-native";
 import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-
 import AppJSON from "../../../app.json";
 
 import Reanimated, {
@@ -28,6 +24,7 @@ import {
   Paperclip,
   Puzzle,
   Route,
+  Scroll,
   Settings as SettingsLucide,
   Sparkles,
   SwatchBook,
@@ -41,6 +38,7 @@ import { useTheme } from "@react-navigation/native";
 import {get_settings_widgets} from "@/addons/addons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AddonPlacementManifest} from "@/addons/types";
+import { useFlagsStore } from "@/stores/flags";
 
 const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -49,6 +47,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
   const [ addons, setAddons ] = useState<Array<AddonPlacementManifest>>([]);
   const [devModeEnabled, setDevModeEnabled] = useState(false);
+  const defined = useFlagsStore(state => state.defined);
 
   const removeAccount = useAccounts((store) => store.remove);
 
@@ -63,13 +62,13 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   }, []);
 
   useEffect(() => {
-    if(route.params?.view) {
+    if (route.params?.view) {
+      // @ts-expect-error : on ignore le state de navigation
       navigation.navigate(route.params.view);
     }
   }, [route.params]);
 
   useEffect(() => {
-    // on focus
     const unsubscribe = navigation.addListener("focus", async () => {
       setTimeout(() => {
         get_settings_widgets().then((addons) => {
@@ -91,12 +90,14 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           color: "#CF0029",
           label: "Notifications",
           onPress: () => navigation.navigate("SettingsNotifications"),
+          disabled: !defined("enable_notifications"),
         },
         {
           icon: <Cable />,
           color: "#D79400",
           label: "Services externes",
           onPress: () => navigation.navigate("SettingsExternalServices"),
+          disabled: !defined("enable_external_services"),
         },
       ],
     },
@@ -155,14 +156,14 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           label: "Extensions",
           description: "Disponible prochainement",
           onPress: () => navigation.navigate("SettingsAddons"),
-          disabled: true,
+          disabled: !defined("enable_addons"),
         },
         {
           icon: <WandSparkles />,
           color: "#58A3C3",
           label: "Papillon Magic",
           onPress: () => navigation.navigate("SettingsMagic"),
-        }
+        },
       ],
     },
     {
@@ -241,7 +242,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
             zIndex: 1000,
           }}
         >
-          <ModalHandle theme={theme} />
+          <ModalHandle />
         </Reanimated.View>
       }
 
@@ -299,11 +300,11 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
             }
             <NativeList>
               {tab.tabs.map((subtab, index) => (
-                (Platform.OS === "android" && subtab.android === false) ? <View key={index}/> :
+                (Platform.OS === "android" && "android" in subtab && !subtab.android) ? <View key={index} /> :
                   <NativeItem
                     key={index}
                     onPress={subtab.onPress}
-                    disabled={subtab.disabled}
+                    disabled={"disabled" in subtab && subtab.disabled}
                     leading={
                       <NativeIcon
                         icon={subtab.icon}
@@ -317,8 +318,8 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
                     <NativeText variant="title">
                       {subtab.label}
                     </NativeText>
-                    {subtab.description &&
-                      <NativeText variant="subtitle" style={{marginTop: -3}}>
+                    {"description" in subtab && subtab.description &&
+                      <NativeText variant="subtitle" style={{ marginTop: -3 }}>
                         {subtab.description}
                       </NativeText>
                     }

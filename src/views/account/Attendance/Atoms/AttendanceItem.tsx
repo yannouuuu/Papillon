@@ -1,30 +1,39 @@
-import { useTheme } from "@react-navigation/native";
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
-import { View, Text, Button, ActivityIndicator, Platform } from "react-native";
+import { type ReactNode, type Dispatch, type SetStateAction, useState } from "react";
+import type { Attendance } from "@/services/shared/Attendance";
+import type { Absence } from "@/services/shared/Absence";
 
-import { Screen } from "@/router/helpers/types";
-import { useCurrentAccount } from "@/stores/account";
-import { useAttendanceStore } from "@/stores/attendance";
-import { updateAttendanceInCache, updateAttendancePeriodsInCache } from "@/services/attendance";
+import { View } from "react-native";
+import { ChevronDown, ChevronUp } from "lucide-react-native";
+import { FadeIn, FadeInUp, FadeOut, FadeOutDown } from "react-native-reanimated";
 import { NativeItem, NativeList, NativeText } from "@/components/Global/NativeComponents";
-import TabAnimatedTitle from "@/components/Global/TabAnimatedTitle";
-import Reanimated, { FadeIn, FadeInUp, FadeOut, FadeOutDown, FadeOutUp, LinearTransition } from "react-native-reanimated";
-import PapillonPicker from "@/components/Global/PapillonPicker";
-import { ChevronDown, ChevronUp, UserX } from "lucide-react-native";
-import PapillonHeader from "@/components/Global/PapillonHeader";
-import { ScrollView } from "react-native-gesture-handler";
+import { leadingZero } from "@/utils/format/attendance_time";
 import { animPapillon } from "@/utils/ui/animations";
-import { getAbsenceTime, leadingZero } from "@/utils/format/attendance_time";
 
-const AttendanceItem = ({
+interface AttendanceItemProps {
+  title: string
+  icon: ReactNode
+  attendances: Attendance[keyof Attendance]
+  missed?: { hours: number, minutes: number }
+}
+
+const NO_JUSTICATION = "Sans justification";
+
+const AttendanceItem: React.FC<AttendanceItemProps> = ({
   title,
   icon,
   attendances,
-  showMore,
-  setShowMore,
   missed
 }) => {
-  const newAbsences = attendances.sort((a, b) => b.fromTimestamp - a.fromTimestamp);
+  const [showMore, setShowMore] = useState(false);
+
+  const sorted = attendances.sort((a, b) => {
+    if ("timestamp" in b && "timestamp" in a)
+      return b.timestamp - a.timestamp;
+
+    // Seulement le type `Absence` utilise `fromTimestamp`.
+    // Tout les autres utilisent `timestamp`.
+    return (b as Absence).fromTimestamp - (a as Absence).fromTimestamp;
+  });
 
   return (
     <NativeList
@@ -55,23 +64,27 @@ const AttendanceItem = ({
         }
       >
         <NativeText variant="overtitle">
-          {title} ({newAbsences.length})
+          {title} ({sorted.length})
         </NativeText>
       </NativeItem>
 
-      {newAbsences.slice(0, showMore ? newAbsences.length : 3).map((absence, index) => {
+      {sorted.slice(0, showMore ? sorted.length : 3).map((item, index) => {
         let totalTime = "";
-        if (absence.hours) {
-          totalTime = absence.hours.split("h")[0] + "h" + leadingZero(absence.hours.split("h")[1]) + " min";
+        if ("hours" in item) {
+          const [hours, minutes] = item.hours.split("h").map(Number);
+          totalTime = hours + "h" + leadingZero(minutes) + " min";
         }
-        else if(absence.duration) {
-          totalTime = absence.duration + " min";
+        else if ("duration" in item) {
+          totalTime = item.duration + " min";
         }
+
+        const timestamp = "fromTimestamp" in item ? item.fromTimestamp : item.timestamp;
+        const not_justified = "justified" in item && !item.justified;
+        const justification = "reasons" in item ? item.reasons || NO_JUSTICATION : "reason" in item ? item.reason.text : NO_JUSTICATION;
 
         return (
           <NativeItem
-            key={absence.fromTimestamp || absence.timestamp}
-            identifier={absence.fromTimestamp || absence.timestamp}
+            key={timestamp}
             entering={animPapillon(FadeInUp).delay((showMore ? index - 3 : index) * 20 + 50)}
             exiting={animPapillon(FadeOutDown).delay(index * 20)}
             animated
@@ -79,7 +92,7 @@ const AttendanceItem = ({
             trailing={
               <NativeText
                 style={{
-                  color: !absence.justified && "#D10000",
+                  color: not_justified ? "#D10000" : void 0,
                   fontSize: 16,
                 }}
               >
@@ -89,17 +102,19 @@ const AttendanceItem = ({
             separator
           >
             <NativeText variant="title">
-              {absence.reasons || absence.reason && absence.reason.text || "Sans justification"}
+              {justification}
             </NativeText>
-            {!absence.justified && (
+
+            {not_justified && (
               <NativeText variant="default" style={{
                 color: "#D10000",
               }}>
                 Non justifié
               </NativeText>
             )}
+
             <NativeText variant="subtitle">
-              {new Date(absence.fromTimestamp || absence.timestamp).toLocaleDateString("fr-FR", {
+              {new Date(timestamp).toLocaleDateString("fr-FR", {
                 weekday: "long",
                 month: "short",
                 day: "numeric",

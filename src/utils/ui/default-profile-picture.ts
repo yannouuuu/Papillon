@@ -6,6 +6,8 @@ export const defaultProfilePicture = (service: AccountService) => {
       return require("../../../assets/images/service_pronote.png");
     case AccountService.EcoleDirecte:
       return require("../../../assets/images/service_ed.png");
+    case AccountService.Skolengo:
+      return require("../../../assets/images/service_skolengo.png");
     default:
       console.warn("No default profile picture for service", service);
   }

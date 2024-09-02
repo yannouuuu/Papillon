@@ -134,7 +134,7 @@ const AccountContainerCard = ({ account, onPress }: {
                   fontFamily: "semibold",
                   maxWidth: "85%",
                 }}>{account.studentName?.first} {account.studentName?.last}</Text>
-              <View
+              {account.className && <View
                 style={{
                   backgroundColor: theme.dark ? colors.primary + "60" : colors.primary + "40",
                   borderRadius: 8,
@@ -152,7 +152,7 @@ const AccountContainerCard = ({ account, onPress }: {
                     letterSpacing: 0.5,
                   }}
                 >{account.className}</Text>
-              </View>
+              </View>}
             </View>
             {account.schoolName && (
               <Text

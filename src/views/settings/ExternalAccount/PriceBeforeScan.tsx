@@ -5,19 +5,9 @@ import { useTheme, NavigationProp, RouteProp } from "@react-navigation/native";
 import QRCode from "react-native-qrcode-svg";
 import Barcode from "react-native-barcode-svg";
 import { useAccounts } from "@/stores/account";
+import { Screen } from "@/router/helpers/types";
 
-type RootStackParamList = {
-  PriceBeforeScan: { accountID: string };
-  PriceAfterScan: { accountID: string };
-  HomeScreen: undefined;
-};
-
-type Props = {
-  navigation: NavigationProp<RootStackParamList, "PriceBeforeScan">;
-  route: RouteProp<RootStackParamList, "PriceBeforeScan">;
-};
-
-const PriceBeforeScan: React.FC<Props> = ({ navigation, route }) => {
+const PriceBeforeScan: Screen<"PriceBeforeScan"> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const accounts = useAccounts((state) => state.accounts);
   const { accountID } = route.params;

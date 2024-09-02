@@ -1,19 +1,14 @@
 import type { Grade } from "@/services/shared/Grade";
 
-type TargetGrade = {
+export interface GradeHistory {
   value: number;
-  disabled: boolean;
-};
-
-type GradeHistory = {
-  value: number;
-  date: number;
+  date: string;
 };
 
 type Target = "student" | "average" | "min" | "max";
 
-export type getAverageDiffGradeReturn = {
-  difference: number;
+export type AverageDiffGrade = {
+  difference?: number;
   with: number;
   without: number;
 };
@@ -49,7 +44,7 @@ const getPronoteAverage = (grades: Grade[], target: Target = "student"): number 
 };
 
 // Get subject average as Pronote calculates it
-const getSubjectAverage = (subject: Grade[], target: Target = "student"): number => {
+export const getSubjectAverage = (subject: Grade[], target: Target = "student"): number => {
   // Arrays of grades and outOf to be divided
   const calcGradesList: number[] = [];
   const calcOutOfList: number[] = [];
@@ -59,26 +54,40 @@ const getSubjectAverage = (subject: Grade[], target: Target = "student"): number
     const targetGrade = grade[target];
 
     // If targetGrade is undefined or disabled, skip
-    if (!targetGrade || targetGrade.disabled) return;
+    if (!targetGrade || targetGrade.disabled || targetGrade.value === null || targetGrade.value < 0) return;
 
     // If coefficient is 0, skip
     if (grade.coefficient === 0) return;
 
-    if (targetGrade.value > 20 || grade.coefficient < 1) {
+    if(grade.isBonus) {
+      // Get subject average without this grade
+      const averageMoy = grade.outOf.value! / 2;
+      const newGrVal = targetGrade.value - averageMoy;
+
+      if (newGrVal < 0) {
+        // If the grade is negative, skip
+        return;
+      }
+
+      // Push the grade and outOf
+      calcGradesList.push(newGrVal);
+    }
+    else if (targetGrade.value > 20 || grade.coefficient < 1) {
       // If grade is over 20, reajust the grade to be on 20
       // (grade [/20] / outOf) / (20 * coefficient)
 
       // Calculate the grade on 20 (grade / outOf * 20)
-      let gradeOn20 = (targetGrade.value / grade.outOf.value) * 20;
+      let gradeOn20 = (targetGrade.value / grade.outOf.value!) * 20;
 
       // Push the grade and outOf
       calcGradesList.push(gradeOn20 * grade.coefficient);
       calcOutOfList.push(20 * grade.coefficient);
-    } else {
+    }
+    else {
       // Else, push the grade and outOf
       // (grade / outOf) * (outOf * coefficient)
       calcGradesList.push(targetGrade.value * grade.coefficient);
-      calcOutOfList.push(grade.outOf.value * grade.coefficient);
+      calcOutOfList.push(grade.outOf.value! * grade.coefficient);
     }
   });
 
@@ -91,12 +100,19 @@ const getSubjectAverage = (subject: Grade[], target: Target = "student"): number
   // Sum all outOf
   const calcOutOfAvg = calcOutOfList.reduce((acc, outOf) => acc + outOf, 0);
 
+  // Calculate the average
+  let subjectAvg = (calcGradesAvg / calcOutOfAvg) * 20;
+
+  if(subjectAvg > 20) {
+    subjectAvg = 20;
+  }
+
   // Return the average
-  return (calcGradesAvg / calcOutOfAvg) * 20;
+  return subjectAvg;
 };
 
 // Get the average difference of a grade in a list
-const getAverageDiffGrade = (grades: Grade[], list: Grade[], target: Target = "student"): getAverageDiffGradeReturn => {
+const getAverageDiffGrade = (grades: Grade[], list: Grade[], target: Target = "student"): AverageDiffGrade => {
   // Get grades list
   const baseList = list;
   // remove each grade from the list
@@ -127,13 +143,13 @@ const getAveragesHistory = (grades: Grade[], target: Target = "student", final?:
     };
   });
 
+  // Sort the history by date
+  history.sort((a, b) => a.date.localeCompare(b.date));
+
   history.push({
     value: final || getPronoteAverage(grades, target),
     date: new Date().toISOString(),
   });
-
-  // Sort the history by date
-  history.sort((a, b) => a.date.localeCompare(b.date));
 
   return history;
 };

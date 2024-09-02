@@ -15,6 +15,8 @@ import { useCurrentAccount } from "@/stores/account";
 import TabAnimatedTitle from "@/components/Global/TabAnimatedTitle";
 import { Chat } from "@/services/shared/Chat";
 import { getChats } from "@/services/chats";
+import InitialIndicator from "@/components/News/InitialIndicator";
+import parse_initials from "@/utils/format/format_pronote_initials";
 
 // Voir la documentation de `react-navigation`.
 //
@@ -63,21 +65,33 @@ const Messages: Screen<"Messages"> = ({
       </TouchableOpacity>
       <NativeList>
         {!chats ? (
-          <NativeText>
-            En cours de chargement
-          </NativeText>
-
-        ) : chats.length === 0 ? (
-          <NativeText>
-            Aucune discussion !
-          </NativeText>
-        ) : chats.map((chat) => (
-          <NativeItem key={chat.id} onPress={() => navigation.navigate("Chat", { handle: chat })}>
+          <NativeItem>
             <NativeText>
-              {chat.subject}
+              En cours de chargement
+            </NativeText>
+          </NativeItem>
+        ) : chats.length === 0 ? (
+          <NativeItem>
+            <NativeText>
+              Aucune discussion !
+            </NativeText>
+          </NativeItem>
+        ) : chats.map((chat) => (
+          <NativeItem
+            key={chat.id}
+            onPress={() => navigation.navigate("Chat", { handle: chat })}
+            leading={<InitialIndicator
+              initial={parse_initials(chat.recipient)}
+              color={theme.colors.primary}
+            />}
+
+
+          >
+            <NativeText>
+              {chat.recipient}
             </NativeText>
             <NativeText>
-              De {chat.creator} à {chat.recipient}
+              {chat.subject}
             </NativeText>
           </NativeItem>
         ))}

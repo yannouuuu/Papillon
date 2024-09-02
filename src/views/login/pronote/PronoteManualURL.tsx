@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import type { Screen } from "@/router/helpers/types";
+import type { RouteParameters, Screen } from "@/router/helpers/types";
 import { Platform, TextInput, View, StyleSheet, TouchableOpacity } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import determinateAuthenticationView from "@/services/pronote/determinate-authentication-view";
@@ -12,8 +12,9 @@ import MaskStars from "@/components/FirstInstallation/MaskStars";
 import PapillonShineBubble from "@/components/FirstInstallation/PapillonShineBubble";
 import ButtonCta from "@/components/FirstInstallation/ButtonCta";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Link2, X } from "lucide-react-native";
+import { Check, Link2, TriangleAlert, X } from "lucide-react-native";
 import { useAlert } from "@/providers/AlertProvider";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -50,6 +51,32 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
   useEffect(() => {
     setClipboardFound(false);
   }, [instanceURL]);
+  
+  const checkForDemoInstance = async <ScreenName extends keyof RouteParameters>(
+    instanceURL: string,
+    navigation: NativeStackNavigationProp<RouteParameters, ScreenName>,
+    showAlert: any
+  ): Promise<void> => {
+    if (!instanceURL.includes("demo.index-education.net")) return determinateAuthenticationView(instanceURL, navigation, showAlert);
+    showAlert({
+      title: "Instance non prise en charge",
+      message: "Désolé, les instances de démonstration ne sont pas prises en charge, elles peuvent être instables ou ne pas fonctionner correctement.",
+      actions: [
+        {
+          title: "Continuer",
+          primary: false,
+          icon: <TriangleAlert />,
+          onPress: () => determinateAuthenticationView(instanceURL, navigation, showAlert)
+        },
+        {
+          title: "Annuler",
+          icon: <Check />,
+          primary: true,
+          backgroundColor: "#29947A",
+        }
+      ]
+    });
+  };
 
   return (
     <View style={[
@@ -125,9 +152,8 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
         <ButtonCta
           value="Confirmer"
           primary
-          onPress={() => determinateAuthenticationView(instanceURL, navigation, showAlert)}
+          onPress={() => checkForDemoInstance(instanceURL, navigation, showAlert)}
         />
-
         {(route.params?.method) && (
           <ButtonCta
             value="Quitter"

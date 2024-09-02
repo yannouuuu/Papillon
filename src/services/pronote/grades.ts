@@ -5,6 +5,7 @@ import { type AverageOverview, type Grade, GradeInformation, type GradeValue } f
 import { decodeAttachment } from "./attachment";
 import { decodePeriod } from "./period";
 import pronote from "pawnote";
+import { info } from "@/utils/logger/logger";
 
 const getTab = (account: PronoteAccount): pronote.Tab => {
   if (!account.instance)
@@ -19,7 +20,7 @@ const getTab = (account: PronoteAccount): pronote.Tab => {
 
 export const getGradesPeriods = (account: PronoteAccount): { periods: Period[], default: string } => {
   const tab = getTab(account);
-  console.info("PRONOTE->getGradesPeriods(): OK");
+  info("PRONOTE->getGradesPeriods(): OK", "pronote");
 
   return {
     default: tab.defaultPeriod!.name,

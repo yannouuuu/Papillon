@@ -1,12 +1,19 @@
-import { Platform, TouchableHighlight, TouchableNativeFeedback, TouchableOpacity, View } from "react-native";
+import type React from "react";
+import { Platform, TouchableHighlight, TouchableNativeFeedback, View } from "react-native";
 
-const NativeTouchable = ({ children, ...props }) => {
+type NativeTouchableProps = {
+  children: React.ReactNode;
+  underlayColor?: string;
+} & React.ComponentProps<typeof TouchableNativeFeedback>;
+
+const NativeTouchable: React.FC<NativeTouchableProps> = ({
+  children,
+  ...props
+}) => {
   if(Platform.OS === "android") {
     return (
       <TouchableNativeFeedback {...props}>
-        <View
-          style={props.style}
-        >
+        <View style={props.style}>
           {children}
         </View>
       </TouchableNativeFeedback>
@@ -16,7 +23,8 @@ const NativeTouchable = ({ children, ...props }) => {
   return (
     <TouchableHighlight
       underlayColor={"rgba(0, 0, 0, 0.1)"}
-      {...props}>
+      {...props}
+    >
       {children}
     </TouchableHighlight>
   );

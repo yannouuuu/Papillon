@@ -1,37 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { useMemo } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { NativeItem, NativeText } from "@/components/Global/NativeComponents";
 import { getSubjectData } from "@/services/shared/Subject";
-import { Grade } from "@/services/shared/Grade";
+import type { Grade } from "@/services/shared/Grade";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RouteParameters } from "@/router/helpers/types";
 
 interface GradeItemProps {
-  subject: {
-    average: {
-      subjectName: string;
-    };
-    grades: any[];
-  };
+  subject: { average: { subjectName: string }, grades: any[] };
   grade: Grade;
-  navigation: any;
+  navigation: NativeStackNavigationProp<RouteParameters, keyof RouteParameters>
   index: number;
   totalItems: number;
 }
 
 const GradeItem: React.FC<GradeItemProps> = ({ subject, grade, navigation, index, totalItems }) => {
-  const [subjectData, setSubjectData] = useState({
-    color: "#888888",
-    pretty: "Matière inconnue",
-    emoji: "❓",
-  });
-
-  useEffect(() => {
-    const fetchSubjectData = async () => {
-      const data = await getSubjectData(subject.average.subjectName);
-      setSubjectData(data);
-    };
-
-    fetchSubjectData();
-  }, [subject.average.subjectName]);
+  const subjectData = useMemo(() => getSubjectData(subject.average.subjectName), [subject.average.subjectName]);
 
   const formattedDate = new Date(grade.timestamp).toLocaleDateString("fr-FR", {
     weekday: "long",
@@ -40,8 +24,8 @@ const GradeItem: React.FC<GradeItemProps> = ({ subject, grade, navigation, index
     year: "numeric",
   });
 
-  const gradeValue = !grade.student.disabled
-    ? parseFloat(grade.student.value).toFixed(2)
+  const gradeValue = typeof grade.student.value === "number"
+    ? grade.student.value.toFixed(2)
     : "N. not";
 
   return (
@@ -68,9 +52,11 @@ const GradeItem: React.FC<GradeItemProps> = ({ subject, grade, navigation, index
           </NativeText>
         </View>
         <View style={styles.rightContent}>
-          <NativeText style={styles.gradeValue}>{gradeValue}</NativeText>
+          <NativeText style={styles.gradeValue}>
+            {gradeValue}
+          </NativeText>
           <NativeText style={styles.maxGrade}>
-            /{parseFloat(grade.outOf.value).toFixed(0)}
+            /{grade.outOf.value?.toFixed(0) ?? "??"}
           </NativeText>
         </View>
       </View>
@@ -78,9 +64,9 @@ const GradeItem: React.FC<GradeItemProps> = ({ subject, grade, navigation, index
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   container: {
-    flexDirection: "row" as const,
+    flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     gap: 16,
@@ -89,7 +75,7 @@ const styles = {
     flex: 1,
   },
   rightContent: {
-    flexDirection: "row" as const,
+    flexDirection: "row",
     alignItems: "flex-end",
   },
   gradeValue: {
@@ -102,6 +88,6 @@ const styles = {
     lineHeight: 15,
     opacity: 0.6,
   },
-};
+});
 
 export default GradeItem;

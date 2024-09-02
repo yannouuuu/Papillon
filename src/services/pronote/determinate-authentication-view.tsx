@@ -1,8 +1,8 @@
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RouteParameters } from "@/router/helpers/types";
-import { KeyRound, LockKeyhole } from "lucide-react-native";
+import { Check, KeyRound, LockKeyhole } from "lucide-react-native";
 import pronote from "pawnote";
-import {info} from "@/utils/logger/logger";
+import {info, warn} from "@/utils/logger/logger";
 
 /**
  * Va exécuter une requête pour déterminer
@@ -21,14 +21,14 @@ const determinateAuthenticationView = async <ScreenName extends keyof RouteParam
 
   try {
     instance = await pronote.instance(pronoteURL);
-    console.info("PRONOTE->determinateAuthenticationView(): OK");
+    info("PRONOTE->determinateAuthenticationView(): OK", "pronote");
   }
   catch (error) {
     try {
-      console.warn(`PRONOTE->determinateAuthenticationView(): Une erreur est survenue avec l'URL '${pronoteURL}' ! Tentative avec une URL alternative (TOUTATICE)...`);
+      warn(`PRONOTE->determinateAuthenticationView(): Une erreur est survenue avec l'URL '${pronoteURL}' ! Tentative avec une URL alternative (TOUTATICE)...`, "pronote");
       pronoteURL = pronoteURL.replace(".index-education.net", ".pronote.toutatice.fr");
       instance = await pronote.instance(pronoteURL);
-      console.info("PRONOTE->determinateAuthenticationView(): OK");
+      info("PRONOTE->determinateAuthenticationView(): OK", "pronote");
     }
     catch {
       showAlert({
@@ -50,7 +50,6 @@ const determinateAuthenticationView = async <ScreenName extends keyof RouteParam
   });
 
   info(JSON.stringify(instance, null, 2), (new Error()).stack!);
-
   if (instance.casToken && instance.casURL) {
     showAlert({
       title: `L'instance ${instance.name} nécessite une connexion ENT.`,

@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import { Image, View, StyleSheet, StatusBar } from "react-native";
+import { Image, View, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Reanimated, { LinearTransition, FlipInXDown } from "react-native-reanimated";
 
@@ -13,8 +13,12 @@ import { useAlert } from "@/providers/AlertProvider";
 import { Audio } from "expo-av";
 import { useTheme } from "@react-navigation/native";
 import GetV6Data from "@/utils/login/GetV6Data";
+import { Check, Undo2 } from "lucide-react-native";
+import Constants from "expo-constants";
 
 const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
+  const theme = useTheme();
+  const { colors } = theme;
   const [sound, setSound] = useState<Audio.Sound | null>(null);
 
   const { showAlert } = useAlert();
@@ -28,7 +32,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
     setTimeout(async () => {
       const v6Data = await GetV6Data();
       setV6Data(v6Data);
-      if(v6Data.restore && !v6Data.imported) {
+      if (v6Data.restore && !v6Data.imported) {
         navigation.navigate("PronoteV6Import", { data: v6Data.data });
       }
     }, 1);
@@ -41,15 +45,66 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
         playSound();
         break;
       case "ed":
-        navigation.navigate("EcoleDirecteCredentials");
-        playSound();
+        if(__DEV__) {
+          showAlert({
+            title: "[DEBUG] Service en développement",
+            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
+            actions: [
+              {
+                title: "Annuler",
+                onPress: () => {},
+                icon: <Undo2 />,
+                primary: false,
+              },
+              {
+                title: "Continuer",
+                onPress: () => {
+                  navigation.navigate("SkolengoAuthenticationSelector");
+                  playSound();
+                },
+                icon: <Check />,
+                primary: true,
+              }
+            ]
+          });
+        } else UnsupportedAlert();
+        break;
+      case "skolengo":
+        // TODO : Remove this alert when Skolengo is fully supported
+        if(__DEV__) {
+          showAlert({
+            title: "[DEBUG] Service en développement",
+            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
+            actions: [
+              {
+                title: "Annuler",
+                onPress: () => {},
+                icon: <Undo2 />,
+                primary: false,
+              },
+              {
+                title: "Continuer",
+                onPress: () => {
+                  navigation.navigate("SkolengoAuthenticationSelector");
+                  playSound();
+                },
+                icon: <Check />,
+                primary: true,
+              }
+            ]
+          });
+        } else UnsupportedAlert();
         break;
       default:
-        showAlert({
-          title: "Service non supporté",
-          message: "Désolé, ce service n'est pas encore supporté. Veuillez réessayer dans une prochaine version."
-        });
+        UnsupportedAlert();
     }
+  };
+
+  const UnsupportedAlert = () => {
+    showAlert({
+      title: "Service non supporté",
+      message: "Désolé, ce service n'est pas encore supporté. Veuillez réessayer dans une prochaine version."
+    });
   };
 
   useEffect(() => {

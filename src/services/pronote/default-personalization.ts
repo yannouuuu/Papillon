@@ -13,12 +13,14 @@ const defaultPronoteTabs = [
   "News",
   "Attendance",
   "Messages",
+  "Menu"
 ] as typeof defaultTabs[number]["tab"][];
 
 const defaultPersonalization = async (instance: pronote.SessionHandle): Promise<Partial<Personalization>> => {
   const user = instance.user.resources[0];
   return {
     color: colors[0],
+    magicEnabled: true,
 
     profilePictureB64: user.profilePicture
       ? await downloadAsBase64(user.profilePicture.url)

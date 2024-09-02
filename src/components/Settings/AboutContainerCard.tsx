@@ -17,15 +17,14 @@ const AboutContainerCard = ({ theme }: { theme: any }) => {
         overflow: "hidden",
         backgroundColor: colors.primary + "22",
       }}>
-        <LottieView
-          source={require("@/../assets/lottie/Header_apropos.json")}
+        <Image
+          source={require("@/../assets/images/settings/about_papillon.png")}
           style={{
-            width: "100%",
-            height: "100%",
+            width: "90%",
+            height: "90%",
+            resizeMode: "contain",
+            marginTop: 30,
           }}
-
-          loop
-          autoPlay
         />
       </View>
       <NativeItem>

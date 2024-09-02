@@ -8,6 +8,7 @@ import { PressableScale } from "react-native-pressable-scale";
 import { useTheme } from "@react-navigation/native";
 import RedirectButton from "@/components/Home/RedirectButton";
 import { PapillonNavigation } from "@/router/refs";
+import { log } from "@/utils/logger/logger";
 
 interface Attendance {
   absences: {
@@ -26,7 +27,7 @@ const AttendanceElement: React.FC = () => {
 
   useEffect(() => {
     void async function () {
-      console.log("update grades periods in cache");
+      log("update grades periods in cache", "attendance:updateGradesPeriodsInCache");
       if (account?.instance) {
         await updateGradesPeriodsInCache(account);
       }

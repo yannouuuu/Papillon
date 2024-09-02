@@ -1,38 +1,38 @@
-import React from "react";
-import { View, Platform, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Platform, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 
 import { PapillonContextEnter, PapillonContextExit } from "@/utils/ui/animations";
 import { useTheme } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import Reanimated from "react-native-reanimated";
+import Reanimated, { type AnimatedStyle } from "react-native-reanimated";
 import { NativeText } from "./NativeComponents";
 
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { Check } from "lucide-react-native";
 
-const PapillonPicker = ({
+interface PapillonPickerProps {
+  children: React.ReactNode
+  data: string[]
+  selected: string
+  contentContainerStyle?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>
+  delay?: number
+  onSelectionChange?: (item: string) => unknown
+}
+
+const PapillonPicker: React.FC<PapillonPickerProps> = ({
   children,
   data,
   selected,
-  style,
   contentContainerStyle,
   delay,
   onSelectionChange,
-}: {
-  children: React.ReactNode,
-  data: string[],
-  selected: string,
-  contentContainerStyle?: any,
-  delay?: number,
-  style?: any,
-  onSelectionChange?: (item: string) => void,
 }) => {
   const theme = useTheme();
-  const [contentHeight, setContentHeight] = React.useState(0);
-  const [opened, setOpened] = React.useState(false);
+  const [contentHeight, setContentHeight] = useState(0);
+  const [opened, setOpened] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     Haptics.selectionAsync();
   }, [opened]);
 
@@ -52,7 +52,7 @@ const PapillonPicker = ({
         <Reanimated.View
           style={styles.children}
           onLayout={(event)=> {
-            const {x, y, height, width} = event.nativeEvent.layout;
+            const height = event.nativeEvent.layout.height;
             setContentHeight(height);
           }}
         >
@@ -106,7 +106,7 @@ const PapillonPicker = ({
                   )}
                 </TouchableOpacity>
 
-                { index === data.length - 1 ? null : (
+                {index === data.length - 1 ? null : (
                   <View
                     style={{
                       height: 1,

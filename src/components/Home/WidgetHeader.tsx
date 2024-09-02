@@ -1,11 +1,16 @@
 import { useTheme } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { cloneElement } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 
-const WidgetHeader: React.FC = ({ icon, title, loading }) => {
-  const colors = useTheme().colors;
+const WidgetHeader: React.FC<{
+  title: string
+  icon?: React.ReactElement
+  loading?: boolean
+}> = ({ icon, title, loading }) => {
+  const theme = useTheme();
+  const { colors } = theme;
 
-  const newIcon = icon && React.cloneElement(icon, {
+  const clonedIcon = icon && cloneElement(icon, {
     size: 20,
     strokeWidth: 2.3,
     color: colors.text,
@@ -21,7 +26,7 @@ const WidgetHeader: React.FC = ({ icon, title, loading }) => {
         opacity: 0.5,
       }}
     >
-      {icon && newIcon}
+      {clonedIcon}
 
       <Text
         style={{

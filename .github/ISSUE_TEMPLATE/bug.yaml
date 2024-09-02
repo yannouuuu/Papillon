@@ -2,10 +2,6 @@ name: 🐛 Signaler un bug
 description: Signalez un bug pour nous aider à améliorer Papillon
 title: '[Bug]: '
 labels: [bug]
-assignees: 
-  - Vexcited
-  - ecnivtwelve
-  - LeGeek01
 body:
   - type: textarea
     attributes:
@@ -46,8 +42,8 @@ body:
   - type: input
     attributes:
       label: Version
-      placeholder: '7.0.0-beta'
-      value: '7.0.0-beta'
+      placeholder: '7.0.1-beta'
+      value: '7.0.1-beta'
     validations:
       required: true
   - type: dropdown

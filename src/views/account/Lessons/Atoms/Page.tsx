@@ -18,7 +18,7 @@ const RefreshControl = createNativeWrapper(RNRefreshControl, {
   shouldCancelWhenOutside: false,
 });
 
-const getDuration = (minutes) => {
+const getDuration = (minutes: number): string => {
   const durationHours = Math.floor(minutes / 60);
   const durationRemainingMinutes = minutes % 60;
   return `${durationHours} h ${lz(durationRemainingMinutes)} min`;
@@ -26,16 +26,23 @@ const getDuration = (minutes) => {
 
 const lz = (num: number) => (num < 10 ? `0${num}` : num);
 
-export const Page = ({
+interface Props {
+  index: number
+  timetables: Record<number, Timetable>
+  loadTimetableWeek: (weekNumber: number, force?: boolean) => Promise<void>
+  getWeekFromIndex: (index: number) => {
+    weekNumber: number;
+    dayNumber: number;
+  }
+  current: boolean
+}
+
+export const Page: React.FC<Props> = ({
   index,
   timetables,
   loadTimetableWeek,
   current,
   getWeekFromIndex,
-}: {
-  index: number
-  timetables: Record<number, Timetable>
-  loadTimetableWeek: (weekNumber: number) => Promise<void>
 }) => {
   const { colors } = useTheme();
   const { weekNumber, dayNumber } = useMemo(() => getWeekFromIndex(index), [index, getWeekFromIndex]);
@@ -49,7 +56,7 @@ export const Page = ({
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await loadTimetableWeek(weekNumber);
+    await loadTimetableWeek(weekNumber, true);
     setIsRefreshing(false);
   };
 
@@ -78,7 +85,6 @@ export const Page = ({
                     currentDayTimetable[i + 1].startTimestamp - item.endTimestamp > 3000000 && (
                     <SeparatorCourse
                       i={i}
-                      colors={colors}
                       start={currentDayTimetable[i + 1].startTimestamp}
                       end={item.endTimestamp}
                     />
@@ -99,7 +105,14 @@ export const Page = ({
   );
 };
 
-const SeparatorCourse = ({ i, colors, start, end }) => {
+const SeparatorCourse: React.FC<{
+  i: number
+  start: number
+  end: number
+}> = ({ i, start, end }) => {
+  const { colors } = useTheme();
+  const startHours = new Date(start).getHours();
+
   return (
     <Reanimated.View
       style={{
@@ -115,14 +128,15 @@ const SeparatorCourse = ({ i, colors, start, end }) => {
         marginLeft: 70,
       }}
       entering={
-        Platform.OS === "ios" &&
-        FadeInDown.delay(50 * i)
-          .springify()
-          .mass(1)
-          .damping(20)
-          .stiffness(300)
+        Platform.OS === "ios" ?
+          FadeInDown.delay(50 * i)
+            .springify()
+            .mass(1)
+            .damping(20)
+            .stiffness(300)
+          : void 0
       }
-      exiting={Platform.OS === "ios" && FadeOut.duration(300)}
+      exiting={Platform.OS === "ios" ? FadeOut.duration(300) : void 0}
     >
       <View
         style={{
@@ -149,8 +163,8 @@ const SeparatorCourse = ({ i, colors, start, end }) => {
           }}
         />
 
-        {new Date(start).getHours() > 11 &&
-          new Date(start).getHours() < 14 ? (
+        {startHours > 11 &&
+          startHours < 14 ? (
             <Utensils size={20} color={colors.text} />
           ) : (
             <Sofa size={20} color={colors.text} />
@@ -164,8 +178,8 @@ const SeparatorCourse = ({ i, colors, start, end }) => {
             color: colors.text,
           }}
         >
-          {new Date(start).getHours() > 11 &&
-            new Date(start).getHours() < 14
+          {startHours > 11 &&
+            startHours < 14
             ? "Pause méridienne"
             : "Pas de cours"}
         </Text>
