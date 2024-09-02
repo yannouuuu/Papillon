@@ -98,14 +98,14 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
         En continuant, vous acceptez les&nbsp;
         <Text
           style={{ textDecorationLine: "underline" }}
-          onPress={() => openUrl(PRIVACY_POLICY_URL)}
+          onPress={() => openUrl(TERMS_OF_SERVICE_URL)}
         >
           conditions d'utilisation
         </Text>
         &nbsp;et la&nbsp;
         <Text
           style={{ textDecorationLine: "underline" }}
-          onPress={() => openUrl(TERMS_OF_SERVICE_URL)}
+          onPress={() => openUrl(PRIVACY_POLICY_URL)}
         >
           politique de confidentialité
         </Text>.
