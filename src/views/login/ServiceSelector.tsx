@@ -231,10 +231,12 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
           />
         )}
 
-        <ButtonCta
-          value="Fournisseur d'identité"
-          onPress={() => navigation.navigate("IdentityProviderSelector")}
-        />
+        {__DEV__ && (
+          <ButtonCta
+            value="Fournisseur d'identité"
+            onPress={() => navigation.navigate("IdentityProviderSelector")}
+          />
+        )}
       </View>
     </SafeAreaView>
   );
