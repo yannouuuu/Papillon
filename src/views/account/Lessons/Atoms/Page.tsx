@@ -82,7 +82,7 @@ export const Page: React.FC<Props> = ({
                   <TimetableItem key={item.startTimestamp} item={item} index={i} />
 
                   {currentDayTimetable[i + 1] &&
-                    currentDayTimetable[i + 1].startTimestamp - item.endTimestamp > 3000000 && (
+                    currentDayTimetable[i + 1].startTimestamp - item.endTimestamp > 1740000 && (
                     <SeparatorCourse
                       i={i}
                       start={currentDayTimetable[i + 1].startTimestamp}

@@ -1,4 +1,6 @@
 export interface TimetableClass {
+  subject: string
+  id: number
   type: "lesson" | "activity" | "detention"
   title: string
   startTimestamp: number
