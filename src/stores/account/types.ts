@@ -118,7 +118,11 @@ export interface SkolengoAccount extends BaseAccount {
 
 export interface LocalAccount extends BaseAccount {
   service: AccountService.Local
-  instance: undefined,
+
+  // Both are useless for local accounts.
+  instance: undefined
+  authentication: undefined
+
   identityProvider: {
     identifier: string
     name: string,
