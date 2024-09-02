@@ -20,10 +20,7 @@ const determinateAuthenticationView = async <ScreenName extends keyof RouteParam
   if (!pronoteURL.startsWith("https://") && !pronoteURL.startsWith("http://")) {
     pronoteURL = `https://${pronoteURL}`;
     pronoteURL = pronote.cleanURL(pronoteURL);
-    console.log(pronoteURL);
   }
-
-  console.log(pronoteURL);
 
   try {
     instance = await pronote.instance(pronoteURL);
