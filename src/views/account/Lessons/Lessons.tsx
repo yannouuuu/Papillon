@@ -41,32 +41,26 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
 
   const [currentPageIndex, setCurrentPageIndex] = useState(1);
   const [showDatePicker, setShowDatePicker] = useState(false);
+
   let loadedWeeks = useRef<Set<number>>(new Set());
   let currentlyLoadingWeeks = useRef<Set<number>>(new Set());
+  let lastAccountID = useRef<string | null>(null);
 
   // Too hard to type, please send help :D
   const PagerRef = useRef<any>(null);
-
-  const today = useMemo(() => new Date(), []);
-  const defaultDate = useMemo(() => new Date(today), [today]);
-
-  const [firstDate, setFirstDate] = useState(new Date("2024-09-01"));
-
-  useEffect(() => {
-    if (account.instance) {
-      if (account.service === AccountService.Pronote) {
-        setFirstDate(new Date(account.instance.instance.firstDate));
-      }
-    }
-  }, [account]);
-
   const getDateFromIndex = useCallback((index: number) => {
-    const date = new Date(defaultDate);
+    const date = new Date();
     date.setDate(date.getDate() + index);
     return date;
-  }, [defaultDate]);
+  }, []);
 
   const getWeekFromIndex = (index: number) => {
+    let firstDate = new Date("2024-09-01");
+
+    if (account.service === AccountService.Pronote && account.instance) {
+      firstDate = account.instance.instance.firstDate;
+    }
+
     const date = getDateFromIndex(index);
     const firstDayOfYear = new Date(firstDate);
     const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
@@ -81,8 +75,14 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
     currentlyLoadingWeeks.current.add(weekNumber);
 
     try {
-      await updateTimetableForWeekInCache(account, weekNumber);
-      loadedWeeks.current.add(weekNumber);
+      if (account.instance) {
+        await updateTimetableForWeekInCache(account, weekNumber);
+        loadedWeeks.current.add(weekNumber);
+      }
+      else if (weekNumber in timetables) {
+        loadedWeeks.current.add(weekNumber);
+      }
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -97,9 +97,21 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
   }, [timetables]);
 
   useEffect(() => {
+    if (lastAccountID.current === null) {
+      lastAccountID.current = account.localID;
+    }
+    else {
+      // On reload les semaines si on change de compte.
+      if (lastAccountID.current !== account.localID) {
+        lastAccountID.current = account.localID;
+        loadedWeeks.current = new Set();
+        currentlyLoadingWeeks.current = new Set();
+      }
+    }
+
     const { weekNumber } = getWeekFromIndex(currentPageIndex);
     loadTimetableWeek(weekNumber);
-  }, [currentPageIndex]);
+  }, [currentPageIndex, account?.instance, account.localID]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -121,7 +133,7 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
           showDatePicker={showDatePicker}
           setShowDatePicker={setShowDatePicker}
           currentPageIndex={currentPageIndex}
-          defaultDate={defaultDate}
+          defaultDate={new Date()}
           PagerRef={PagerRef}
           getDateFromIndex={getDateFromIndex}
         />
