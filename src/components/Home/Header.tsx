@@ -287,7 +287,7 @@ const HeaderButton: React.FC<{
   onPress: () => void
 }> = ({icon, index, text, scrolled, onPress}) => {
   const theme = useTheme();
-  const {colors} = theme;
+  const { colors } = theme;
 
   const newIcon = React.cloneElement(icon, {
     size: 24,
