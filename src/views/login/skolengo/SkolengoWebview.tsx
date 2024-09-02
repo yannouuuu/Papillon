@@ -26,6 +26,7 @@ import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { Audio } from "expo-av";
 import { authTokenToSkolengoTokenSet } from "@/services/skolengo/skolengo-types";
 import { getSkolengoAccount } from "@/services/skolengo/skolengo-account";
+import { log } from "@/utils/logger/logger";
 
 // TODO : When the app is not started with Expo Go (so with a prebuild or a release build), use the expo auth-session module completely with the deeplink and without the webview.
 
@@ -225,9 +226,9 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                     discovery: discovery!
                   });
                   setLoginStep("Finalisation du compte...");
-                  /* await skolengoAccount.instance!.getUserInfo().then((info) => {
-                    console.log("info", info);
-                  }).catch(console.log); */
+                  await skolengoAccount.instance!.getUserInfo().then((info) => {
+                    log("info", "Skolengo");
+                  }).catch(console.log);
                   createStoredAccount(skolengoAccount);
                   switchTo(skolengoAccount);
 

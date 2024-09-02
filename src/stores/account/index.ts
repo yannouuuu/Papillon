@@ -109,7 +109,7 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
     log("reloaded all external accounts", "[switchTo]");
 
     set({ linkedAccounts });
-    log(`done reading ${account.name}and rehydrating stores.`, "[switchTo]");
+    log(`done reading ${account.name} and rehydrating stores.`, "[switchTo]");
   },
 
   linkExistingExternalAccount: (account) => {
