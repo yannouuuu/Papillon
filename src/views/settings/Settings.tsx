@@ -363,7 +363,16 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           }}
         >
           version {AppJSON.expo.version} {"\n"}
-          fabriqué avec ❤️ par l'équipe Papillon
+          os {Platform.OS} {Platform.Version} {"\n"}
+          fabriqué avec ❤️ par l'équipe&nbsp;
+          <Text
+            style={{
+              textDecorationLine: "underline",
+            }}
+            onPress={() => navigation.navigate("SettingsAbout")}
+          >
+            Papillon
+          </Text>
         </Text>
       </Reanimated.ScrollView>
     </>
