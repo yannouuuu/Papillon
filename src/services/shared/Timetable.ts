@@ -1,5 +1,5 @@
 export interface TimetableClass {
-  subject: any
+  subject: string
   id: number
   type: "lesson" | "activity" | "detention"
   title: string
