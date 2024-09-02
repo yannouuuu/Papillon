@@ -15,6 +15,7 @@ import { useTheme } from "@react-navigation/native";
 import GetV6Data from "@/utils/login/GetV6Data";
 import { Check, Undo2 } from "lucide-react-native";
 import Constants from "expo-constants";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
   const theme = useTheme();
@@ -148,32 +149,71 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
         offsetTop={"20%"}
       />
 
-      <Reanimated.View
-        style={styles.list}
-        layout={LinearTransition}
+      <View
+        style={{
+          width: "100%",
+          flex: 1,
+          alignItems: "center",
+          marginTop: -36,
+          zIndex: 1000,
+        }}
       >
-        {services.map((srv) => (
-          <Reanimated.View
-            style={{ width: "100%" }}
-            layout={LinearTransition}
-            entering={FlipInXDown.springify().delay(100)}
-          >
-            <DuoListPressable
-              key={srv.name}
-              leading={
-                <Image
-                  source={srv.image}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
-              }
-              text={srv.title}
-              enabled={srv.name === service}
-              onPress={() => setService(srv.name as Services)}
-            />
-          </Reanimated.View>
-        ))}
-      </Reanimated.View>
+        <LinearGradient
+          colors={[colors.background, colors.background + "00"]}
+          style={{
+            width: "100%",
+            height: 50,
+            position: "absolute",
+            top: 0,
+            zIndex: 100,
+          }}
+        />
+
+        <LinearGradient
+          colors={[colors.background + "00", colors.background]}
+          style={{
+            width: "100%",
+            height: 50,
+            position: "absolute",
+            bottom: 0,
+            zIndex: 100,
+          }}
+        />
+
+        <Reanimated.ScrollView
+          style={styles.list}
+          contentContainerStyle={{
+            alignItems: "center",
+            gap: 9,
+            paddingHorizontal: 20,
+            paddingTop: 30,
+            paddingBottom: 60,
+          }}
+          layout={LinearTransition}
+        >
+          {services.map((srv) => (
+            <Reanimated.View
+              style={{ width: "100%" }}
+              layout={LinearTransition}
+              entering={FlipInXDown.springify().delay(100)}
+            >
+              <DuoListPressable
+                key={srv.name}
+                leading={
+                  <Image
+                    source={srv.image}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                }
+                text={srv.title}
+                enabled={srv.name === service}
+                onPress={() => setService(srv.name as Services)}
+              />
+            </Reanimated.View>
+          ))}
+        </Reanimated.ScrollView>
+      </View>
 
       <View style={styles.buttons}>
         <ButtonCta
@@ -204,9 +244,6 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
     width: "100%",
-    alignItems: "center",
-    gap: 9,
-    paddingHorizontal: 20,
   },
 
   buttons: {
