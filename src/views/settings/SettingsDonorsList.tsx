@@ -84,7 +84,7 @@ const SettingsDonorsList = () => {
                   color: "#2ecc71",
                   fontFamily: "semibold",
                   fontSize: 22,
-                  lineHeight: 28,  // Ajout de cette ligne
+                  lineHeight: 28,
                 }}
               >
                 {totalDonations.toFixed(2)} €
