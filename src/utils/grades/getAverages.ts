@@ -3,7 +3,7 @@ import type { Grade } from "@/services/shared/Grade";
 export interface GradeHistory {
   value: number;
   date: string;
-}
+};
 
 type Target = "student" | "average" | "min" | "max";
 
