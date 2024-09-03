@@ -18,6 +18,17 @@ export async function updateGradesPeriodsInCache <T extends Account> (account: T
 
       break;
     }
+    case AccountService.Local: {
+      periods = [
+        {
+          name: "Toutes",
+          startTimestamp: 1609459200,
+          endTimestamp: 1622505600
+        },
+      ];
+      defaultPeriod = "Toutes";
+      break;
+    }
     default:
       throw new Error("Service not implemented");
   }
@@ -37,6 +48,16 @@ export async function updateGradesAndAveragesInCache <T extends Account> (accoun
 
         grades = output.grades;
         averages = output.averages;
+
+        break;
+      }
+      case AccountService.Local: {
+        grades = [];
+        averages = {
+          subjects: [],
+          overall: { value: 0, disabled: true },
+          classOverall: { value: 0, disabled: true }
+        };
 
         break;
       }
