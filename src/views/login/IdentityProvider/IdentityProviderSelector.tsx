@@ -13,7 +13,14 @@ const IdentityProviderSelector: Screen<"IdentityProviderSelector"> = ({ navigati
       description: "Utilisez votre compte Sésame pour vous connecter",
       image: require("@/../assets/images/service_rennes1.png"),
       navigate: () => navigation.navigate("UnivRennes1_Login"),
-    }
+    },
+    {
+      name: "univ_limoges",
+      title: "Université de Limoges",
+      description: "Utilisez votre compte Biome pour vous connecter",
+      image: require("@/../assets/images/service_unilim.png"),
+      navigate: () => navigation.navigate("UnivLimoges_Login"),
+    },
   ];
 
   return (
@@ -21,7 +28,6 @@ const IdentityProviderSelector: Screen<"IdentityProviderSelector"> = ({ navigati
       style={{ flex: 1 }}
       contentContainerStyle={{ padding: 16, paddingTop: 0 }}
     >
-
       <NativeListHeader label="Fournisseurs disponibles" />
 
       <NativeList>

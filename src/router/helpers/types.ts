@@ -44,6 +44,7 @@ export type RouteParameters = {
   // login.identityProvider
   IdentityProviderSelector: undefined;
   UnivRennes1_Login: undefined;
+  UnivLimoges_Login: undefined;
 
   // login.skolengo
   SkolengoAuthenticationSelector: undefined;

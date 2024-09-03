@@ -8,6 +8,7 @@ import type { Screen } from "@/router/helpers/types";
 import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { AccountService, LocalAccount } from "@/stores/account/types";
 import defaultPersonalization from "@/services/local/default-personalization";
+import uuid from "@/utils/uuid-v4";
 
 const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
   const mainURL = "https://sesame.univ-rennes1.fr/comptes/";
@@ -18,18 +19,18 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
   const switchTo = useCurrentAccount(store => store.switchTo);
 
   const loginUnivData = async (data: any) => {
-    if(data?.user?.uid !== null) {
+    if (data?.user?.uid !== null) {
       const local_account: LocalAccount = {
-        instance: {
-          rawData: data
-        },
+        authentication: undefined,
+        instance: undefined,
+
         identityProvider: {
           identifier: "univ-rennes1",
           name: "Université de Rennes",
           rawData: data
         },
 
-        localID: data?.user?.infos.email.lhs + "@" + data?.user?.infos?.email?.domain,
+        localID: uuid(),
         service: AccountService.Local,
 
         isExternal: false,
@@ -41,7 +42,7 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
           last: data?.user?.infos?.lastName,
         },
         className: "", // TODO ?
-        schoolName: "",
+        schoolName: "Université de Rennes",
 
         personalization: await defaultPersonalization()
       };
@@ -76,15 +77,14 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         startInLoadingState={true}
         incognito={true}
         onLoadEnd={(e) => {
-          console.log(e.nativeEvent);
           if (e.nativeEvent.title === "Sésame" && e.nativeEvent.url === mainURL) {
-            webViewRef.current.injectJavaScript(`
+            webViewRef.current?.injectJavaScript(`
               window.location.href = "https://sesame.univ-rennes1.fr/comptes/api/auth/data";
             `);
           }
 
           if (e.nativeEvent.url === "https://sesame.univ-rennes1.fr/comptes/api/auth/data") {
-            webViewRef.current.injectJavaScript(`
+            webViewRef.current?.injectJavaScript(`
               window.ReactNativeWebView.postMessage(JSON.stringify({type: "loginData", data: document.querySelector("pre").innerText}));
             `);
           }
