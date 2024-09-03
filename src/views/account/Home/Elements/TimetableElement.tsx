@@ -31,6 +31,9 @@ const TimetableElement = () => {
 
   useEffect(() => {
     const updateNextCourses = () => {
+      setHidden(true);
+      setNextCourses([]);
+
       if (!account.instance || !timetables) {
         return;
       }
