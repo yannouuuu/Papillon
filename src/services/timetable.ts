@@ -13,6 +13,10 @@ export async function updateTimetableForWeekInCache <T extends Account> (account
       break;
     }
     case AccountService.Local: {
+      const timetable = [];
+      useTimetableStore.getState().updateClasses(weekNumber, [
+        {}
+      ]);
       break;
     }
     default: {
