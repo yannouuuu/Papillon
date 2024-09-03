@@ -29,9 +29,9 @@ const lz = (num: number) => (num < 10 ? `0${num}` : num);
 interface Props {
   index: number
   timetables: Record<number, Timetable>
-  loadTimetableWeek: (weekNumber: number, force?: boolean) => Promise<void>
+  loadTimetableWeek: (epochWeekNumber: number, force?: boolean) => Promise<void>
   getWeekFromIndex: (index: number) => {
-    weekNumber: number;
+    epochWeekNumber: number;
     dayNumber: number;
   }
   current: boolean
@@ -45,10 +45,10 @@ export const Page: React.FC<Props> = ({
   getWeekFromIndex,
 }) => {
   const { colors } = useTheme();
-  const { weekNumber, dayNumber } = useMemo(() => getWeekFromIndex(index), [index, getWeekFromIndex]);
+  const { epochWeekNumber, dayNumber } = useMemo(() => getWeekFromIndex(index), [index, getWeekFromIndex]);
 
-  const currentDayTimetable: Timetable = (!(weekNumber in timetables)) ? []
-    : timetables[weekNumber]
+  const currentDayTimetable: Timetable = (!(epochWeekNumber in timetables)) ? []
+    : timetables[epochWeekNumber]
       .filter(c => new Date(c.startTimestamp).getDay() === dayNumber)
       .sort((a, b) => a.startTimestamp - b.startTimestamp);
 
@@ -56,7 +56,7 @@ export const Page: React.FC<Props> = ({
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await loadTimetableWeek(weekNumber, true);
+    await loadTimetableWeek(epochWeekNumber, true);
     setIsRefreshing(false);
   };
 

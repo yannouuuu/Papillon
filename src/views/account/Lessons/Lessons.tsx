@@ -10,17 +10,17 @@ import { Page } from "./Atoms/Page";
 
 import InfinitePager from "react-native-infinite-pager";
 import { HeaderCalendar, LessonsDateModal } from "./LessonsHeader";
-import { AccountService } from "@/stores/account/types";
 import type { Timetable as TTimetable } from "@/services/shared/Timetable";
+import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 
 const RenderPage = ({ index, timetables, getWeekFromIndex, loadTimetableWeek, currentPageIndex } : {
   index: number
   timetables: Record<number, TTimetable>
   getWeekFromIndex: (index: number) => {
-    weekNumber: number;
+    epochWeekNumber: number;
     dayNumber: number;
   }
-  loadTimetableWeek: (weekNumber: number) => Promise<void>
+  loadTimetableWeek: (epochWeekNumber: number) => Promise<void>
   currentPageIndex: number
 }) => (
   <View>
@@ -50,16 +50,6 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
   const today = useMemo(() => new Date(), []);
   const defaultDate = useMemo(() => new Date(today), [today]);
 
-  const [firstDate, setFirstDate] = useState(new Date("2024-09-01"));
-
-  useEffect(() => {
-    if (account.instance) {
-      if (account.service === AccountService.Pronote) {
-        setFirstDate(new Date(account.instance.instance.firstDate));
-      }
-    }
-  }, [account]);
-
   const getDateFromIndex = useCallback((index: number) => {
     const date = new Date(defaultDate);
     date.setDate(date.getDate() + index);
@@ -68,25 +58,23 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
 
   const getWeekFromIndex = (index: number) => {
     const date = getDateFromIndex(index);
-    const firstDayOfYear = new Date(firstDate);
-    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
-    const weekNumber = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    const epochWeekNumber = dateToEpochWeekNumber(date);
     const dayNumber = date.getDay();
-    return { weekNumber, dayNumber };
+    return { epochWeekNumber, dayNumber };
   };
 
-  const loadTimetableWeek = async (weekNumber: number, force = false) => {
-    if (currentlyLoadingWeeks.current.has(weekNumber)) return;
-    if (loadedWeeks.current.has(weekNumber) && !force) return;
-    currentlyLoadingWeeks.current.add(weekNumber);
+  const loadTimetableWeek = async (epochWeekNumber: number, force = false) => {
+    if (currentlyLoadingWeeks.current.has(epochWeekNumber)) return;
+    if (loadedWeeks.current.has(epochWeekNumber) && !force) return;
+    currentlyLoadingWeeks.current.add(epochWeekNumber);
 
     try {
-      await updateTimetableForWeekInCache(account, weekNumber);
-      loadedWeeks.current.add(weekNumber);
+      await updateTimetableForWeekInCache(account, epochWeekNumber);
+      loadedWeeks.current.add(epochWeekNumber);
     } catch (error) {
       console.error(error);
     } finally {
-      currentlyLoadingWeeks.current.delete(weekNumber);
+      currentlyLoadingWeeks.current.delete(epochWeekNumber);
     }
   };
 
@@ -97,8 +85,8 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
   }, [timetables]);
 
   useEffect(() => {
-    const { weekNumber } = getWeekFromIndex(currentPageIndex);
-    loadTimetableWeek(weekNumber);
+    const { epochWeekNumber } = getWeekFromIndex(currentPageIndex);
+    loadTimetableWeek(epochWeekNumber);
   }, [currentPageIndex]);
 
   useEffect(() => {
@@ -130,7 +118,6 @@ const Timetable: Screen<"Lessons"> = ({ navigation }) => {
       <InfinitePager
         onPageChange={setCurrentPageIndex}
         ref={PagerRef}
-        minIndex={1}
         renderPage={({ index }) => <RenderPage
           index={index}
           timetables={timetables}
