@@ -363,7 +363,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           }}
         >
           version {AppJSON.expo.version} {"\n"}
-          fabriqué avec ❤️ par les l'équipe de Papillon
+          fabriqué avec ❤️ par les les contributeurs de Papillon
         </Text>
       </Reanimated.ScrollView>
     </>
