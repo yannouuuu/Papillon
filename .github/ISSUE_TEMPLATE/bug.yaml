@@ -57,6 +57,14 @@ body:
       required: true
   - type: dropdown
     attributes:
+      label: Source de l'application
+      options:
+        - Stores (Play Store / App Store)
+        - Github
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
       label: Service scolaire
       options:
         - 🦋 Pronote
