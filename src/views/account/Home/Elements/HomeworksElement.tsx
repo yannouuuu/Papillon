@@ -51,7 +51,6 @@ const HomeworksElement = () => {
     debouncedUpdateHomeworks();
   }, [account.instance, currentWeek]);
 
-
   useEffect(() => {
     setCurrentWeek(getWeekNumber(currentDay));
   }, [currentDay, currentlyUpdating]);
@@ -64,7 +63,24 @@ const HomeworksElement = () => {
     [account, updateHomeworks]
   );
 
-  if (!homeworks[currentWeek] || homeworks[currentWeek]?.filter(hw => new Date(hw.due).getDate() === currentDay.getDate()).length === 0) {
+  // Calcul de la plage de dates de la semaine actuelle
+  const getStartAndEndOfWeek = (date: Date) => {
+    const startOfWeek = new Date(date);
+    startOfWeek.setDate(date.getDate() - date.getDay()); // Premier jour de la semaine (dimanche)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Dernier jour de la semaine (samedi)
+    return { startOfWeek, endOfWeek };
+  };
+
+  const { startOfWeek, endOfWeek } = useMemo(() => getStartAndEndOfWeek(currentDay), [currentDay]);
+
+  // Filtrage des devoirs pour la semaine actuelle
+  const homeworksForCurrentWeek = homeworks[currentWeek]?.filter(hw => {
+    const hwDate = new Date(hw.due);
+    return hwDate >= startOfWeek && hwDate <= endOfWeek;
+  });
+
+  if (!homeworksForCurrentWeek || homeworksForCurrentWeek.length === 0) {
     return null;
   }
 
@@ -76,12 +92,12 @@ const HomeworksElement = () => {
         )}
       />
       <NativeList>
-        {homeworks[currentWeek]?.filter(hw => new Date(hw.due).getDate() === currentDay.getDate()).map((hw, index) => (
+        {homeworksForCurrentWeek.map((hw, index) => (
           <HomeworkItem
             homework={hw}
             key={index}
             index={index}
-            total={homeworks[currentWeek].length}
+            total={homeworksForCurrentWeek.length}
             onDonePressHandler={() => {
               handleDonePress(hw);
             }}
