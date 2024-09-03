@@ -65,14 +65,15 @@ const AccountSwitcher: React.FC<{
           },
         ]}
       >
-        {account.personalization.profilePictureB64 && !shouldHidePicture ? (
+        {!shouldHidePicture ? (
           <Image
-            source={account.personalization.profilePictureB64 ? { uri: account.personalization.profilePictureB64 } : defaultProfilePicture(account.service)}
+            source={(account.personalization.profilePictureB64 && account.personalization.profilePictureB64.trim() !== "") ? { uri: account.personalization.profilePictureB64 } : defaultProfilePicture(account.service)}
             style={[
               styles.avatar,
               {
                 backgroundColor: colors.text + "22",
                 height: small ? 30 : 28,
+                width: small ? 30 : 28,
               }
             ]}
           />

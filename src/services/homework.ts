@@ -20,6 +20,10 @@ export async function updateHomeworkForWeekInCache <T extends Account> (account:
         homeworks = await getHomeworkForWeek(account, weekNumber);
         break;
       }
+      case AccountService.Local: {
+        homeworks = [];
+        break;
+      }
       default:
         console.info(`[updateHomeworkForWeekInCache]: updating to empty since ${account.service} not implemented.`);
     }
@@ -36,6 +40,9 @@ export async function toggleHomeworkState <T extends Account> (account: T, homew
     case AccountService.Pronote: {
       const { toggleHomeworkState } = await import("./pronote/homework");
       await toggleHomeworkState(account, homework);
+      break;
+    }
+    case AccountService.Local: {
       break;
     }
     default: {

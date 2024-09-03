@@ -14,6 +14,11 @@ export async function updateTimetableForWeekInCache <T extends Account> (account
       useTimetableStore.getState().updateClasses(epochWeekNumber, timetable);
       break;
     }
+    case AccountService.Local: {
+      const timetable = [];
+      useTimetableStore.getState().updateClasses(epochWeekNumber, []);
+      break;
+    }
     default: {
       throw new Error("Service not implemented.");
     }

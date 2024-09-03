@@ -61,6 +61,10 @@ const GeneralAverageWidget = forwardRef(({
     setHidden(typeof average !== "number" || average < 0);
   }, [average]);
 
+  if (isNaN(average ?? 0)) {
+    setHidden(true);
+  }
+
   return (
     <>
       <View

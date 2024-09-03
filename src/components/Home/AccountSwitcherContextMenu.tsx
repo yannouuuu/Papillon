@@ -196,7 +196,12 @@ const ContextMenu: React.FC<{
                           fontFamily: "medium",
                         }}
                       >
-                        {AccountService[account.service]}
+                        {AccountService[account.service] !== "Local" ?
+                          AccountService[account.service] :
+                          account.identityProvider ?
+                            account.identityProvider.name :
+                            "Compte local"
+                        }
                       </Text>
                     </View>
                     {currentAccount.localID === account.localID && (

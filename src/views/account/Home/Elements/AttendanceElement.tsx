@@ -69,7 +69,7 @@ const AttendanceElement: React.FC = () => {
     };
   };
 
-  if (!totalMissed) {
+  if (!totalMissed || totalMissed.absences.length === 0) {
     return null;
   }
 

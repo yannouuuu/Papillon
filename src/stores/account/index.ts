@@ -27,7 +27,7 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
   account: null,
   linkedAccounts: [],
 
-  mutateProperty: (key, value) => {
+  mutateProperty: <T extends keyof PrimaryAccount>(key: T, value: PrimaryAccount[T]) => {
     log(`mutate property ${key} in storage`, "current:update");
 
     // Since "instance" is a runtime only key,
@@ -66,16 +66,6 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
     set({ account });
     useAccounts.setState({ lastOpenedAccountID: account.localID });
 
-    // Account is currently not authenticated,
-    if (typeof account.instance === "undefined") {
-      log("instance undefined, reloading...", "[switchTo]");
-      // Automatically reconnect the main instance.
-      const { instance, authentication } = await reload(account);
-      get().mutateProperty("authentication", authentication);
-      get().mutateProperty("instance", instance);
-      log("instance reload done !", "[switchTo]");
-    }
-
     // Rehydrate every store that needs it.
     await Promise.all([
       [useTimetableStore, "timetable"] as const,
@@ -91,6 +81,16 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
       info(`rehydrating ${storageName}`, "switchTo");
       return store.persist.rehydrate();
     }));
+
+    // Account is currently not authenticated,
+    if (typeof account.instance === "undefined") {
+      log("instance undefined, reloading...", "[switchTo]");
+      // Automatically reconnect the main instance.
+      const { instance, authentication } = await reload(account);
+      get().mutateProperty("authentication", authentication);
+      get().mutateProperty("instance", instance);
+      log("instance reload done !", "[switchTo]");
+    }
 
     const accounts = useAccounts.getState().accounts;
     const linkedAccounts = account.linkedExternalLocalIDs.map((linkedID) => {
