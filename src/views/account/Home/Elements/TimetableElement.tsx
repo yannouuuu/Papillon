@@ -29,6 +29,16 @@ const TimetableElement = () => {
     );
   };
 
+  const isSameDay = (timestamp1: number, timestamp2: number) => {
+    const date1 = new Date(timestamp1);
+    const date2 = new Date(timestamp2);
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
+  };
+
   useEffect(() => {
     const updateNextCourses = () => {
       if (!account.instance || !timetables) {
@@ -36,13 +46,27 @@ const TimetableElement = () => {
       }
 
       const allCourses = Object.values(timetables).flat();
-      const today = new Date().getTime();
+      const now = new Date();
+      const today = now.getTime();
 
       const sortedCourses = allCourses
         .filter((c) => c.endTimestamp > today)
         .sort((a, b) => a.startTimestamp - b.startTimestamp);
 
-      const nextThreeCourses = sortedCourses.slice(0, 3);
+      let nextThreeCourses: TimetableClass[] = [];
+      let currentDay = now;
+
+      for (const course of sortedCourses) {
+        if (isSameDay(course.startTimestamp, currentDay.getTime())) {
+          nextThreeCourses.push(course);
+          if (nextThreeCourses.length === 3) break;
+        } else if (nextThreeCourses.length > 0) {
+          break;
+        } else {
+          currentDay = new Date(course.startTimestamp);
+          nextThreeCourses.push(course);
+        }
+      }
 
       if (nextThreeCourses.length > 0) {
         setNextCourses(nextThreeCourses);
@@ -82,6 +106,7 @@ const TimetableElement = () => {
           <React.Fragment key={course.id || index}>
             <TimetableItem item={course} index={index} small />
             {nextCourses[index + 1] &&
+              isSameDay(course.endTimestamp, nextCourses[index + 1].startTimestamp) &&
               nextCourses[index + 1].startTimestamp - course.endTimestamp > 1740000 && (
               <SeparatorCourse
                 i={index}
