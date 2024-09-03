@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Alert, Image, Platform, Text, View } from "react-native";
 import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as WebBrowser from "expo-web-browser";
 import AppJSON from "../../../app.json";
 
 import Reanimated, {
@@ -50,6 +51,13 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const defined = useFlagsStore(state => state.defined);
 
   const removeAccount = useAccounts((store) => store.remove);
+
+  const openUrl = async (url: string) => {
+    await WebBrowser.openBrowserAsync(url, {
+      controlsColor: colors.primary,
+      presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
+    });
+  };
 
   useEffect(() => {
     AsyncStorage.getItem("devmode")
@@ -174,8 +182,9 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           icon: <HandCoins />,
           color: "#CBA024",
           label: "Soutenir Papillon",
-          onPress: () => {},
-          disabled: true,
+          onPress: () => {
+            openUrl("https://papillon.bzh/donate");
+          },
         },
         {
           icon: <Info />,
