@@ -8,7 +8,11 @@ import colors from "@/utils/data/colors.json";
 const defaultLocalTabs = [
   "Home",
   "Lessons",
+  "Homeworks",
   "Grades",
+  "News",
+  "Attendance",
+  "Messages",
   "Menu"
 ] as typeof defaultTabs[number]["tab"][];
 
