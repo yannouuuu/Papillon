@@ -1,15 +1,13 @@
 import type { Screen } from "@/router/helpers/types";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { Image, Platform, Text, View } from "react-native";
+import { Alert, Image, Platform, Text, View } from "react-native";
 import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AppJSON from "../../../app.json";
 
 import Reanimated, {
   FadeIn,
-  FadeInDown,
   FadeOut,
-  FadeOutDown,
   runOnJS,
   useAnimatedScrollHandler,
   useSharedValue
@@ -26,6 +24,7 @@ import {
   Paperclip,
   Puzzle,
   Route,
+  Scroll,
   Settings as SettingsLucide,
   Sparkles,
   SwatchBook,
@@ -40,7 +39,6 @@ import {get_settings_widgets} from "@/addons/addons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AddonPlacementManifest} from "@/addons/types";
 import { useFlagsStore } from "@/stores/flags";
-import ButtonCta from "@/components/FirstInstallation/ButtonCta";
 
 const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -49,7 +47,6 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
   const [ addons, setAddons ] = useState<Array<AddonPlacementManifest>>([]);
   const [devModeEnabled, setDevModeEnabled] = useState(false);
-  const [disconnectPopup, setDisconnectPopup] = useState(false);
   const defined = useFlagsStore(state => state.defined);
 
   const removeAccount = useAccounts((store) => store.remove);
@@ -195,7 +192,23 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           color: "#CF0029",
           label: "Se déconnecter",
           onPress: () => {
-            setDisconnectPopup(true);
+            Alert.alert("Se déconnecter", "Êtes-vous sûr de vouloir vous déconnecter ?", [
+              {
+                text: "Annuler",
+                style: "cancel",
+              },
+              {
+                text: "Se déconnecter",
+                style: "destructive",
+                onPress: () => {
+                  removeAccount(account.localID);
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: "AccountSelector" }],
+                  });
+                },
+              },
+            ]);
           },
         },
       ]
@@ -350,74 +363,9 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           }}
         >
           version {AppJSON.expo.version} {"\n"}
-          os {Platform.OS} {Platform.Version} {"\n"}
-          fabriqué avec ❤️ par l'équipe&nbsp;
-          <Text
-            style={{
-              textDecorationLine: "underline",
-            }}
-            onPress={() => navigation.navigate("SettingsAbout")}
-          >
-            Papillon
-          </Text>
+          fabriqué avec ❤️ par les contributeurs de Papillon
         </Text>
       </Reanimated.ScrollView>
-      <View
-        style={[
-          disconnectPopup ? {
-            display: "flex",
-            position: "absolute",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-          } : {
-            display: "none"
-          }
-        ]}
-      >
-        <Reanimated.View
-          style={{
-            height: 300,
-            width: "80%",
-            backgroundColor: colors.card,
-            borderRadius: 30,
-            justifyContent: "space-between",
-            elevation: 5,
-            padding: 20,
-          }}
-          entering={FadeInDown}
-          exiting={FadeOutDown}
-        >
-          <View style={{ justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ fontSize: 24, color: colors.text }}>Se déconnecter</Text>
-            <Text style={{ textAlign: "center", marginTop: 20, color: colors.text }}>
-              Êtes-vous sûr de vouloir vous déconnecter ?
-            </Text>
-          </View>
-          <View>
-            <ButtonCta
-              value={"Se déconnecter"}
-              onPress={() => {
-                removeAccount(account.localID);
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: "AccountSelector" }],
-                });
-              }}
-            />
-            <ButtonCta
-              value={"Annuler"}
-              primary
-              onPress={() => setDisconnectPopup(false)}
-              style={{ marginTop: 10 }}
-            />
-          </View>
-        </Reanimated.View>
-      </View>
     </>
   );
 };
