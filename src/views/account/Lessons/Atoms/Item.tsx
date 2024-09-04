@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   timeContainerSmall: {
-    minWidth: 40,
+    minWidth: 60,
   },
   timeText: {
     fontSize: 17,

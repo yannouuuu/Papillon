@@ -51,7 +51,7 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
   useEffect(() => {
     setClipboardFound(false);
   }, [instanceURL]);
-  
+
   const checkForDemoInstance = async <ScreenName extends keyof RouteParameters>(
     instanceURL: string,
     navigation: NativeStackNavigationProp<RouteParameters, ScreenName>,
@@ -119,6 +119,7 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
 
           <TextInput
             keyboardType="url"
+            autoCapitalize="none"
             placeholder="URL de l'instance Pronote"
 
             style={[styles.searchInput, { color: theme.colors.text }]}

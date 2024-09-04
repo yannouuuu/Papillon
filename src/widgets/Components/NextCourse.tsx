@@ -32,6 +32,10 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
 
   useEffect(() => {
     void async function () {
+      setLoading(true);
+      setNextCourse(null);
+      setHidden(true);
+
       if (!account.instance || !timetables) {
         return;
       }

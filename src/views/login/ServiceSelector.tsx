@@ -162,7 +162,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
           colors={[colors.background, colors.background + "00"]}
           style={{
             width: "100%",
-            height: 50,
+            height: 40,
             position: "absolute",
             top: 0,
             zIndex: 100,
@@ -173,7 +173,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
           colors={[colors.background + "00", colors.background]}
           style={{
             width: "100%",
-            height: 50,
+            height: 40,
             position: "absolute",
             bottom: 0,
             zIndex: 100,
@@ -191,11 +191,12 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
           }}
           layout={LinearTransition}
         >
-          {services.map((srv) => (
+          {services.map((srv, i) => (
             <Reanimated.View
               style={{ width: "100%" }}
               layout={LinearTransition}
-              entering={FlipInXDown.springify().delay(100)}
+              entering={FlipInXDown.springify().delay(100 * i)}
+              key={srv.name}
             >
               <DuoListPressable
                 key={srv.name}
@@ -227,6 +228,13 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
           <ButtonCta
             value="Importer mon compte"
             onPress={() => navigation.navigate("PronoteV6Import", { data: v6Data.data })}
+          />
+        )}
+
+        {__DEV__ && (
+          <ButtonCta
+            value="Fournisseur d'identité"
+            onPress={() => navigation.navigate("IdentityProviderSelector")}
           />
         )}
       </View>

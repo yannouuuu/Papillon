@@ -13,6 +13,10 @@ export async function updateNewsInCache <T extends Account> (account: T): Promis
       useNewsStore.getState().updateInformations(informations);
       break;
     }
+    case AccountService.Local: {
+      useNewsStore.getState().updateInformations([]);
+      break;
+    }
     default: {
       throw new Error("Service not implemented.");
     }
