@@ -7,6 +7,7 @@ const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const InfiniteDatePager = ({ renderDate, initialDate = new Date(), onDateChange }) => {
   const pagerRef = useRef(null);
   const baseDate = useRef(new Date(1970, 0, 1)).current;
+  baseDate.setHours(0, 0, 0, 0);
   const [isProgrammaticChange, setIsProgrammaticChange] = useState(false);
 
   const getDateFromIndex = useCallback((index) => {
@@ -32,10 +33,7 @@ const InfiniteDatePager = ({ renderDate, initialDate = new Date(), onDateChange 
 
   const handlePageChange = useCallback((index) => {
     const newDate = getDateFromIndex(index);
-    if (!isProgrammaticChange) {
-      onDateChange?.(newDate);
-    }
-    setIsProgrammaticChange(false);
+    onDateChange?.(newDate);
   }, [getDateFromIndex, onDateChange, isProgrammaticChange]);
 
   useEffect(() => {

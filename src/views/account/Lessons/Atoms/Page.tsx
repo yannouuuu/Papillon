@@ -61,7 +61,7 @@ export const Page: React.FC<Props> = ({
   };
 
   return (
-    <Reanimated.View style={{ height: "100%" }}>
+    <Reanimated.View style={{ height: "100%", width: "100%", flex: 1 }}>
       <ScrollView
         style={{ flex: 1, height: "100%" }}
         contentContainerStyle={{ flexGrow: 1 }}
@@ -74,18 +74,18 @@ export const Page: React.FC<Props> = ({
           />
         }
       >
-        {currentDayTimetable.length > 0 ? (
+        {timetables.length > 0 ? (
           current && (
             <View style={{ paddingHorizontal: 10, paddingVertical: 10, gap: 10 }}>
-              {currentDayTimetable.map((item, i) => (
+              {timetables.map((item, i) => (
                 <View key={item.startTimestamp} style={{ gap: 10 }}>
                   <TimetableItem key={item.startTimestamp} item={item} index={i} />
 
-                  {currentDayTimetable[i + 1] &&
-                    currentDayTimetable[i + 1].startTimestamp - item.endTimestamp > 1740000 && (
+                  {timetables[i + 1] &&
+                    timetables[i + 1].startTimestamp - item.endTimestamp > 1740000 && (
                     <SeparatorCourse
                       i={i}
-                      start={currentDayTimetable[i + 1].startTimestamp}
+                      start={timetables[i + 1].startTimestamp}
                       end={item.endTimestamp}
                     />
                   )}
