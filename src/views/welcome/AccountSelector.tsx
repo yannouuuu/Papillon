@@ -39,7 +39,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
       if (!useAccounts.persist.hasHydrated()) return;
 
       // If there are no accounts, redirect the user to the first installation page.
-      if (accounts.length === 0) {
+      if (accounts.filter((account) => !account.isExternal).length === 0) {
         // Use the `reset` method to clear the navigation stack.
         navigation.reset({
           index: 0,
@@ -146,21 +146,22 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           </NativeList>
         )}
 
-        <Reanimated.View
-          entering={animPapillon(FadeInDown)}
-          layout={animPapillon(LinearTransition)}
-        >
-          <NativeListHeader label="Comptes connectés" />
-          <NativeList>
-            {accounts.map((account, index) => {
-              return !account.isExternal && (
-                <NativeItem
-                  key={index}
-                  leading={
-                    <PapillonAvatar
-                      source={account.personalization.profilePictureB64 ? { uri: account.personalization.profilePictureB64 } : defaultProfilePicture(account.service)}
-                      badgeOffset={4}
-                      badge={account.service !== AccountService.Local &&
+        {accounts.filter((account) => !account.isExternal).length > 0 && (
+          <Reanimated.View
+            entering={animPapillon(FadeInDown)}
+            layout={animPapillon(LinearTransition)}
+          >
+            <NativeListHeader label="Comptes connectés" />
+            <NativeList>
+              {accounts.map((account, index) => {
+                return !account.isExternal && (
+                  <NativeItem
+                    key={index}
+                    leading={
+                      <PapillonAvatar
+                        source={account.personalization.profilePictureB64 ? { uri: account.personalization.profilePictureB64 } : defaultProfilePicture(account.service)}
+                        badgeOffset={4}
+                        badge={account.service !== AccountService.Local &&
                         <Image
                           source={defaultProfilePicture(account.service)}
                           style={{
@@ -171,38 +172,39 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                             borderWidth: 2,
                           }}
                         />
+                        }
+                      />
+                    }
+                    onPress={async () => {
+                      if (currentAccount?.localID !== account.localID) {
+                        setLoading(true);
+                        await switchTo(account);
+                        setLoading(false);
                       }
-                    />
-                  }
-                  onPress={async () => {
-                    if (currentAccount?.localID !== account.localID) {
-                      setLoading(true);
-                      await switchTo(account);
-                      setLoading(false);
-                    }
 
-                    navigation.reset({
-                      index: 0,
-                      routes: [{ name: "AccountStack" }],
-                    });
-                  }}
-                >
-                  <NativeText variant="title" numberOfLines={1}>
-                    {account.name}
-                  </NativeText>
-                  <NativeText variant="subtitle" numberOfLines={1}>
-                    {account.schoolName ?
-                      account.schoolName :
-                      account.identityProvider ?
-                        account.identityProvider.name :
-                        "Compte local"
-                    }
-                  </NativeText>
-                </NativeItem>
-              );
-            })}
-          </NativeList>
-        </Reanimated.View>
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: "AccountStack" }],
+                      });
+                    }}
+                  >
+                    <NativeText variant="title" numberOfLines={1}>
+                      {account.name}
+                    </NativeText>
+                    <NativeText variant="subtitle" numberOfLines={1}>
+                      {account.schoolName ?
+                        account.schoolName :
+                        account.identityProvider ?
+                          account.identityProvider.name :
+                          "Compte local"
+                      }
+                    </NativeText>
+                  </NativeItem>
+                );
+              })}
+            </NativeList>
+          </Reanimated.View>
+        )}
 
         <Reanimated.View
           entering={animPapillon(FadeInDown).delay(100)}
