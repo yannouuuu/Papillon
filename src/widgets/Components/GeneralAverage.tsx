@@ -58,7 +58,7 @@ const GeneralAverageWidget = forwardRef(({
   }, [defaultPeriod]);
 
   useEffect(() => {
-    setHidden(typeof average !== "number" || average < 0);
+    setHidden(typeof average !== "number" || average < 0 || average + "" === "NaN");
   }, [average]);
 
   return (
