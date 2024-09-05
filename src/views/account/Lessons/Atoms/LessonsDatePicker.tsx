@@ -14,11 +14,12 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const ITEM_WIDTH = 108;
+const ITEM_WIDTH = 104;
 const ITEM_MARGIN = 10;
 const ITEM_TOTAL_WIDTH = ITEM_WIDTH + ITEM_MARGIN * 2;
 const DATE_RANGE = 30;
 const SCROLL_THRESHOLD = 7;
+const SCROLL_VELOCITY = 100;
 
 const generateDateRange = (centerDate) => {
   return Array.from({ length: DATE_RANGE }, (_, i) => addDays(centerDate, i - Math.floor(DATE_RANGE / 2)));
@@ -94,7 +95,11 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
     if (dateIndex !== -1) {
       const diffFromCenter = dateIndex - centerIndex;
       if (Math.abs(diffFromCenter) <= SCROLL_THRESHOLD) {
-        flatListRef.current?.scrollToIndex({ index: dateIndex, animated: true });
+        flatListRef.current?.scrollToIndex({
+          index: dateIndex,
+          animated: true,
+          velocity: SCROLL_VELOCITY
+        });
         setSelectedDate(initialDate);
       } else {
         setDates(generateDateRange(initialDate));
@@ -110,7 +115,11 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
 
   useEffect(() => {
     if (dates.length > 0) {
-      flatListRef.current?.scrollToIndex({ index: centerIndex, animated: false });
+      flatListRef.current?.scrollToIndex({
+        index: centerIndex,
+        animated: false,
+        velocity: SCROLL_VELOCITY
+      });
     }
   }, [dates, centerIndex]);
 
@@ -211,7 +220,7 @@ const styles = StyleSheet.create({
     borderColor: "#007AFF",
   },
   dayText: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: "semibold",
     letterSpacing: 0.2,
   },
