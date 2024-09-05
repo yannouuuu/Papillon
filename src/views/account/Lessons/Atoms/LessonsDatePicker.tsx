@@ -117,10 +117,10 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
   const handleDatePress = useCallback((date) => {
     setSelectedDate(date);
     onDateSelect(date);
-    if (isSameDay(date, new Date())) {
+    if (isSameDay(selectedDate, initialDate)) {
       onCurrentDatePress();
     }
-  }, [onDateSelect, onCurrentDatePress]);
+  }, [onDateSelect, onCurrentDatePress, initialDate, selectedDate]);
 
   const getItemLayout = useCallback((_, index) => ({
     length: ITEM_TOTAL_WIDTH,

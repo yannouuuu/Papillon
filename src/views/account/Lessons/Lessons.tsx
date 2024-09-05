@@ -10,6 +10,8 @@ import { useTimetableStore } from "@/stores/timetable";
 import { AccountService } from "@/stores/account/types";
 import { updateTimetableForWeekInCache } from "@/services/timetable";
 import { Page } from "./Atoms/Page";
+import { LessonsDateModal } from "./LessonsHeader";
+import { set } from "lodash";
 
 const Lessons: Screen<"Lessons"> = () => {
   const account = useCurrentAccount(store => store.account!);
@@ -45,6 +47,8 @@ const Lessons: Screen<"Lessons"> = () => {
 
   const [loadingWeeks, setLoadingWeeks] = useState([]);
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const loadTimetableWeek = async (weekNumber: number, force = false) => {
     if (currentlyLoadingWeeks.current.has(weekNumber)) {
       return;
@@ -79,7 +83,9 @@ const Lessons: Screen<"Lessons"> = () => {
             setSelectedDate(newDate);
           }
         }}
-        onCurrentDatePress={() => {}}
+        onCurrentDatePress={() => {
+          setShowDatePicker(true);
+        }}
         initialDate={pickerDate}
       />
 
@@ -104,6 +110,18 @@ const Lessons: Screen<"Lessons"> = () => {
             loading={loadingWeeks.includes(getWeekFromDate(date))}
           />
         )}
+      />
+
+      <LessonsDateModal
+        showDatePicker={showDatePicker}
+        setShowDatePicker={setShowDatePicker}
+        currentDate={pickerDate}
+        onDateSelect={(date) => {
+          const newDate = new Date(date);
+          newDate.setHours(0, 0, 0, 0);
+          // setPickerDate(newDate);
+          setSelectedDate(newDate);
+        }}
       />
     </View>
   );

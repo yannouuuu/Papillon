@@ -84,7 +84,7 @@ export const Page = ({ day, date, current, refreshAction, loading }) => {
         </Reanimated.View>
       )}
 
-      {day && day.length === 0 && current && (
+      {day && day.length === 0 && current && !loading && (
         <Reanimated.View
           entering={animPapillon(FadeInDown)}
           exiting={animPapillon(FadeOut)}
