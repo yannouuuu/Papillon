@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { Check } from "lucide-react-native";
+import { Check, ChevronDown, ChevronUp } from "lucide-react-native";
 import parse_homeworks from "@/utils/format/format_pronote_homeworks";
 import { getSubjectData } from "@/services/shared/Subject";
 import { useTheme } from "@react-navigation/native";
 import type { Homework } from "@/services/shared/Homework";
 import { NativeItem, NativeText } from "@/components/Global/NativeComponents";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
-import { ChevronDown, ChevronUp } from "lucide-react-native";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 
 const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }: {
@@ -33,7 +32,6 @@ const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }:
 
   const [mainLoaded, setMainLoaded] = useState(false);
 
-  // on done change
   useEffect(() => {
     setIsLoading(false);
     setMainLoaded(true);
@@ -88,7 +86,11 @@ const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }:
         </View>
         {needsExpansion && (
           <Animated.View style={[{ marginLeft: 8 }, rotateStyle]}>
-            <ChevronDown size={20} color={theme.colors.text} />
+            {expanded ? (
+              <ChevronUp size={20} color={theme.colors.text} />
+            ) : (
+              <ChevronDown size={20} color={theme.colors.text} />
+            )}
           </Animated.View>
         )}
       </TouchableOpacity>
