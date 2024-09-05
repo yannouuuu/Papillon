@@ -54,6 +54,10 @@ const Lessons: Screen<"Lessons"> = () => {
       return;
     }
 
+    if(timetables[weekNumber] && !force) {
+      return;
+    }
+
     currentlyLoadingWeeks.current.add(weekNumber);
     if(force) {
       setLoadingWeeks([...loadingWeeks, weekNumber]);
