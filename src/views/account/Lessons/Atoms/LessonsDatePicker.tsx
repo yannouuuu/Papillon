@@ -14,7 +14,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const ITEM_WIDTH = 110;
+const ITEM_WIDTH = 108;
 const ITEM_MARGIN = 10;
 const ITEM_TOTAL_WIDTH = ITEM_WIDTH + ITEM_MARGIN * 2;
 const DATE_RANGE = 30;
@@ -194,12 +194,12 @@ const styles = StyleSheet.create({
   },
   dateItem: {
     width: ITEM_WIDTH,
-    height: 30,
+    height: 29,
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: ITEM_MARGIN,
-    borderRadius: 12,
+    borderRadius: 11,
     borderCurve: "continuous",
     backgroundColor: "#f0f0f0",
   },
