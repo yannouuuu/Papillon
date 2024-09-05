@@ -32,7 +32,7 @@ const SkolengoInstanceSelector: Screen<"SkolengoInstanceSelector"> = ({
 
   const [search, setSearch] = useState("");
   const searchInputRef = React.createRef<TextInput>();
-  const debouncedSearch = useDebounce(search, 250);
+  const debouncedSearch = useDebounce(search, 1000);
 
   const [hasSearched, setHasSearched] = useState(false);
 

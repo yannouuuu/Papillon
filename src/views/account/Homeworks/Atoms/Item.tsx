@@ -15,7 +15,7 @@ const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }:
   total: number
 }) => {
   const theme = useTheme();
-  const [subjectData, setSubjectData] = useState({ color: "#888888", pretty: "Matière inconnue" });
+  const [subjectData, setSubjectData] = useState(getSubjectData(homework.subject));
 
   useEffect(() => {
     const data = getSubjectData(homework.subject);
@@ -61,6 +61,6 @@ const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }:
       </NativeText>
     </NativeItem>
   );
-});
+}, (prevProps, nextProps) => prevProps.index === nextProps.index);
 
 export default HomeworkItem;
