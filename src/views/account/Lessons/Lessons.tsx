@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, View } from "react-native";
 
 import { Screen } from "@/router/helpers/types";
@@ -19,8 +19,11 @@ const Lessons: Screen<"Lessons"> = () => {
   let currentlyLoadingWeeks = useRef<Set<number>>(new Set());
   let lastAccountID = useRef<string | null>(null);
 
-  const [pickerDate, setPickerDate] = React.useState(new Date());
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const [pickerDate, setPickerDate] = React.useState(new Date(today));
+  const [selectedDate, setSelectedDate] = React.useState(new Date(today));
 
   const getWeekFromDate = (date: Date) => {
     let firstDate = new Date(account?.instance?.instance?.firstDate || "2024-09-01");
@@ -36,9 +39,11 @@ const Lessons: Screen<"Lessons"> = () => {
   useEffect(() => {
     void (async () => {
       const weekNumber = getWeekFromDate(pickerDate);
-      await loadTimetableWeek(weekNumber, true);
+      await loadTimetableWeek(weekNumber, false);
     })();
   }, [pickerDate, account.instance]);
+
+  const [loadingWeeks, setLoadingWeeks] = useState([]);
 
   const loadTimetableWeek = async (weekNumber: number, force = false) => {
     if (currentlyLoadingWeeks.current.has(weekNumber)) {
@@ -46,12 +51,16 @@ const Lessons: Screen<"Lessons"> = () => {
     }
 
     currentlyLoadingWeeks.current.add(weekNumber);
+    if(force) {
+      setLoadingWeeks([...loadingWeeks, weekNumber]);
+    }
 
     try {
       await updateTimetableForWeekInCache(account, weekNumber, force);
       setUpdatedWeeks(new Set(updatedWeeks.add(weekNumber)));
     } finally {
       currentlyLoadingWeeks.current.delete(weekNumber);
+      setLoadingWeeks(loadingWeeks.filter((week) => week !== weekNumber));
     }
   };
 
@@ -85,20 +94,15 @@ const Lessons: Screen<"Lessons"> = () => {
           }
         }}
         renderDate={(date) => (
-          <View>
-            <NativeText>
-              {date.toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </NativeText>
-
-            {timetables[getWeekFromDate(date)]?.filter((lesson) => new Date(lesson.startTimestamp).getDate() === date.getDate()).map((lesson) => (
-              <NativeText key={lesson.id}>{lesson.title}</NativeText>
-            ))}
-          </View>
+          <Page
+            current={date.getDay() == pickerDate.getDay()}
+            date={date}
+            day={timetables[getWeekFromDate(date)]?.filter((lesson) => new Date(lesson.startTimestamp).getDate() === date.getDate())}
+            refreshAction={() => {
+              loadTimetableWeek(getWeekFromDate(date), true);
+            }}
+            loading={loadingWeeks.includes(getWeekFromDate(date))}
+          />
         )}
       />
     </View>
