@@ -35,30 +35,30 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
       setLoading(true);
       setNextCourse(null);
       setHidden(true);
-  
+
       if (!account.instance || !timetables) {
         return;
       }
-  
+
       const allCourses = Object.values(timetables).flat();
-  
+
       let nextCourse = null;
-  
+
       nextCourse = allCourses
         .filter(c => c.startTimestamp < today && c.endTimestamp > today && c.status !== "Cours annulé")
         .sort((a, b) => b.endTimestamp - a.endTimestamp)[0];
-  
+
       if (!nextCourse) {
         nextCourse = allCourses
           .filter(c => c.startTimestamp > today && c.status !== "Cours annulé")
           .sort((a, b) => a.startTimestamp - b.startTimestamp)[0];
       }
-  
+
       if (nextCourse) {
         setNextCourse(nextCourse);
         setHidden(false);
       }
-  
+
       setLoading(false);
     }();
   }, [account.instance, timetables]);  
