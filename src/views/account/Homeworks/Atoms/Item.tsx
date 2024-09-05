@@ -7,6 +7,8 @@ import { useTheme } from "@react-navigation/native";
 import type { Homework } from "@/services/shared/Homework";
 import { NativeItem, NativeText } from "@/components/Global/NativeComponents";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
+import { ChevronDown, ChevronUp } from "lucide-react-native";
+import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 
 const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }: {
   homework: Homework,
@@ -39,6 +41,21 @@ const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }:
 
   const parsedContent = useMemo(() => parse_homeworks(homework.content), [homework.content]);
 
+  const [expanded, setExpanded] = useState(false);
+
+  const rotateStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: withTiming(expanded ? "180deg" : "0deg") }],
+    };
+  });
+
+  const [needsExpansion, setNeedsExpansion] = useState(false);
+
+  const onTextLayout = useCallback(e => {
+    const linesNumber = e.nativeEvent.lines.length;
+    setNeedsExpansion(linesNumber > 3);
+  }, []);
+
   return (
     <NativeItem
       separator={index !== total - 1}
@@ -53,12 +70,28 @@ const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }:
         />
       }
     >
-      <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
-        {subjectData.pretty}
-      </NativeText>
-      <NativeText variant="default" numberOfLines={3}>
-        {parsedContent}
-      </NativeText>
+      <TouchableOpacity
+        onPress={() => needsExpansion && setExpanded(!expanded)}
+        style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
+      >
+        <View style={{ flex: 1 }}>
+          <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
+            {subjectData.pretty}
+          </NativeText>
+          <NativeText
+            variant="default"
+            numberOfLines={expanded ? undefined : 3}
+            onTextLayout={onTextLayout}
+          >
+            {parsedContent}
+          </NativeText>
+        </View>
+        {needsExpansion && (
+          <Animated.View style={[{ marginLeft: 8 }, rotateStyle]}>
+            <ChevronDown size={20} color={theme.colors.text} />
+          </Animated.View>
+        )}
+      </TouchableOpacity>
     </NativeItem>
   );
 }, (prevProps, nextProps) => prevProps.index === nextProps.index);
