@@ -56,7 +56,7 @@ export const Page = ({ day, date, current, refreshAction, loading }) => {
           }}
         >
           {day && day.map((item, i) => (
-            <View key={item.startTimestamp} style={{ gap: 10 }}>
+            <View key={item.startTimestamp + i.toString()} style={{ gap: 10 }}>
               <TimetableItem key={item.startTimestamp} item={item} index={i} />
 
               {day[i + 1] &&
