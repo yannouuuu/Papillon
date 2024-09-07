@@ -11,59 +11,7 @@ import { NestableDraggableFlatList, NestableScrollContainer, ShadowDecorator } f
 import { PressableScale } from "react-native-pressable-scale";
 import Reanimated, { FadeIn, FadeOut, FadeOutRight, LinearTransition, ZoomIn, ZoomOut, ZoomOutRight } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-export const defaultTabs = [
-  {
-    tab: "Home",
-    label: "Accueil",
-    description: "L'essentiel de Papillon",
-    icon: require("@/../assets/lottie/tab_home.json"),
-    enabled: true,
-    installed: true,
-  },
-  {
-    tab: "Lessons",
-    label: "Cours",
-    description: "Consultez votre emploi du temps",
-    icon: require("@/../assets/lottie/tab_calendar.json"),
-    enabled: true,
-  },
-  {
-    tab: "Homeworks",
-    label: "Devoirs",
-    description: "Organisez votre travail à faire",
-    icon: require("@/../assets/lottie/tab_book_2.json"),
-    enabled: true,
-  },
-  {
-    tab: "Grades",
-    label: "Notes",
-    description: "Vos dernières notes et moyennes",
-    icon: require("@/../assets/lottie/tab_chart.json"),
-    enabled: true,
-  },
-  {
-    tab: "News",
-    label: "Actualités",
-    description: "Les dernières news de votre école",
-    icon: require("@/../assets/lottie/tab_news.json"),
-    enabled: true,
-  },
-  {
-    tab: "Attendance",
-    label: "Vie scolaire",
-    description: "Vos absences, retards et sanctions",
-    icon: require("@/../assets/lottie/tab_check.json"),
-    enabled: true,
-  },
-  {
-    tab: "Messages",
-    label: "Messages",
-    description: "Votre messagerie scolaire",
-    icon: require("@/../assets/lottie/tab_chat.json"),
-    enabled: true,
-  },
-] as const;
+import { defaultTabs } from "@/consts/DefaultTabs";
 
 
 const SettingsTabs = () => {
@@ -77,72 +25,82 @@ const SettingsTabs = () => {
   const [tabs, setTabs] = useState(defaultTabs);
 
   const toggleTab = (tab: string) => {
-    if (tabs.filter(t => t.enabled).length === 5 && !tabs.find(t => t.tab === tab)?.enabled) {
-      playFailAnimation();
-      return;
-    }
+    void (async () => {
+      if (tabs.filter(t => t.enabled).length === 5 && !tabs.find(t => t.tab === tab)?.enabled) {
+        playFailAnimation();
+        return;
+      }
 
-    const newTabs = [...tabs];
-    const index = newTabs.findIndex(t => t.tab === tab);
+      const newTabs = [...tabs];
+      const index = newTabs.findIndex(t => t.tab === tab);
 
-    if (index !== -1 && !safeTabs.includes(tab)) {
-      newTabs[index].enabled = !newTabs[index].enabled;
-      setTabs(newTabs);
-    }
+      if (index !== -1 && !safeTabs.includes(tab)) {
+        newTabs[index].enabled = !newTabs[index].enabled;
+        setTabs(newTabs);
+      }
+    })();
   };
 
   useEffect(() => {
-    const newTabs = [...tabs];
-    const homeIndex = newTabs.findIndex(tab => tab.tab === "Home");
+    void (async () => {
+      const newTabs = [...tabs];
+      const homeIndex = newTabs.findIndex(tab => tab.tab === "Home");
 
-    // Ensure Home is among first 5 tabs
-    if (homeIndex > 4) {
-      const homeTab = newTabs.splice(homeIndex, 1)[0];
-      newTabs.splice(4, 0, homeTab);
-    }
+      // Ensure Home is among first 5 tabs
+      if (homeIndex > 4) {
+        const homeTab = newTabs.splice(homeIndex, 1)[0];
+        newTabs.splice(4, 0, homeTab);
+      }
 
-    if (homeIndex > 4) {
-      setTabs(newTabs);
-    }
+      if (homeIndex > 4) {
+        setTabs(newTabs);
+      }
+    })();
   }, [tabs]);
 
   useEffect(() => {
-    mutateProperty("personalization", {
-      ...account.personalization,
-      tabs: tabs.map(({ tab, enabled, installed }) => ({ name: tab, enabled, installed })),
-    });
+    void (async () => {
+      mutateProperty("personalization", {
+        ...account.personalization,
+        tabs: tabs.map(({ tab, enabled, installed }) => ({ name: tab, enabled, installed })),
+      });
+    })();
   }, [tabs]);
 
   const [hideTabTitles, setHideTabTitles] = useState(false);
   const [showTabBackground, setShowTabBackground] = useState(false);
 
   useEffect(() => {
-    mutateProperty("personalization", {
-      ...account.personalization,
-      hideTabTitles : hideTabTitles,
-      showTabBackground: showTabBackground,
-    });
+    void (async () => {
+      mutateProperty("personalization", {
+        ...account.personalization,
+        hideTabTitles : hideTabTitles,
+        showTabBackground: showTabBackground,
+      });
+    })();
   }, [hideTabTitles, showTabBackground]);
 
   useLayoutEffect(() => {
-    if (account.personalization.tabs) {
-      const new_tabs = account.personalization.tabs.map(personalizationTab => ({
-        ...tabs.find(t => t.tab === personalizationTab.name)!,
-        enabled: personalizationTab.enabled,
-      }));
+    void(async () => {
+      if (account.personalization.tabs) {
+        const new_tabs = account.personalization.tabs.map(personalizationTab => ({
+          ...tabs.find(t => t.tab === personalizationTab.name)!,
+          enabled: personalizationTab.enabled,
+        }));
 
-      setTabs(new_tabs);
-    }
-    else {
-      setTabs(defaultTabs);
-      mutateProperty("personalization", {
-        ...account.personalization,
-        tabs: defaultTabs.map(({ tab, enabled }) => ({ name: tab, enabled })),
-      });
-    }
+        setTabs(new_tabs);
+      }
+      else {
+        setTabs(defaultTabs);
+        mutateProperty("personalization", {
+          ...account.personalization,
+          tabs: defaultTabs.map(({ tab, enabled }) => ({ name: tab, enabled })),
+        });
+      }
 
-    setHideTabTitles(account.personalization.hideTabTitles ?? false);
-    setShowTabBackground(account.personalization.showTabBackground ?? false);
+      setHideTabTitles(account.personalization.hideTabTitles ?? false);
+      setShowTabBackground(account.personalization.showTabBackground ?? false);
+    })();
   }, []);
 
   const [failAnimation, setFailAnimation] = useState(false);
