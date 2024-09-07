@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import { PieChart } from "lucide-react-native"; // Utilisation de Book comme icône de matière
+import { PieChart } from "lucide-react-native"; // Utilisation de PieChart comme icône de matière
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { Text, View } from "react-native";
 import Reanimated, { LinearTransition } from "react-native-reanimated";
@@ -49,9 +49,9 @@ const LastGradeWidget = forwardRef(({
 
     const percentage = (gradeValue / maxGradeValue) * 100; // Calcul du pourcentage
 
-    if (percentage < 50) return "red"; // Rouge si inférieur à 50%
-    if (percentage < 60) return "orange"; // Orange entre 50% et 60%
-    return "#0096FF"; // Bleu pour tout ce qui est supérieur ou égal à 60%
+    if (percentage < 50) return "black"; // Noir si inférieur à 50%
+    if (percentage < 60) return "black"; // Noir entre 50% et 60%
+    return "black"; // Noir pour tout ce qui est supérieur ou égal à 60%
   }, [gradeValue, maxGradeValue]);
 
   // Récupération des données de la matière pour obtenir l'émoji associé
@@ -68,8 +68,9 @@ const LastGradeWidget = forwardRef(({
       setLoading(false);
     }();
   }, [defaultPeriod]);
+
   // Détermination du texte à afficher pour la description
-  const descriptionText = lastGrade?.description?.trim() || lastGrade?.subjectName || "Nouvelle Note";
+  const descriptionText = lastGrade?.subjectName || "Nouvelle Note";
 
   // Effet pour cacher le widget si la valeur de la note n'est pas un nombre valide
   useEffect(() => {
@@ -126,15 +127,15 @@ const LastGradeWidget = forwardRef(({
             padding: 6,
           }}
         >
-          <Text style={{ fontSize: 29 }}>{subjectEmoji}</Text>
+          <Text style={{ fontSize: 25 }}>{subjectEmoji}</Text>
         </View>
 
-        {/* Affichage du commentaire de l'évaluation en gras */}
+        {/* Affichage du nom de la matière en gras */}
         <Text
           style={{
             color: colors.text,
             fontFamily: "semibold",
-            fontSize: 24,
+            fontSize: 22,
             flex: 1, // Permet au texte de prendre l'espace restant
           }}
         >
@@ -168,7 +169,7 @@ const LastGradeWidget = forwardRef(({
         {/* Affichage de l'unité de notation */}
         <Text
           style={{
-            color: colors.text + "80", // Un peu plus transparent
+            color: colors.text + "50", // Couleur du barème de notation
             fontFamily: "semiBold",
             fontSize: 15,
           }}
