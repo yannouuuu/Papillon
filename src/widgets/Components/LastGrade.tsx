@@ -44,19 +44,11 @@ const LastGradeWidget = forwardRef(({
   const maxGradeValue = lastGrade?.outOf?.value ?? 20; // Récupération de l'échelle de notation du professeur
 
   // Détermination de la couleur de la note en fonction du pourcentage
-  const gradeColor = useMemo(() => {
-    if (gradeValue === null || maxGradeValue === null) return "grey"; // Cas de valeur absente
-
-    const percentage = (gradeValue / maxGradeValue) * 100; // Calcul du pourcentage
-
-    if (percentage < 50) return "black"; // Noir si inférieur à 50%
-    if (percentage < 60) return "black"; // Noir entre 50% et 60%
-    return "black"; // Noir pour tout ce qui est supérieur ou égal à 60%
-  }, [gradeValue, maxGradeValue]);
 
   // Récupération des données de la matière pour obtenir l'émoji associé
   const subjectData = getSubjectData(lastGrade?.subjectName || "");
   const subjectEmoji = subjectData.emoji;
+  const subjectColor = subjectData.color;
 
   // Effet pour mettre à jour les notes et moyennes en cache
   useEffect(() => {
@@ -122,7 +114,7 @@ const LastGradeWidget = forwardRef(({
         {/* Affichage de l'émoji dans un cadre rond */}
         <View
           style={{
-            backgroundColor: "#FFF1F3", // Couleur de fond très claire
+            backgroundColor: subjectColor + "22",
             borderRadius: 50, // Pour faire un cadre rond
             padding: 6,
           }}
@@ -161,7 +153,7 @@ const LastGradeWidget = forwardRef(({
             fontSize: 24.5,
             lineHeight: 24,
             fontFamily: "semibold",
-            color: gradeColor,
+            color: theme.dark ? "#fff" : "#000",
           }}
           contentContainerStyle={{
             paddingLeft: 6,
