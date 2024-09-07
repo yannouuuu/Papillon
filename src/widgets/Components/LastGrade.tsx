@@ -95,7 +95,7 @@ const LastGradeWidget = forwardRef(({
             fontSize: 16,
           }}
         >
-          Dernière Note
+          Dernière note
         </Text>
       </View>
 
