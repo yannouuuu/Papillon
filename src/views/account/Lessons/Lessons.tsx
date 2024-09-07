@@ -12,6 +12,7 @@ import { updateTimetableForWeekInCache } from "@/services/timetable";
 import { Page } from "./Atoms/Page";
 import { LessonsDateModal } from "./LessonsHeader";
 import { set } from "lodash";
+import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 
 const Lessons: Screen<"Lessons"> = () => {
   const account = useCurrentAccount(store => store.account!);
@@ -28,12 +29,9 @@ const Lessons: Screen<"Lessons"> = () => {
   const [selectedDate, setSelectedDate] = React.useState(new Date(today));
 
   const getWeekFromDate = (date: Date) => {
-    const firstDate = new Date(1970, 0, 1);
+    const epochWeekNumber = dateToEpochWeekNumber(date);
 
-    const diff = date.getTime() - firstDate.getTime();
-    const diffDays = diff / (1000 * 3600 * 24);
-
-    return Math.floor(diffDays / 7) + 1;
+    return epochWeekNumber;
   };
 
   const [updatedWeeks, setUpdatedWeeks] = React.useState(new Set<number>());
@@ -53,6 +51,7 @@ const Lessons: Screen<"Lessons"> = () => {
     if((currentlyLoadingWeeks.current.has(weekNumber) || loadedWeeks.current.has(weekNumber)) && !force) {
       return;
     }
+    setLoadingWeeks([...loadingWeeks, weekNumber]);
 
     try {
       await updateTimetableForWeekInCache(account, weekNumber, force);
@@ -61,7 +60,26 @@ const Lessons: Screen<"Lessons"> = () => {
     finally {
       currentlyLoadingWeeks.current.delete(weekNumber);
       loadedWeeks.current.add(weekNumber);
+      setUpdatedWeeks(new Set(updatedWeeks).add(weekNumber));
+      setLoadingWeeks(loadingWeeks.filter((w) => w !== weekNumber));
     }
+  };
+
+  const getAllLessonsForDay = (date: Date) => {
+    const week = getWeekFromDate(date);
+    const timetable = timetables[week] || [];
+
+    const newDate = new Date(date);
+    newDate.setHours(0, 0, 0, 0);
+
+    const day = timetable.filter((lesson) => {
+      const lessonDate = new Date(lesson.startTimestamp);
+      lessonDate.setHours(0, 0, 0, 0);
+
+      return lessonDate.getTime() === newDate.getTime();
+    });
+
+    return day;
   };
 
   return (
@@ -99,7 +117,7 @@ const Lessons: Screen<"Lessons"> = () => {
           <Page
             current={date.getDay() == pickerDate.getDay()}
             date={date}
-            day={timetables[getWeekFromDate(date)]?.filter((lesson) => new Date(lesson.startTimestamp).getDate() === date.getDate())}
+            day={getAllLessonsForDay(date)}
             refreshAction={() => {
               loadTimetableWeek(getWeekFromDate(date), true);
             }}
