@@ -138,6 +138,7 @@ const LastGradeWidget = forwardRef(({
             fontSize: 22,
             flex: 1, // Permet au texte de prendre l'espace restant
           }}
+          numberOfLines={2} // Ajout de la propriété numberOfLines
         >
           {descriptionText}
         </Text>
