@@ -50,8 +50,18 @@ const Lessons: Screen<"Lessons"> = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const loadTimetableWeek = async (weekNumber: number, force = false) => {
-    console.log("Loading week", weekNumber);
-    await updateTimetableForWeekInCache(account, weekNumber, force);
+    if((currentlyLoadingWeeks.current.has(weekNumber) || loadedWeeks.current.has(weekNumber)) && !force) {
+      return;
+    }
+
+    try {
+      await updateTimetableForWeekInCache(account, weekNumber, force);
+      currentlyLoadingWeeks.current.add(weekNumber);
+    }
+    finally {
+      currentlyLoadingWeeks.current.delete(weekNumber);
+      loadedWeeks.current.add(weekNumber);
+    }
   };
 
   return (
