@@ -6,7 +6,7 @@ const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
 const InfiniteDatePager = ({ renderDate, initialDate = new Date(), onDateChange }) => {
   const pagerRef = useRef(null);
-  const baseDate = useRef(new Date(1970, 0, 1)).current;
+  const baseDate = useRef(new Date()).current;
   baseDate.setHours(0, 0, 0, 0);
   const lastChangeTime = useRef(0);
 
@@ -43,7 +43,7 @@ const InfiniteDatePager = ({ renderDate, initialDate = new Date(), onDateChange 
   useEffect(() => {
     const index = getIndexFromDate(initialDate);
     pagerRef.current?.setPage(index, false);
-  }, [initialDate, getIndexFromDate]);
+  }, [initialDate]);
 
   return (
     <View style={styles.container}>

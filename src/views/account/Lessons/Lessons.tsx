@@ -30,7 +30,6 @@ const Lessons: Screen<"Lessons"> = () => {
 
   const getWeekFromDate = (date: Date) => {
     const epochWeekNumber = dateToEpochWeekNumber(date);
-
     return epochWeekNumber;
   };
 
