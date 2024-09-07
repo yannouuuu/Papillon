@@ -11,31 +11,39 @@ import { useCurrentAccount } from "@/stores/account";
 import { useGradesStore } from "@/stores/grades";
 import { getSubjectData } from "@/services/shared/Subject"; // Importation pour l'obtention des données sur la matière
 
+// Déclaration du composant LastGradeWidget en utilisant forwardRef pour exposer des méthodes au parent
 const LastGradeWidget = forwardRef(({
   setLoading,
   setHidden,
   loading,
 }: WidgetProps, ref) => {
+  // Récupération du thème pour les couleurs
   const theme = useTheme();
   const { colors } = theme;
 
+  // Accès à l'information du compte utilisateur courant
   const account = useCurrentAccount((store) => store.account);
 
+  // Accès aux notes et à la période par défaut depuis le store
   const grades = useGradesStore((store) => store.grades);
   const defaultPeriod = useGradesStore((store) => store.defaultPeriod);
 
+  // Expose la méthode handlePress au parent via ref
   useImperativeHandle(ref, () => ({
     handlePress: () => "Grades"
   }));
 
+  // Utilisation de useMemo pour calculer la dernière note
   const lastGrade = useMemo(() => {
     const periodGrades = grades[defaultPeriod] || [];
     return periodGrades[periodGrades.length - 1]; // Récupération de la dernière note.
   }, [grades, defaultPeriod]);
 
+  // Extraction de la valeur de la note et de l'échelle de notation
   const gradeValue = lastGrade?.student.value ?? 0;
   const maxGradeValue = lastGrade?.outOf?.value ?? 20; // Récupération de l'échelle de notation du professeur
 
+  // Détermination de la couleur de la note en fonction du pourcentage
   const gradeColor = useMemo(() => {
     if (gradeValue === null || maxGradeValue === null) return "grey"; // Cas de valeur absente
 
@@ -46,9 +54,11 @@ const LastGradeWidget = forwardRef(({
     return "blue"; // Bleu pour tout ce qui est supérieur ou égal à 60%
   }, [gradeValue, maxGradeValue]);
 
-  const subjectData = getSubjectData(lastGrade?.subjectName || ""); // Récupération des données de la matière
+  // Récupération des données de la matière pour obtenir l'émoji associé
+  const subjectData = getSubjectData(lastGrade?.subjectName || "");
   const subjectEmoji = subjectData.emoji;
 
+  // Effet pour mettre à jour les notes et moyennes en cache
   useEffect(() => {
     void async function () {
       if (!account?.instance || !defaultPeriod) return;
@@ -59,10 +69,12 @@ const LastGradeWidget = forwardRef(({
     }();
   }, [defaultPeriod]);
 
+  // Effet pour cacher le widget si la valeur de la note n'est pas un nombre valide
   useEffect(() => {
     setHidden(typeof gradeValue !== "number" || gradeValue < 0);
   }, [gradeValue]);
 
+  // Cacher le widget si aucune note n'est disponible
   if (!lastGrade) {
     setHidden(true);
   }
