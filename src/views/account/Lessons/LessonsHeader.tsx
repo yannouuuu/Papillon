@@ -159,10 +159,8 @@ interface LessonsDateModalProps {
 const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
   showDatePicker,
   setShowDatePicker,
-  currentPageIndex,
-  defaultDate,
-  PagerRef,
-  getDateFromIndex
+  currentDate,
+  onDateSelect,
 }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -175,13 +173,12 @@ const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
           marginTop: -5,
           marginBottom: 10,
         }}
-        value={getDateFromIndex(currentPageIndex)}
+        value={currentDate}
         display={"calendar"}
         mode="date"
         onChange={(event, selectedDate) => {
           if (selectedDate) {
-            const newPageIndex = Math.round((selectedDate.getTime() - defaultDate.getTime()) / 86400000);
-            PagerRef.current?.setPage(newPageIndex);
+            onDateSelect(selectedDate);
           }
 
           setShowDatePicker(false);
@@ -254,7 +251,7 @@ const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
                   color: "#fff",
                 }}
               >
-                {getDateFromIndex(currentPageIndex).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+                {new Date(currentDate).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
               </Text>
 
               <TouchableOpacity
@@ -282,15 +279,14 @@ const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
                 marginTop: -5,
                 marginBottom: 10,
               }}
-              value={getDateFromIndex(currentPageIndex)}
+              value={currentDate}
               display={"inline"}
               mode="date"
               locale="fr-FR"
               accentColor={colors.primary}
               onChange={(event, selectedDate) => {
                 if (selectedDate) {
-                  const newPageIndex = Math.round((selectedDate.getTime() - defaultDate.getTime()) / 86400000);
-                  PagerRef.current?.setPage(newPageIndex);
+                  onDateSelect(selectedDate);
                 }
               }}
             />
