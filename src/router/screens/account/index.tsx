@@ -18,7 +18,6 @@ export const screens = [
   createScreen("Lessons", Lessons, {
     headerTitle: "Cours",
     tabBarLabel: "Cours",
-    headerShown: false,
     tabBarLottie: require("@/../assets/lottie/tab_calendar.json"),
   }),
   createScreen("Homeworks", Homeworks, {
