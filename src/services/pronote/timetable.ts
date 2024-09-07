@@ -4,6 +4,8 @@ import { ErrorServiceUnauthenticated } from "../shared/errors";
 import pronote from "pawnote";
 import { info } from "@/utils/logger/logger";
 
+export const pronoteFirstDate = new Date("2024-09-01");
+
 const decodeTimetableClass = (c: pronote.TimetableClassLesson | pronote.TimetableClassDetention | pronote.TimetableClassActivity): TimetableClass => {
   const base = {
     startTimestamp: c.startDate.getTime(),

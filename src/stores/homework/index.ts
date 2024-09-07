@@ -9,19 +9,19 @@ export const useHomeworkStore = create<HomeworkStore>()(
   persist(
     (set) => ({
       homeworks: {},
-      updateHomeworks: (weekNumber, homeworks) => {
-        log(`updating homeworks for week ${weekNumber}`, "homework:updateHomeworks");
+      updateHomeworks: (epochWeekNumber, homeworks) => {
+        log(`updating homeworks for week ${epochWeekNumber}`, "homework:updateHomeworks");
 
         set((state) => {
           return {
             homeworks: {
               ...state.homeworks,
-              [weekNumber]: homeworks
+              [epochWeekNumber]: homeworks
             }
           };
         });
 
-        log(`updated homeworks for week ${weekNumber}`, "homework:updateHomeworks");
+        log(`updated homeworks for week ${epochWeekNumber}`, "homework:updateHomeworks");
       }
     }),
     {

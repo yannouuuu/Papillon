@@ -23,7 +23,7 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
   const today = todayDate.getTime();
 
   useImperativeHandle(ref, () => ({
-    handlePress: () => null
+    handlePress: () => "Lessons"
   }));
 
   useEffect(() => {
@@ -45,12 +45,12 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
       let nextCourse = null;
 
       nextCourse = allCourses
-        .filter(c => c.startTimestamp < today && c.endTimestamp > today)
+        .filter(c => c.startTimestamp < today && c.endTimestamp > today && c.status !== "Cours annulé")
         .sort((a, b) => b.endTimestamp - a.endTimestamp)[0];
 
       if (!nextCourse) {
         nextCourse = allCourses
-          .filter(c => c.startTimestamp > today)
+          .filter(c => c.startTimestamp > today && c.status !== "Cours annulé")
           .sort((a, b) => a.startTimestamp - b.startTimestamp)[0];
       }
 
@@ -61,7 +61,7 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
 
       setLoading(false);
     }();
-  }, [account.instance, timetables]);
+  }, [account.instance, timetables]);  
 
   return !hidden && (
     <View

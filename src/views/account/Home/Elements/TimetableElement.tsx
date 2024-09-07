@@ -2,15 +2,17 @@ import { NativeListHeader } from "@/components/Global/NativeComponents";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { animPapillon } from "@/utils/ui/animations";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Reanimated, { FadeInDown, FadeOut, LinearTransition } from "react-native-reanimated";
 import { TimetableItem } from "../../Lessons/Atoms/Item";
 import { PapillonNavigation } from "@/router/refs";
 import RedirectButton from "@/components/Home/RedirectButton";
 import { TimetableClass } from "@/services/shared/Timetable";
+import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 import { useTheme } from "@react-navigation/native";
 import { Image, Platform, Text, View } from "react-native";
 import { Sofa, Utensils } from "lucide-react-native";
+import { updateTimetableForWeekInCache } from "@/services/timetable";
 
 const TimetableElement = () => {
   const account = useCurrentAccount((store) => store.account!);
@@ -38,6 +40,46 @@ const TimetableElement = () => {
       date1.getFullYear() === date2.getFullYear()
     );
   };
+
+  const epochWeekNumber = useMemo(
+    () => dateToEpochWeekNumber(new Date()),
+    []
+  );
+
+  const [currentlyUpdating, setCurrentlyUpdating] = useState(false);
+
+  useEffect(() => {
+    if (
+      !timetables[epochWeekNumber] &&
+          !currentlyUpdating &&
+          account.instance
+    ) {
+      setCurrentlyUpdating(true);
+      updateTimetableForWeekInCache(account, epochWeekNumber);
+    }
+  }, [epochWeekNumber, currentlyUpdating, timetables, account?.instance]);
+
+  /* const nextCourseIndex = useMemo(() => {
+    if (timetables[epochWeekNumber]) {
+      const currentDay = new Date();
+
+      const courses = timetables[epochWeekNumber].filter(
+        (c) =>
+          new Date(c.startTimestamp).getDay() === currentDay.getDay()
+      );
+      setCourses(courses);
+
+      const nextCourse = courses.find(
+        (c) => new Date(c.startTimestamp) > currentDay
+      );
+
+      if (nextCourse) {
+        return courses.indexOf(nextCourse);
+      }
+    }
+
+    return null;
+  }, [timetables, epochWeekNumber]); */
 
   useEffect(() => {
     const updateNextCourses = () => {
@@ -89,14 +131,21 @@ const TimetableElement = () => {
     return null;
   }
 
-  const label = isToday(nextCourses[0].startTimestamp) ? "Emploi du temps" : "Prochains cours";
+  const label = isToday(nextCourses[0].startTimestamp)
+    ? "Emploi du temps"
+    : "Prochains cours";
 
   return (
     <>
       <NativeListHeader
         animated
         label={label}
-        trailing={<RedirectButton navigation={PapillonNavigation.current} redirect="Lessons" />}
+        trailing={
+          <RedirectButton
+            navigation={PapillonNavigation.current}
+            redirect="Lessons"
+          />
+        }
       />
       <Reanimated.View
         layout={animPapillon(LinearTransition)}
@@ -109,11 +158,18 @@ const TimetableElement = () => {
           <React.Fragment key={course.id || index}>
             <TimetableItem item={course} index={index} small />
             {nextCourses[index + 1] &&
-              isSameDay(course.endTimestamp, nextCourses[index + 1].startTimestamp) &&
-              nextCourses[index + 1].startTimestamp - course.endTimestamp > 1740000 && (
+                          isSameDay(
+                            course.endTimestamp,
+                            nextCourses[index + 1].startTimestamp
+                          ) &&
+                          nextCourses[index + 1].startTimestamp -
+                              course.endTimestamp >
+                              1740000 && (
               <SeparatorCourse
                 i={index}
-                start={nextCourses[index + 1].startTimestamp}
+                start={
+                  nextCourses[index + 1].startTimestamp
+                }
                 end={course.endTimestamp}
               />
             )}
@@ -158,7 +214,11 @@ const SeparatorCourse: React.FC<{
       }}
       entering={
         Platform.OS === "ios"
-          ? FadeInDown.delay(50 * i).springify().mass(1).damping(20).stiffness(300)
+          ? FadeInDown.delay(50 * i)
+            .springify()
+            .mass(1)
+            .damping(20)
+            .stiffness(300)
           : void 0
       }
       exiting={Platform.OS === "ios" ? FadeOut.duration(300) : void 0}
@@ -202,7 +262,9 @@ const SeparatorCourse: React.FC<{
             color: colors.text,
           }}
         >
-          {startHours > 11 && startHours < 14 ? "Pause méridienne" : "Pas de cours"}
+          {startHours > 11 && startHours < 14
+            ? "Pause méridienne"
+            : "Pas de cours"}
         </Text>
 
         <Text
