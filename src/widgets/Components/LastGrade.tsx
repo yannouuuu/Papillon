@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import { Book } from "lucide-react-native"; // Utilisation de Book comme icône de matière
+import { PieChart } from "lucide-react-native"; // Utilisation de Book comme icône de matière
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { Text, View } from "react-native";
 import Reanimated, { LinearTransition } from "react-native-reanimated";
@@ -51,7 +51,7 @@ const LastGradeWidget = forwardRef(({
 
     if (percentage < 50) return "red"; // Rouge si inférieur à 50%
     if (percentage < 60) return "orange"; // Orange entre 50% et 60%
-    return "blue"; // Bleu pour tout ce qui est supérieur ou égal à 60%
+    return "#0096FF"; // Bleu pour tout ce qui est supérieur ou égal à 60%
   }, [gradeValue, maxGradeValue]);
 
   // Récupération des données de la matière pour obtenir l'émoji associé
@@ -68,6 +68,8 @@ const LastGradeWidget = forwardRef(({
       setLoading(false);
     }();
   }, [defaultPeriod]);
+  // Détermination du texte à afficher pour la description
+  const descriptionText = lastGrade?.description?.trim() || lastGrade?.subjectName || "Nouvelle Note";
 
   // Effet pour cacher le widget si la valeur de la note n'est pas un nombre valide
   useEffect(() => {
@@ -92,7 +94,7 @@ const LastGradeWidget = forwardRef(({
           opacity: 0.5,
         }}
       >
-        <Book size={20} color={colors.text} />
+        <PieChart size={20} color={colors.text} />
         <Text
           style={{
             color: colors.text,
@@ -132,11 +134,11 @@ const LastGradeWidget = forwardRef(({
           style={{
             color: colors.text,
             fontFamily: "semibold",
-            fontSize: 25,
+            fontSize: 24,
             flex: 1, // Permet au texte de prendre l'espace restant
           }}
         >
-          {lastGrade?.description || "Nouvelle Note"}
+          {descriptionText}
         </Text>
       </Reanimated.View>
 
