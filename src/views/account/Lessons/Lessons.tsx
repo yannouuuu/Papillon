@@ -121,6 +121,7 @@ const Lessons: Screen<"Lessons"> = () => {
             current={date.getDay() == pickerDate.getDay()}
             date={date}
             day={getAllLessonsForDay(date)}
+            weekExists={timetables[getWeekFromDate(date)] && timetables[getWeekFromDate(date)].length > 0}
             refreshAction={() => {
               loadTimetableWeek(getWeekFromDate(date), true);
             }}

@@ -16,6 +16,7 @@ import LessonsNoCourseItem from "./NoCourse";
 import { Timetable } from "@/services/shared/Timetable";
 import { animPapillon } from "@/utils/ui/animations";
 import LessonsLoading from "./Loading";
+import MissingItem from "@/components/Global/MissingItem";
 
 const RefreshControl = createNativeWrapper(RNRefreshControl, {
   disallowInterruption: true,
@@ -30,7 +31,7 @@ const getDuration = (minutes: number): string => {
   return `${durationHours} h ${lz(durationRemainingMinutes)} min`;
 };
 
-export const Page = ({ day, date, current, refreshAction, loading }) => {
+export const Page = ({ day, date, current, refreshAction, loading, weekExists }) => {
   return (
     <ScrollView
       style={{
@@ -85,12 +86,23 @@ export const Page = ({ day, date, current, refreshAction, loading }) => {
       )}
 
       {day && day.length === 0 && current && !loading && (
-        <Reanimated.View
-          entering={animPapillon(FadeInDown)}
-          exiting={animPapillon(FadeOut)}
-        >
-          <LessonsNoCourseItem />
-        </Reanimated.View>
+        weekExists && (new Date(date).getDay() == 6 || new Date(date).getDay() == 0) ? (
+          <MissingItem
+            emoji="🌴"
+            title="C'est le week-end !"
+            description="Profitez de votre week-end, il n'y a pas de cours aujourd'hui."
+            entering={animPapillon(FadeInDown)}
+            exiting={animPapillon(FadeOut)}
+          />
+        ) : (
+          <MissingItem
+            emoji="📆"
+            title="Pas de cours aujourd'hui"
+            description="Aucun cours n'est prévu pour aujourd'hui."
+            entering={animPapillon(FadeInDown)}
+            exiting={animPapillon(FadeOut)}
+          />
+        )
       )}
     </ScrollView>
   );
