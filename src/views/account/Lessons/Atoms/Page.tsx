@@ -158,10 +158,10 @@ const SeparatorCourse: React.FC<{
           tintColor={colors.text}
           style={{
             position: "absolute",
-            top: "-20%",
+            top: "-15%",
             left: "-20%",
             width: "200%",
-            height: "200%",
+            height: "300%",
             opacity: 0.05,
           }}
         />
