@@ -1,15 +1,16 @@
 import { useTheme } from "@react-navigation/native";
-import { PieChart } from "lucide-react-native"; // Utilisation de PieChart comme icône de matière
+import { CheckSquare } from "lucide-react-native"; // Utilisation de PieChart comme icône de matière
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { Text, View } from "react-native";
 import Reanimated, { LinearTransition } from "react-native-reanimated";
 
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
+import { NativeText } from "@/components/Global/NativeComponents";
 import { WidgetProps } from "@/components/Home/Widget";
 import { updateGradesAndAveragesInCache } from "@/services/grades";
+import { getSubjectData } from "@/services/shared/Subject"; // Importation pour l'obtention des données sur la matière
 import { useCurrentAccount } from "@/stores/account";
 import { useGradesStore } from "@/stores/grades";
-import { getSubjectData } from "@/services/shared/Subject"; // Importation pour l'obtention des données sur la matière
 
 // Déclaration du composant LastGradeWidget en utilisant forwardRef pour exposer des méthodes au parent
 const LastGradeWidget = forwardRef(({
@@ -62,7 +63,7 @@ const LastGradeWidget = forwardRef(({
   }, [defaultPeriod]);
 
   // Détermination du texte à afficher pour la description
-  const descriptionText = lastGrade?.subjectName || "Nouvelle Note";
+  const descriptionText = getSubjectData(lastGrade?.subjectName || "").pretty;
 
   // Effet pour cacher le widget si la valeur de la note n'est pas un nombre valide
   useEffect(() => {
@@ -87,7 +88,7 @@ const LastGradeWidget = forwardRef(({
           opacity: 0.5,
         }}
       >
-        <PieChart size={20} color={colors.text} />
+        <CheckSquare size={20} color={colors.text} />
         <Text
           style={{
             color: colors.text,
@@ -119,21 +120,19 @@ const LastGradeWidget = forwardRef(({
             padding: 6,
           }}
         >
-          <Text style={{ fontSize: 25 }}>{subjectEmoji}</Text>
+          <Text style={{ fontSize: 18 }}>{subjectEmoji}</Text>
         </View>
 
         {/* Affichage du nom de la matière en gras */}
-        <Text
+        <NativeText
+          variant="title"
           style={{
-            color: colors.text,
-            fontFamily: "semibold",
-            fontSize: 22,
-            flex: 1, // Permet au texte de prendre l'espace restant
+            width: "70%",
           }}
           numberOfLines={2} // Ajout de la propriété numberOfLines
         >
           {descriptionText}
-        </Text>
+        </NativeText>
       </Reanimated.View>
 
       {/* Affichage de la note en bas */}
