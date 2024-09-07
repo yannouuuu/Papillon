@@ -28,7 +28,7 @@ const Lessons: Screen<"Lessons"> = () => {
   const [selectedDate, setSelectedDate] = React.useState(new Date(today));
 
   const getWeekFromDate = (date: Date) => {
-    let firstDate = new Date(account?.instance?.instance?.firstDate || "2024-09-01");
+    const firstDate = new Date(1970, 0, 1);
 
     const diff = date.getTime() - firstDate.getTime();
     const diffDays = diff / (1000 * 3600 * 24);
@@ -50,26 +50,8 @@ const Lessons: Screen<"Lessons"> = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const loadTimetableWeek = async (weekNumber: number, force = false) => {
-    if (currentlyLoadingWeeks.current.has(weekNumber)) {
-      return;
-    }
-
-    if(timetables[weekNumber] && !force) {
-      return;
-    }
-
-    currentlyLoadingWeeks.current.add(weekNumber);
-    if(force) {
-      setLoadingWeeks([...loadingWeeks, weekNumber]);
-    }
-
-    try {
-      await updateTimetableForWeekInCache(account, weekNumber, force);
-      setUpdatedWeeks(new Set(updatedWeeks.add(weekNumber)));
-    } finally {
-      currentlyLoadingWeeks.current.delete(weekNumber);
-      setLoadingWeeks(loadingWeeks.filter((week) => week !== weekNumber));
-    }
+    console.log("Loading week", weekNumber);
+    await updateTimetableForWeekInCache(account, weekNumber, force);
   };
 
   return (
