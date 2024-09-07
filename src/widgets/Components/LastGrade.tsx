@@ -153,7 +153,7 @@ const LastGradeWidget = forwardRef(({
             fontSize: 24.5,
             lineHeight: 24,
             fontFamily: "semibold",
-            color: theme.dark ? "#fff" : "#000",
+            color: colors.text,
           }}
           contentContainerStyle={{
             paddingLeft: 6,
