@@ -48,11 +48,11 @@ const Lessons: Screen<"Lessons"> = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const loadTimetableWeek = async (weekNumber: number, force = false) => {
-    if((currentlyLoadingWeeks.current.has(weekNumber) || loadedWeeks.current.has(weekNumber)) && !force) {
+    if ((currentlyLoadingWeeks.current.has(weekNumber) || loadedWeeks.current.has(weekNumber)) && !force) {
       return;
     }
 
-    if(force) {
+    if (force) {
       setLoadingWeeks([...loadingWeeks, weekNumber]);
     }
 

@@ -1,6 +1,6 @@
 import type { Personalization } from "@/stores/account/types";
 import downloadAsBase64 from "@/utils/external/download-as-base64";
-import { defaultTabs } from "@/views/settings/SettingsTabs";
+import { defaultTabs } from "@/consts/DefaultTabs";
 import type pronote from "pawnote";
 
 import colors from "@/utils/data/colors.json";

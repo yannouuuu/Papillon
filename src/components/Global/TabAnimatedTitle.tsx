@@ -2,7 +2,7 @@ import type React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import LottieView from "lottie-react-native";
 import { X } from "lucide-react-native";
-import { defaultTabs } from "@/views/settings/SettingsTabs";
+import { defaultTabs } from "@/consts/DefaultTabs";
 import { type RouteProp, useTheme } from "@react-navigation/native";
 import type { RouteParameters } from "@/router/helpers/types";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";

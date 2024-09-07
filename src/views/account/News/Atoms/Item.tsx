@@ -25,7 +25,7 @@ import parse_initials from "@/utils/format/format_pronote_initials";
 import important_json from "@/utils/magic/regex/important.json";
 import formatDate from "@/utils/format/format_date_complets";
 import InitialIndicator from "@/components/News/InitialIndicator";
-import { defaultTabs } from "@/views/settings/SettingsTabs";
+import { defaultTabs } from "@/consts/DefaultTabs";
 import { RefreshControl } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 import BetaIndicator from "@/components/News/Beta";

@@ -159,8 +159,10 @@ interface LessonsDateModalProps {
 const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
   showDatePicker,
   setShowDatePicker,
-  currentDate,
-  onDateSelect,
+  currentPageIndex,
+  defaultDate,
+  PagerRef,
+  getDateFromIndex
 }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -173,12 +175,13 @@ const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
           marginTop: -5,
           marginBottom: 10,
         }}
-        value={currentDate}
+        value={getDateFromIndex(currentPageIndex)}
         display={"calendar"}
         mode="date"
         onChange={(event, selectedDate) => {
           if (selectedDate) {
-            onDateSelect(selectedDate);
+            const newPageIndex = Math.round((selectedDate.getTime() - defaultDate.getTime()) / 86400000);
+            PagerRef.current?.setPage(newPageIndex);
           }
 
           setShowDatePicker(false);
@@ -251,7 +254,7 @@ const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
                   color: "#fff",
                 }}
               >
-                {new Date(currentDate).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
+                {getDateFromIndex(currentPageIndex).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })}
               </Text>
 
               <TouchableOpacity
@@ -279,14 +282,15 @@ const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
                 marginTop: -5,
                 marginBottom: 10,
               }}
-              value={currentDate}
+              value={getDateFromIndex(currentPageIndex)}
               display={"inline"}
               mode="date"
               locale="fr-FR"
               accentColor={colors.primary}
               onChange={(event, selectedDate) => {
                 if (selectedDate) {
-                  onDateSelect(selectedDate);
+                  const newPageIndex = Math.round((selectedDate.getTime() - defaultDate.getTime()) / 86400000);
+                  PagerRef.current?.setPage(newPageIndex);
                 }
               }}
             />
