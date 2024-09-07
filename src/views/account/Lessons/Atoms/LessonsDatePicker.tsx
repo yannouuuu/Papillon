@@ -86,6 +86,7 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
   const [dates, setDates] = useState(() => generateDateRange(initialDate));
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [centerIndex, setCenterIndex] = useState(Math.floor(DATE_RANGE / 2));
+  const [isProgrammaticScroll, setIsProgrammaticScroll] = useState(false);
   const flatListRef = useRef(null);
   const scrollX = useSharedValue(0);
   const lastItemIndex = useSharedValue(0);
@@ -98,6 +99,7 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
     if (dateIndex !== -1) {
       const diffFromCenter = dateIndex - centerIndex;
       if (Math.abs(diffFromCenter) <= SCROLL_THRESHOLD) {
+        setIsProgrammaticScroll(true);
         flatListRef.current?.scrollToIndex({
           index: dateIndex,
           animated: true,
@@ -118,6 +120,7 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
 
   useEffect(() => {
     if (dates.length > 0) {
+      setIsProgrammaticScroll(true);
       flatListRef.current?.scrollToIndex({
         index: centerIndex,
         animated: false,
@@ -129,7 +132,7 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
   const handleDatePress = useCallback((date) => {
     setSelectedDate(date);
     onDateSelect(date);
-    if (isSameDay(selectedDate, initialDate)) {
+    if (isSameDay(date, selectedDate) && isSameDay(selectedDate, initialDate)) {
       onCurrentDatePress();
     }
   }, [onDateSelect, onCurrentDatePress, initialDate, selectedDate]);
@@ -150,7 +153,10 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
       const currentItemIndex = Math.round(event.contentOffset.x / ITEM_TOTAL_WIDTH);
       if (currentItemIndex !== lastItemIndex.value) {
         lastItemIndex.value = currentItemIndex;
-        runOnJS(triggerHaptic)();
+        runOnJS(setIsProgrammaticScroll)(false);
+        if (!isProgrammaticScroll) {
+          runOnJS(triggerHaptic)();
+        }
       }
     },
   });
@@ -161,11 +167,9 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
     if (newSelectedDate && !isSameDay(newSelectedDate, selectedDate)) {
       setSelectedDate(newSelectedDate);
       onDateSelect(newSelectedDate);
-      if (isSameDay(newSelectedDate, new Date())) {
-        onCurrentDatePress();
-      }
     }
-  }, [dates, selectedDate, onDateSelect, onCurrentDatePress]);
+    setIsProgrammaticScroll(false);
+  }, [dates, selectedDate, onDateSelect]);
 
   const renderDateItem = useCallback(({ item, index }) => (
     <DateItem

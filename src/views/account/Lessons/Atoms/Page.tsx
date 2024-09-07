@@ -72,7 +72,7 @@ export const Page = ({ day, date, current, refreshAction, loading }) => {
         </View>
       }
 
-      {loading && (
+      {loading && day.length == 0 && (
         <Reanimated.View
           style={{
             padding: 26,
