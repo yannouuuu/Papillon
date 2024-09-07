@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Platform } from "
 import { format, addDays, isSameDay } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useTheme } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
 
 import Animated, {
   useSharedValue,
@@ -10,6 +11,7 @@ import Animated, {
   useAnimatedStyle,
   interpolate,
   Extrapolate,
+  runOnJS,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -86,6 +88,7 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
   const [centerIndex, setCenterIndex] = useState(Math.floor(DATE_RANGE / 2));
   const flatListRef = useRef(null);
   const scrollX = useSharedValue(0);
+  const lastItemIndex = useSharedValue(0);
 
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -137,9 +140,18 @@ const HorizontalDatePicker = ({ onDateSelect, onCurrentDatePress, initialDate = 
     index,
   }), []);
 
+  const triggerHaptic = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
+
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollX.value = event.contentOffset.x;
+      const currentItemIndex = Math.round(event.contentOffset.x / ITEM_TOTAL_WIDTH);
+      if (currentItemIndex !== lastItemIndex.value) {
+        lastItemIndex.value = currentItemIndex;
+        runOnJS(triggerHaptic)();
+      }
     },
   });
 

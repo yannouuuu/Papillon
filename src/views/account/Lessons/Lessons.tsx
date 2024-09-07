@@ -51,7 +51,10 @@ const Lessons: Screen<"Lessons"> = () => {
     if((currentlyLoadingWeeks.current.has(weekNumber) || loadedWeeks.current.has(weekNumber)) && !force) {
       return;
     }
-    setLoadingWeeks([...loadingWeeks, weekNumber]);
+
+    if(force) {
+      setLoadingWeeks([...loadingWeeks, weekNumber]);
+    }
 
     try {
       await updateTimetableForWeekInCache(account, weekNumber, force);
