@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useState } from "react";
+import React, { useRef, useCallback, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import InfinitePager from "react-native-infinite-pager";
 
@@ -8,7 +8,7 @@ const InfiniteDatePager = ({ renderDate, initialDate = new Date(), onDateChange 
   const pagerRef = useRef(null);
   const baseDate = useRef(new Date(1970, 0, 1)).current;
   baseDate.setHours(0, 0, 0, 0);
-  const [isProgrammaticChange, setIsProgrammaticChange] = useState(false);
+  const lastChangeTime = useRef(0);
 
   const getDateFromIndex = useCallback((index) => {
     return new Date(baseDate.getTime() + index * MILLISECONDS_PER_DAY);
@@ -32,13 +32,16 @@ const InfiniteDatePager = ({ renderDate, initialDate = new Date(), onDateChange 
   }, [getDateFromIndex, renderDate]);
 
   const handlePageChange = useCallback((index) => {
-    const newDate = getDateFromIndex(index);
-    onDateChange?.(newDate);
-  }, [getDateFromIndex, onDateChange, isProgrammaticChange]);
+    const now = Date.now();
+    if (now - lastChangeTime.current > 200) { // 200ms throttle
+      lastChangeTime.current = now;
+      const newDate = getDateFromIndex(index);
+      onDateChange?.(newDate);
+    }
+  }, [getDateFromIndex, onDateChange]);
 
   useEffect(() => {
     const index = getIndexFromDate(initialDate);
-    setIsProgrammaticChange(true);
     pagerRef.current?.setPage(index, false);
   }, [initialDate, getIndexFromDate]);
 
