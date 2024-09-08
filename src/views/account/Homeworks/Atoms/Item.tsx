@@ -80,6 +80,7 @@ const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }:
             variant="default"
             numberOfLines={expanded ? undefined : 3}
             onTextLayout={onTextLayout}
+            style={{color: homework.done ? theme.colors.text + "70" : theme.colors.text}}
           >
             {parsedContent}
           </NativeText>
