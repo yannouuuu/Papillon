@@ -99,12 +99,20 @@ const TimetableElement = () => {
         .sort((a, b) => a.startTimestamp - b.startTimestamp);
 
       let nextThreeCourses: TimetableClass[] = [];
+      let verif: string[] = [];
       let currentDay = now;
 
       for (const course of sortedCourses) {
         if (isSameDay(course.startTimestamp, currentDay.getTime())) {
-          nextThreeCourses.push(course);
-          if (nextThreeCourses.length === 3) break;
+          if (
+            ((nextThreeCourses.length === 1 &&
+              nextThreeCourses[0].endTimestamp !== course.endTimestamp) ||
+              nextThreeCourses.length > 1) &&
+            !verif.includes(`${course.endTimestamp}|${course.startTimestamp}`)
+          ) {
+            nextThreeCourses.push(course);
+            verif.push(`${course.endTimestamp}|${course.startTimestamp}`);
+          }
         } else if (nextThreeCourses.length > 0) {
           break;
         } else {
@@ -158,18 +166,15 @@ const TimetableElement = () => {
           <React.Fragment key={course.id || index}>
             <TimetableItem item={course} index={index} small />
             {nextCourses[index + 1] &&
-                          isSameDay(
-                            course.endTimestamp,
-                            nextCourses[index + 1].startTimestamp
-                          ) &&
-                          nextCourses[index + 1].startTimestamp -
-                              course.endTimestamp >
-                              1740000 && (
+              isSameDay(
+                course.endTimestamp,
+                nextCourses[index + 1].startTimestamp
+              ) &&
+              nextCourses[index + 1].startTimestamp - course.endTimestamp >
+                1740000 && (
               <SeparatorCourse
                 i={index}
-                start={
-                  nextCourses[index + 1].startTimestamp
-                }
+                start={nextCourses[index + 1].startTimestamp}
                 end={course.endTimestamp}
               />
             )}
