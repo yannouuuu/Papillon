@@ -13,7 +13,7 @@ import Reanimated, {
 import { get_home_widgets } from "@/addons/addons";
 import AddonsWebview, { type AddonHomePageInfo } from "@/components/Addons/AddonsWebview";
 import { NativeText } from "@/components/Global/NativeComponents";
-import { defaultTabs } from "@/views/settings/SettingsTabs";
+import { defaultTabs } from "@/consts/DefaultTabs";
 import { Widgets } from "@/widgets";
 import LottieView from "lottie-react-native";
 import { PressableScale } from "react-native-pressable-scale";
