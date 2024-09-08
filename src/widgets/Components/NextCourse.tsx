@@ -61,7 +61,7 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
 
       setLoading(false);
     }();
-  }, [account.instance, timetables]);  
+  }, [account.instance, timetables]);
 
   return !hidden && (
     <View
