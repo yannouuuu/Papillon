@@ -3,7 +3,11 @@ import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { animPapillon } from "@/utils/ui/animations";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Reanimated, { FadeInDown, FadeOut, LinearTransition } from "react-native-reanimated";
+import Reanimated, {
+  FadeInDown,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 import { TimetableItem } from "../../Lessons/Atoms/Item";
 import { PapillonNavigation } from "@/router/refs";
 import RedirectButton from "@/components/Home/RedirectButton";
@@ -41,18 +45,15 @@ const TimetableElement = () => {
     );
   };
 
-  const epochWeekNumber = useMemo(
-    () => dateToEpochWeekNumber(new Date()),
-    []
-  );
+  const epochWeekNumber = useMemo(() => dateToEpochWeekNumber(new Date()), []);
 
   const [currentlyUpdating, setCurrentlyUpdating] = useState(false);
 
   useEffect(() => {
     if (
       !timetables[epochWeekNumber] &&
-          !currentlyUpdating &&
-          account.instance
+      !currentlyUpdating &&
+      account.instance
     ) {
       setCurrentlyUpdating(true);
       updateTimetableForWeekInCache(account, epochWeekNumber);
@@ -92,11 +93,18 @@ const TimetableElement = () => {
 
       const allCourses = Object.values(timetables).flat();
       const now = new Date();
-      const today = now.getTime();
+      const today = parseInt((now.getTime() / 1000).toString());
+      const tomorrow = today + 1 * 24 * 60 * 60; // Ajouter 1 jour en millisecondes
+      const Bistomorrow = today + 2 * 24 * 60 * 60; // Ajouter 1 jour en millisecondes
 
-      const sortedCourses = allCourses
-        .filter((c) => c.endTimestamp > today)
-        .sort((a, b) => a.startTimestamp - b.startTimestamp);
+      const sortedCourses =
+        allCourses.filter((c) => c.startTimestamp / 1000 < Date.now() / 1000).length !== 0
+          ? allCourses
+            .filter((c) => c.endTimestamp / 1000 > today && c.endTimestamp / 1000 < tomorrow)
+            .sort((a, b) => a.startTimestamp - b.startTimestamp)
+          : allCourses
+            .filter((c) => c.endTimestamp / 1000 > tomorrow && c.endTimestamp / 1000 < Bistomorrow)
+            .sort((a, b) => a.startTimestamp - b.startTimestamp);
 
       let nextThreeCourses: TimetableClass[] = [];
       let verif: string[] = [];
