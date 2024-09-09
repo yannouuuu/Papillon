@@ -13,7 +13,9 @@ export default [
 
   createScreen("SettingStack", SettingsScreen, {
     headerShown: false,
-    presentation: "modal"
+    presentation: "modal",
+    animation: "slide_from_right",
+    animationDuration: 100
   }),
 
   createScreen("AccountStack", AccountScreen, {
