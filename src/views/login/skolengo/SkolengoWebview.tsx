@@ -226,9 +226,6 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                     discovery: discovery!
                   });
                   setLoginStep("Finalisation du compte...");
-                  await skolengoAccount.instance!.getUserInfo().then((info) => {
-                    log("info", "Skolengo");
-                  }).catch(console.log);
                   createStoredAccount(skolengoAccount);
                   switchTo(skolengoAccount);
 
@@ -242,7 +239,7 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                     });
                   });
                 });
-              } else {
+              } else if(!showWebView) {
                 setShowWebView(true);
               }
             }}
@@ -301,9 +298,7 @@ const loginSkolengoWorkflow = async (school: School) => {
   const res = await skolengoUrl.authRes.promptAsync(skolengoUrl.discovery, {
     url: skolengoUrl.url,
   });
-  console.log("res", res);
   if (!res || res?.type !== "success") return;
-  console.log("ress");
   const token = await AuthSession.exchangeCodeAsync(
     {
       clientId: OID_CLIENT_ID,
@@ -313,7 +308,5 @@ const loginSkolengoWorkflow = async (school: School) => {
     },
     skolengoUrl.discovery
   );
-  console.log("token", token);
   if (!token) return;
-  console.log(token);
 };

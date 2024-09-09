@@ -4,6 +4,7 @@ import type { Session as TSSession, Authentication as TSAuthentication } from "t
 import type { Client as ARDClient } from "pawrd";
 import type ScolengoAPI from "scolengo-api";
 import { SkolengoAuthConfig } from "@/services/skolengo/skolengo-types";
+import { User as ScolengoAPIUser } from "scolengo-api/types/models/Common";
 
 export interface Tab {
   name: string
@@ -114,6 +115,7 @@ export interface SkolengoAccount extends BaseAccount {
   service: AccountService.Skolengo
   instance?: ScolengoAPI.Skolengo
   authentication: SkolengoAuthConfig
+  userInfo: ScolengoAPIUser
 }
 
 export interface LocalAccount extends BaseAccount {

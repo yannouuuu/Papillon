@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import { Platform, StyleSheet, Text, View } from "react-native";
 
 import ColorIndicator from "@/components/Lessons/ColorIndicator";
-import { TimetableClass } from "@/services/shared/Timetable";
+import { TimetableClass, TimetableClassStatus } from "@/services/shared/Timetable";
 
 import Reanimated, {
   FadeInDown,
@@ -57,8 +57,8 @@ export const TimetableItem: React.FC<{
       >
         <View style={[{ flex: 1, flexDirection: "column", overflow: "hidden", borderRadius: 10 }]}>
           {item.status && (
-            <View style={[styles.statusContainer, { backgroundColor: item.status === "Cours annulé" ? "#E8BEBF" : subjectData.color + "33" }]}>
-              <Text style={[styles.statusText, { color: item.status === "Cours annulé" ? "#B42828" :  subjectData.color}]}>{item.status}</Text>
+            <View style={[styles.statusContainer, { backgroundColor: item.status === TimetableClassStatus.CANCELED ? "#E8BEBF" : subjectData.color + "33" }]}>
+              <Text style={[styles.statusText, { color: item.status === TimetableClassStatus.CANCELED ? "#B42828" :  subjectData.color}]}>{item.status}</Text>
             </View>
           )}
 

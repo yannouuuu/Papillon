@@ -1,4 +1,5 @@
 import { type Account, AccountService } from "@/stores/account/types";
+import { Skolengo } from "scolengo-api";
 
 export interface Reconnected<T extends Account> {
   instance: T["instance"]

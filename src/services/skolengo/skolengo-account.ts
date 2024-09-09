@@ -1,3 +1,4 @@
+import { ReanimatedGraphPublicMethods } from "@birdwingo/react-native-reanimated-graph";
 import { Skolengo, OID_CLIENT_ID, OID_CLIENT_SECRET, BASE_URL } from "scolengo-api";
 import { SkolengoAuthConfig, SkolengoJWT, SkolengoTokenSet, authTokenToSkolengoTokenSet } from "./skolengo-types";
 import { DiscoveryDocument } from "expo-auth-session";
@@ -8,6 +9,7 @@ import { Alert } from "react-native";
 import { decode as htmlDecode } from "html-entities";
 import { useCurrentAccount } from "@/stores/account";
 import defaultSkolengoPersonalization from "./default-personalization";
+import { User } from "scolengo-api/types/models/Common";
 
 const getSkolengoAxiosInstance = ()=>{
   const axioss = axios.create({
@@ -57,7 +59,7 @@ const getJWTClaims = (token: string): SkolengoJWT => {
   return data;
 };
 
-export const getSkolengoAccount = (authConfig: SkolengoAuthConfig)=>{
+export const getSkolengoAccount = async (authConfig: SkolengoAuthConfig, userInfo?: User)=>{
   const skolengoAccount = new Skolengo(
     null,
     authConfig.school,
@@ -78,10 +80,11 @@ export const getSkolengoAccount = (authConfig: SkolengoAuthConfig)=>{
       httpClient: getSkolengoAxiosInstance()
     }
   );
+  if(!userInfo) userInfo = await skolengoAccount.getUserInfo();
   const jwtDecoded = getJWTClaims(skolengoAccount.tokenSet.id_token!);
   const account: SkolengoAccount = {
     service: AccountService.Skolengo,
-    localID: jwtDecoded.sub,
+    localID: userInfo?.id || jwtDecoded.sub,
     isExternal: false,
     name: jwtDecoded.given_name + " " + jwtDecoded.family_name,
     instance: skolengoAccount,
@@ -92,10 +95,13 @@ export const getSkolengoAccount = (authConfig: SkolengoAuthConfig)=>{
     },
     linkedExternalLocalIDs: [],
     studentName: {
-      first: jwtDecoded.given_name || "Inconnu",
-      last: jwtDecoded.family_name || "Inconnu",
+      first: userInfo?.firstName|| jwtDecoded.given_name || "Inconnu",
+      last: userInfo?.lastName|| jwtDecoded.family_name || "Inconnu",
     },
-    personalization: defaultSkolengoPersonalization()
+    schoolName: userInfo?.school?.name,
+    className: userInfo?.className,
+    personalization: await defaultSkolengoPersonalization(skolengoAccount),
+    userInfo
   };
   return account;
 };
