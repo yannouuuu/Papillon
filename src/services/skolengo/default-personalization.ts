@@ -1,5 +1,5 @@
 import type { Personalization, SkolengoAccount } from "@/stores/account/types";
-import { defaultTabs } from "@/views/settings/SettingsTabs";
+import { defaultTabs } from "@/consts/DefaultTabs";
 
 import colors from "@/utils/data/colors.json";
 import { toSkolengoDate } from "./skolengo-types";
