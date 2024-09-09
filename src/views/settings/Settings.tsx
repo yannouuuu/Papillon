@@ -186,7 +186,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           color: "#CBA024",
           label: "Soutenir Papillon",
           onPress: () => {
-            openUrl("https://papillon.bzh/donate");
+            Platform.OS === "android" ? openUrl("https://papillon.bzh/donate") : undefined;
           },
         },
         {
