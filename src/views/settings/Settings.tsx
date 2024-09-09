@@ -29,7 +29,8 @@ import {
   Settings as SettingsLucide,
   Sparkles,
   SwatchBook,
-  WandSparkles
+  WandSparkles,
+  X
 } from "lucide-react-native";
 
 import { NativeIcon, NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
@@ -40,6 +41,7 @@ import {get_settings_widgets} from "@/addons/addons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AddonPlacementManifest} from "@/addons/types";
 import { useFlagsStore } from "@/stores/flags";
+import { useAlert } from "@/providers/AlertProvider";
 
 const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -87,6 +89,8 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
 
     return unsubscribe;
   }, []);
+
+  const { showAlert } = useAlert();
 
   const tabs = [
     {
@@ -204,23 +208,51 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           color: "#CF0029",
           label: "Se déconnecter",
           onPress: () => {
-            Alert.alert("Se déconnecter", "Êtes-vous sûr de vouloir vous déconnecter ?", [
-              {
-                text: "Annuler",
-                style: "cancel",
-              },
-              {
-                text: "Se déconnecter",
-                style: "destructive",
-                onPress: () => {
-                  removeAccount(account.localID);
-                  navigation.reset({
-                    index: 0,
-                    routes: [{ name: "AccountSelector" }],
-                  });
+            if (Platform.OS === "ios") {
+              Alert.alert("Se déconnecter", "Êtes-vous sûr de vouloir vous déconnecter ?", [
+                {
+                  text: "Annuler",
+                  style: "cancel",
                 },
-              },
-            ]);
+                {
+                  text: "Se déconnecter",
+                  style: "destructive",
+                  onPress: () => {
+                    removeAccount(account.localID);
+                    navigation.reset({
+                      index: 0,
+                      routes: [{ name: "AccountSelector" }],
+                    });
+                  },
+                },
+              ]);
+            } else {
+              showAlert({
+                title: "Se déconnecter",
+                message: "Êtes-vous sûr de vouloir vous déconnecter ?",
+                actions: [
+                  {
+                    title: "Annuler",
+                    onPress: () => {},
+                    backgroundColor: colors.card,
+                    icon: <X color={colors.text} />,
+                  },
+                  {
+                    title: "Se déconnecter",
+                    onPress: () => {
+                      removeAccount(account.localID);
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: "AccountSelector" }],
+                      });
+                    },
+                    primary: true,
+                    backgroundColor: "#CF0029",
+                    icon: <LogOut color="#FFFFFF" />,
+                  },
+                ],
+              });
+            }
           },
         },
       ]
