@@ -93,14 +93,12 @@ const TimetableElement = () => {
 
       const allCourses = Object.values(timetables).flat();
       const now = new Date();
-      const today = parseInt((now.getTime() / 1000).toString());
+      const today = parseInt(((new Date(`${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, "0")}-${(new Date().getDate()).toString().padStart(2, "0")}T00:00:00Z`)).getTime() / 1000).toString());
       const tomorrow = today + 1 * 24 * 60 * 60; // Ajouter 1 jour en millisecondes
       const Bistomorrow = today + 2 * 24 * 60 * 60; // Ajouter 1 jour en millisecondes
-
       const sortedCourses =
-        allCourses.filter((c) => c.startTimestamp / 1000 < Date.now() / 1000).length !== 0
-          ? allCourses
-            .filter((c) => c.endTimestamp / 1000 > today && c.endTimestamp / 1000 < tomorrow)
+        allCourses.filter((c) => c.startTimestamp / 1000 > Date.now() / 1000 && c.startTimestamp / 1000 < tomorrow).length !== 0
+          ? allCourses.filter((c) => c.startTimestamp / 1000 > Date.now() / 1000 && c.startTimestamp / 1000 < tomorrow)
             .sort((a, b) => a.startTimestamp - b.startTimestamp)
           : allCourses
             .filter((c) => c.endTimestamp / 1000 > tomorrow && c.endTimestamp / 1000 < Bistomorrow)
@@ -115,7 +113,7 @@ const TimetableElement = () => {
           if (
             ((nextThreeCourses.length === 1 &&
               nextThreeCourses[0].endTimestamp !== course.endTimestamp) ||
-              nextThreeCourses.length > 1) &&
+              nextThreeCourses.length !== 1) &&
             !verif.includes(`${course.endTimestamp}|${course.startTimestamp}`)
           ) {
             nextThreeCourses.push(course);
