@@ -35,9 +35,9 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
   const [clipboardFound, setClipboardFound] = useState(false);
   const [clipboardHasBeenFound, setClipboardHasBeenFound] = useState(false);
 
-  // get url from clipboard if ios
+  // get url from clipboard
   useEffect(() => {
-    if (Platform.OS === "ios" && instanceURL === "" && !route.params?.url) {
+    if (instanceURL === "" && !route.params?.url) {
       Clipboard.getStringAsync().then((clipboardContent) => {
         if (clipboardContent && clipboardContent.startsWith("https://") && clipboardContent.includes("/pronote")) {
           setInstanceURL(clipboardContent);
