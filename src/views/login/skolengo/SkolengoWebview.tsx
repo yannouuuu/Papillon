@@ -27,6 +27,7 @@ import { Audio } from "expo-av";
 import { authTokenToSkolengoTokenSet } from "@/services/skolengo/skolengo-types";
 import { getSkolengoAccount } from "@/services/skolengo/skolengo-account";
 import { log } from "@/utils/logger/logger";
+import { wait } from "@/services/skolengo/data/utils";
 
 // TODO : When the app is not started with Expo Go (so with a prebuild or a release build), use the expo auth-session module completely with the deeplink and without the webview.
 
@@ -219,6 +220,8 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                   setLoginStep("Initialisation du compte...");
                   setShowWebView(false);
                   const newTok = authTokenToSkolengoTokenSet(token);
+                  // need that if the user have ressources from Pronote
+                  await wait(1000);
                   setLoginStep("Obtention du compte...");
                   const skolengoAccount = await getSkolengoAccount({
                     school: route.params.school,

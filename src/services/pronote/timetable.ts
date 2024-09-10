@@ -20,7 +20,7 @@ const decodeTimetableClass = (c: pronote.TimetableClassLesson | pronote.Timetabl
       title: c.subject!.name,
       room: c.classrooms.join(", ") || void 0,
       teacher: c.teacherNames?.join(", ") ?? void 0,
-      status: c.status === "Cours annulé" ? TimetableClassStatus.CANCELED : TimetableClassStatus.NORMAL,
+      status: c.status === "Cours annulé" ? TimetableClassStatus.CANCELED : void 0,
       ...base
     } satisfies TimetableClass;
   }

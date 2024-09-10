@@ -15,6 +15,5 @@ export interface TimetableClass {
 export type Timetable = Array<TimetableClass>;
 
 export enum TimetableClassStatus {
-  NORMAL = "normal",
   CANCELED = "canceled",
 }

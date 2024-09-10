@@ -12,7 +12,7 @@ const decodeNews = (n: SchoolInfo): Information => ({
   date: new Date(n.publicationDateTime),
   attachments: n.illustration ? [decodeSkoAttachment(n.illustration)] : [],
   content: htmlToText(n.content || ""),
-  author: n.author?.person && userToName(n.author.person) || "Inconnu",
+  author: n.author?.person && userToName(n.author.person) || n?.author?.technicalUser?.label || "Inconnu",
   category: _skoUcFist(n.school?.name || n.level || "Autre"),
   // skolengo dont provide this information
   acknowledged: true,

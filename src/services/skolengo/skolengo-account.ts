@@ -17,6 +17,7 @@ const getSkolengoAxiosInstance = ()=>{
   });
 
   axioss.interceptors.response.use(r=>r, (error)=>{
+    if(error.response?.data?.errors?.find((e:any)=>e.title.includes("PRONOTE_RESOURCES"))) return Promise.resolve(error);
     if(__DEV__) {
       console.warn(
         "[SKOLENGO] ERR - ",
@@ -77,7 +78,8 @@ export const getSkolengoAccount = async (authConfig: SkolengoAuthConfig, userInf
           tokenSet
         });
       },
-      httpClient: getSkolengoAxiosInstance()
+      httpClient: getSkolengoAxiosInstance(),
+      handlePronoteError: true
     }
   );
   if(!userInfo) userInfo = await skolengoAccount.getUserInfo();

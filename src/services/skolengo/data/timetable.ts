@@ -18,7 +18,7 @@ const decodeLesson = (lesson: Lesson): TimetableClass => ({
   room: lesson.location ? lesson.location+(lesson.locationComplement ? " - "+lesson.locationComplement : "") : void 0,
   teacher: lesson.teachers?.map(e=>`${e.firstName.at(0)}. ${e.lastName}`).join("/"),
   backgroundColor: lesson.subject.color || void 0,
-  status: lesson.canceled ? TimetableClassStatus.CANCELED : TimetableClassStatus.NORMAL,
+  status: lesson.canceled ? TimetableClassStatus.CANCELED : void 0,
 });
 
 export const getTimetableForWeek = async (account: SkolengoAccount, epochWeekNumber: number): Promise<Timetable> => {
