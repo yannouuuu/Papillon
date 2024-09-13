@@ -85,8 +85,6 @@ const PronoteCredentials: Screen<"PronoteCredentials"> = ({ route, navigation })
     }
   };
 
-  const [showPassword, setShowPassword] = useState(false);
-
   return (
     <LoginView
       serviceIcon={require("@/../assets/images/service_pronote.png")}
