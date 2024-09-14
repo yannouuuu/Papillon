@@ -474,9 +474,9 @@ const WeekView = () => {
             height: 40,
             maxWidth: showPickerButtons ? 40 : null,
             gap: 4,
-            shadowColor: theme.colors.text + "22",
+            shadowColor: "#00000022",
             shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.5,
+            shadowOpacity: 0.6,
             shadowRadius: 4,
           }}
         >
