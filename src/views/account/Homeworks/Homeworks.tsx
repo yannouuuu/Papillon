@@ -44,6 +44,10 @@ const formatDate = (date: string | number | Date): string => {
 const WeekView = () => {
   const flatListRef = useRef(null);
   const { width } = Dimensions.get("window");
+  const finalWidth = width - (
+    320 > width * 0.35 ? width * 0.35 :
+      320
+  );
   const insets = useSafeAreaInsets();
 
   const theme = useTheme();
@@ -77,8 +81,8 @@ const WeekView = () => {
   const [hideDone, setHideDone] = useState(false);
 
   const getItemLayout = useCallback((_, index) => ({
-    length: width,
-    offset: width * index,
+    length: finalWidth,
+    offset: finalWidth * index,
     index,
   }), [width]);
 
@@ -172,7 +176,7 @@ const WeekView = () => {
 
     return (
       <ScrollView
-        style={{ width, height: "100%"}}
+        style={{ width: finalWidth, height: "100%"}}
         contentContainerStyle={{
           padding: 16,
           paddingTop: insets.top + 56,
@@ -252,24 +256,24 @@ const WeekView = () => {
   };
 
   const onScroll = useCallback(({ nativeEvent }) => {
-    if (nativeEvent.contentOffset.x < width) {
+    if (nativeEvent.contentOffset.x < finalWidth) {
       onStartReached();
     }
 
     // Update selected week based on scroll position
-    const index = Math.round(nativeEvent.contentOffset.x / width);
+    const index = Math.round(nativeEvent.contentOffset.x / finalWidth);
     setSelectedWeek(data[index]);
-  }, [width, data]);
+  }, [finalWidth, data]);
 
   const onMomentumScrollEnd = useCallback(({ nativeEvent }) => {
-    const index = Math.round(nativeEvent.contentOffset.x / width);
+    const index = Math.round(nativeEvent.contentOffset.x / finalWidth);
     setSelectedWeek(data[index]);
-  }, [width, data]);
+  }, [finalWidth, data]);
 
   const goToWeek = useCallback((weekNumber) => {
     const index = data.findIndex(week => week === weekNumber);
     if (index !== -1) {
-      const currentIndex = Math.round(flatListRef.current?.contentOffset?.x / width) || 0;
+      const currentIndex = Math.round(flatListRef.current?.contentOffset?.x / finalWidth) || 0;
       const distance = Math.abs(index - currentIndex);
       const animated = distance <= 10; // Animate if the distance is 10 weeks or less
 
@@ -286,7 +290,7 @@ const WeekView = () => {
         setSelectedWeek(weekNumber);
       }, 0);
     }
-  }, [data, width]);
+  }, [data, finalWidth]);
 
   const [showPickerButtons, setShowPickerButtons] = useState(false);
   const [searchHasFocus, setSearchHasFocus] = useState(false);
@@ -467,8 +471,8 @@ const WeekView = () => {
         {showPickerButtons && !searchHasFocus &&
         <Reanimated.View
           layout={animPapillon(LinearTransition)}
-          entering={animPapillon(FadeInRight)}
-          exiting={animPapillon(FadeOutRight)}
+          entering={animPapillon(FadeInLeft).delay(100)}
+          exiting={animPapillon(FadeOutLeft)}
           style={{
             alignItems: "center",
             justifyContent: "center",
