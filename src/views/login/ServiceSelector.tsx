@@ -68,7 +68,7 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
               {
                 title: "Continuer",
                 onPress: () => {
-                  navigation.navigate("SkolengoAuthenticationSelector");
+                  navigation.navigate("EcoleDirecteCredentials");
                   playSound();
                 },
                 icon: <Check />,
