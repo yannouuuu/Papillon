@@ -44,10 +44,10 @@ const formatDate = (date: string | number | Date): string => {
 const WeekView = () => {
   const flatListRef = useRef(null);
   const { width } = Dimensions.get("window");
-  const finalWidth = width - (
+  const finalWidth = width - (width > 600 ? (
     320 > width * 0.35 ? width * 0.35 :
       320
-  );
+  ) : 0);
   const insets = useSafeAreaInsets();
 
   const theme = useTheme();
