@@ -387,7 +387,7 @@ const WeekView = () => {
                   layout={animPapillon(LinearTransition)}
                 >
                   <AnimatedNumber
-                    value={((selectedWeek % 52) + 1).toString()}
+                    value={(((selectedWeek - 10) % 52) + 1).toString()}
                     style={[styles.weekPickerText, styles.weekPickerTextNbr,
                       {
                         color: showPickerButtons ? theme.colors.primary : theme.colors.text,
