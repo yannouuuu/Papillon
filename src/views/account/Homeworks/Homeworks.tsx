@@ -50,6 +50,14 @@ const WeekView = () => {
   const account = useCurrentAccount(store => store.account!);
   const homeworks = useHomeworkStore(store => store.homeworks);
 
+  let firstDate = account.instance.instance.firstDate || null;
+  if (!firstDate) {
+    firstDate = new Date();
+    firstDate.setMonth(8);
+    firstDate.setDate(1);
+  }
+  const firstDateEpoch = dateToEpochWeekNumber(firstDate);
+
   // Function to get the current week number since epoch
   const getCurrentWeekNumber = () => {
     const now = new Date();
@@ -387,7 +395,7 @@ const WeekView = () => {
                   layout={animPapillon(LinearTransition)}
                 >
                   <AnimatedNumber
-                    value={(((selectedWeek - 10) % 52) + 1).toString()}
+                    value={((selectedWeek - firstDateEpoch % 52) % 52 + 1).toString()}
                     style={[styles.weekPickerText, styles.weekPickerTextNbr,
                       {
                         color: showPickerButtons ? theme.colors.primary : theme.colors.text,
