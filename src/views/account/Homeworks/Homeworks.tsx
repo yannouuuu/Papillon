@@ -171,20 +171,6 @@ const WeekView = () => {
           />
         }
       >
-        {searchTerms.toLowerCase().includes(String.fromCharCode(97, 110, 97, 235, 108)) &&
-          <Reanimated.Text
-            style={{
-              fontSize: 240,
-              textAlign: "center",
-            }}
-            entering={animPapillon(ZoomIn)}
-            exiting={animPapillon(FadeOutUp)}
-          >
-            🍔
-            {/* Merci d'avoir leaké le code de Papillon <3 */}
-          </Reanimated.Text>
-        }
-
         {groupedHomework && Object.keys(groupedHomework).map((day, index) => (
           <Reanimated.View
             key={day}
