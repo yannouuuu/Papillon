@@ -150,8 +150,8 @@ const WeekView = () => {
       // filter homeworks by search terms
       if (searchTerms.length > 0) {
         acc[day] = acc[day].filter(homework => {
-          const content = homework.content.toLowerCase();
-          return content.includes(searchTerms);
+          const content = homework.content.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          return content.includes(searchTerms.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
         });
 
         // remove the day if there are no homeworks left
