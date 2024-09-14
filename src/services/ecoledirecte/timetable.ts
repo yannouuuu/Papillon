@@ -15,6 +15,8 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
   if (c.kind === TimetableItemKind.COURS) {
     return {
       type: "lesson",
+      id: c.id,
+      subject: c.subject_short_name,
       title: c.subject_name,
       room: c.room || void 0,
       teacher: c.teacher ?? void 0,
@@ -33,6 +35,8 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
   else if (c.kind === TimetableItemKind.PERMANENCE) {
     return {
       type: "detention",
+      subject: c.subject_name,
+      id: c.id,
       title: c.subject_name ?? "Sans titre",
       room: c.room || void 0,
       ...base
