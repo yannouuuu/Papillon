@@ -50,7 +50,7 @@ const WeekView = () => {
   const account = useCurrentAccount(store => store.account!);
   const homeworks = useHomeworkStore(store => store.homeworks);
 
-  let firstDate = account.instance.instance.firstDate || null;
+  let firstDate = account?.instance?.instance?.firstDate || null;
   if (!firstDate) {
     firstDate = new Date();
     firstDate.setMonth(8);
