@@ -4,11 +4,20 @@ import { useHomeworkStore } from "@/stores/homework";
 import { useTheme } from "@react-navigation/native";
 import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { toggleHomeworkState, updateHomeworkForWeekInCache } from "@/services/homework";
-import { View, Text, FlatList, Dimensions, Button, ScrollView, RefreshControl } from "react-native";
+import { View, Text, FlatList, Dimensions, Button, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from "react-native";
 import { dateToEpochWeekNumber, epochWNToDate } from "@/utils/epochWeekNumber";
 
 import HomeworksNoHomeworksItem from "./Atoms/NoHomeworks";
 import HomeworkItem from "./Atoms/Item";
+import { PressableScale } from "react-native-pressable-scale";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Book, ChevronLeft, ChevronRight } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BlurView } from "expo-blur";
+
+import Reanimated, { FadeIn, FadeInLeft, FadeInRight, FadeOut, FadeOutLeft, FadeOutRight, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
+import { animPapillon } from "@/utils/ui/animations";
+import PapillonSpinner from "@/components/Global/PapillonSpinner";
 
 type HomeworksPageProps = {
   index: number;
@@ -31,6 +40,7 @@ const formatDate = (date: string | number | Date): string => {
 const WeekView = () => {
   const flatListRef = useRef(null);
   const { width } = Dimensions.get("window");
+  const insets = useSafeAreaInsets();
 
   const theme = useTheme();
   const account = useCurrentAccount(store => store.account!);
@@ -47,7 +57,10 @@ const WeekView = () => {
 
   const currentWeek = getCurrentWeekNumber();
   const [data, setData] = useState(Array.from({ length: 100 }, (_, i) => currentWeek - 50 + i));
+
   const [selectedWeek, setSelectedWeek] = useState(currentWeek);
+  const [direction, setDirection] = useState<"left" | "right">("right");
+  const [oldSelectedWeek, setOldSelectedWeek] = useState(selectedWeek);
 
   const getItemLayout = useCallback((_, index) => ({
     length: width,
@@ -63,23 +76,35 @@ const WeekView = () => {
   };
 
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const updateHomeworks = useCallback(async (force = false, showLoading = true) => {
     if(!account) return;
     if(homeworks[selectedWeek] && !force) return;
 
     if (showLoading) {
-      setLoading(true);
+      setRefreshing(true);
     }
+    setLoading(true);
     console.log("[Homeworks]: updating cache...", selectedWeek, epochWNToDate(selectedWeek));
     await updateHomeworkForWeekInCache(account, epochWNToDate(selectedWeek));
     console.log("[Homeworks]: updated cache !", epochWNToDate(selectedWeek));
     setLoading(false);
+    setRefreshing(false);
   }, [account, selectedWeek]);
 
   // on page change, load the homeworks
   useEffect(() => {
-    updateHomeworks(true, false);
+    if (selectedWeek > oldSelectedWeek) {
+      setDirection("right");
+    } else if (selectedWeek < oldSelectedWeek) {
+      setDirection("left");
+    }
+
+    setTimeout(() => {
+      setOldSelectedWeek(selectedWeek);
+      updateHomeworks(true, false);
+    }, 0);
   }, [selectedWeek]);
 
   const renderWeek = ({ item }) => {
@@ -106,12 +131,14 @@ const WeekView = () => {
         style={{ width, height: "100%"}}
         contentContainerStyle={{
           padding: 16,
-          paddingTop: 0,
+          paddingTop: insets.top + 56,
         }}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
-            refreshing={loading}
+            refreshing={refreshing}
             onRefresh={() => updateHomeworks(true)}
+            progressViewOffset={insets.top + 56}
           />
         }
       >
@@ -189,8 +216,158 @@ const WeekView = () => {
     }
   }, [data, width]);
 
+  const [showPickerButtons, setShowPickerButtons] = useState(false);
+
   return (
     <View>
+      <Reanimated.View
+        style={[styles.header, {
+          top: insets.top,
+          zIndex: 100,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 10,
+        }]}
+        layout={animPapillon(LinearTransition)}
+      >
+        {showPickerButtons &&
+          <Reanimated.View
+            layout={animPapillon(LinearTransition)}
+            entering={animPapillon(ZoomIn)}
+            exiting={animPapillon(ZoomOut)}
+          >
+            <PressableScale
+              onPress={() => goToWeek(selectedWeek - 1)}
+              activeScale={0.8}
+            >
+              <BlurView
+                style={[styles.weekButton, {
+                  backgroundColor: theme.colors.primary + 16,
+                }]}
+                tint={theme.dark ? "dark" : "light"}
+              >
+                <ChevronLeft
+                  size={24}
+                  color={theme.colors.primary}
+                  strokeWidth={2.5}
+                />
+              </BlurView>
+            </PressableScale>
+          </Reanimated.View>
+        }
+
+        <Reanimated.View
+          layout={animPapillon(LinearTransition)}
+        >
+          <PressableScale
+            style={[styles.weekPickerContainer]}
+            onPress={() => setShowPickerButtons(!showPickerButtons)}
+          >
+            <Reanimated.View
+              layout={animPapillon(LinearTransition)}
+              style={[{
+                backgroundColor:
+                showPickerButtons ? theme.colors.primary + 16 :
+                  theme.colors.text + 16,
+                overflow: "hidden",
+                borderRadius: 80,
+              }]}
+            >
+              <BlurView
+                style={[styles.weekPicker, {
+                  backgroundColor: "transparent",
+                }]}
+                tint={theme.dark ? "dark" : "light"}
+              >
+                {showPickerButtons &&
+                  <Reanimated.View
+                    entering={animPapillon(FadeIn)}
+                    exiting={animPapillon(FadeOut)}
+                    style={{
+                      marginRight: 5,
+                    }}
+                  >
+                    <Book
+                      color={showPickerButtons ? theme.colors.primary : theme.colors.text}
+                      size={20}
+                      strokeWidth={2.5}
+                    />
+                  </Reanimated.View>
+                }
+
+                <Reanimated.Text style={[styles.weekPickerText, styles.weekPickerTextIntl,
+                  {
+                    color: showPickerButtons ? theme.colors.primary : theme.colors.text,
+                  }
+                ]}
+                layout={animPapillon(LinearTransition)}
+                >
+                  Semaine
+                </Reanimated.Text>
+
+                <Reanimated.Text
+                  key={"wptxt"+oldSelectedWeek}
+                  style={[styles.weekPickerText, styles.weekPickerTextNbr,
+                    {
+                      color: showPickerButtons ? theme.colors.primary : theme.colors.text,
+                    }
+                  ]}
+                  layout={animPapillon(LinearTransition)}
+                  entering={
+                    animPapillon(direction === "left" ? FadeInLeft : FadeInRight)
+                  }
+                  exiting={
+                    animPapillon(direction === "left" ? FadeOutRight : FadeOutLeft)
+                  }
+                >
+                  {oldSelectedWeek % 52}
+                </Reanimated.Text>
+
+                {loading &&
+                  <PapillonSpinner
+                    size={18}
+                    color={showPickerButtons ? theme.colors.primary : theme.colors.text}
+                    strokeWidth={2.8}
+                    entering={animPapillon(ZoomIn)}
+                    exiting={animPapillon(ZoomOut)}
+                    style={{
+                      marginLeft: 5,
+                    }}
+                  />
+                }
+              </BlurView>
+            </Reanimated.View>
+          </PressableScale>
+        </Reanimated.View>
+
+        {showPickerButtons &&
+          <Reanimated.View
+            layout={animPapillon(LinearTransition)}
+            entering={animPapillon(ZoomIn).delay(100)}
+            exiting={animPapillon(FadeOutLeft)}
+          >
+            <PressableScale
+              onPress={() => goToWeek(selectedWeek + 1)}
+              activeScale={0.8}
+            >
+              <BlurView
+                style={[styles.weekButton, {
+                  backgroundColor: theme.colors.primary + 16,
+                }]}
+                tint={theme.dark ? "dark" : "light"}
+              >
+                <ChevronRight
+                  size={24}
+                  color={theme.colors.primary}
+                  strokeWidth={2.5}
+                />
+              </BlurView>
+            </PressableScale>
+          </Reanimated.View>
+        }
+      </Reanimated.View>
+
       <FlatList
         ref={flatListRef}
         data={data}
@@ -216,5 +393,53 @@ const WeekView = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    position: "absolute",
+    top: 0,
+    left: 0,
+  },
+
+  weekPicker: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    height: 40,
+    borderRadius: 80,
+    gap: 5,
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    alignSelf: "flex-start",
+    overflow: "hidden",
+  },
+
+  weekPickerText: {
+    zIndex: 10000,
+  },
+
+  weekPickerTextIntl: {
+    fontSize: 15,
+    fontFamily: "medium",
+    opacity: 0.7,
+  },
+
+  weekPickerTextNbr: {
+    fontSize: 16,
+    fontFamily: "semibold",
+    marginTop: -1,
+  },
+
+  weekButton: {
+    overflow: "hidden",
+    borderRadius: 80,
+    height: 38,
+    width: 38,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
 
 export default WeekView;

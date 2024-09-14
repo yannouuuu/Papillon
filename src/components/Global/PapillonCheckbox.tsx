@@ -7,50 +7,7 @@ import { PressableScale } from "react-native-pressable-scale";
 import { Svg, Circle, G } from "react-native-svg";
 import { Check } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
-
-const LoaderSpinner = ({ size = 50, color = "#000000", strokeWidth = 4 }) => {
-  const animatedValue = useRef(new Animated.Value(0));
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(animatedValue.current, {
-        toValue: 1,
-        duration: 700,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, []);
-
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-
-  const spin = animatedValue.current.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
-
-  return (
-    <View>
-      <Animated.View style={{ transform: [{ rotate: spin }] }}>
-        <Svg width={size} height={size}>
-          <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
-            <Circle
-              cx={size / 2}
-              cy={size / 2}
-              r={radius}
-              stroke={color}
-              strokeWidth={strokeWidth}
-              strokeDasharray={`${circumference * 0.75} ${circumference * 0.25}`}
-              strokeLinecap="round"
-              fill="none"
-            />
-          </G>
-        </Svg>
-      </Animated.View>
-    </View>
-  );
-};
+import PapillonSpinner from "./PapillonSpinner";
 
 interface CheckboxProps {
   checked?: boolean
@@ -124,7 +81,7 @@ const PapillonCheckbox: React.FC<CheckboxProps> = ({
           entering={ZoomIn.springify().mass(1).damping(20).stiffness(300).delay(100)}
           exiting={ZoomOut.duration(100)}
         >
-          <LoaderSpinner size={26} strokeWidth={4} color={color} />
+          <PapillonSpinner size={26} strokeWidth={4} color={color} />
         </Reanimated.View>
       )}
 
