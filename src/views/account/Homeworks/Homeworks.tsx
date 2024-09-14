@@ -10,7 +10,6 @@ import { dateToEpochWeekNumber, epochWNToDate } from "@/utils/epochWeekNumber";
 import HomeworksNoHomeworksItem from "./Atoms/NoHomeworks";
 import HomeworkItem from "./Atoms/Item";
 
-
 type HomeworksPageProps = {
   index: number;
   isActive: boolean;
@@ -28,33 +27,6 @@ const formatDate = (date: string | number | Date): string => {
     month: "long"
   });
 };
-
-const HomeworkList: React.FC<HomeworkListProps> = React.memo(({ groupedHomework, loading, onDonePressHandler }) => {
-  if (!loading && Object.keys(groupedHomework).length === 0) {
-    return <HomeworksNoHomeworksItem />;
-  }
-
-  return (
-    <>
-      {Object.keys(groupedHomework).map((day, index) => (
-        <View key={index}>
-          <NativeListHeader label={day} />
-          <NativeList>
-            {groupedHomework[day].map((homework, idx) => (
-              <HomeworkItem
-                key={homework.id}
-                index={idx}
-                total={groupedHomework[day].length}
-                homework={homework}
-                onDonePressHandler={async () => onDonePressHandler(homework)}
-              />
-            ))}
-          </NativeList>
-        </View>
-      ))}
-    </>
-  );
-}, (prevProps, nextProps) => prevProps.groupedHomework === nextProps.groupedHomework && prevProps.loading === nextProps.loading);
 
 const WeekView = () => {
   const flatListRef = useRef(null);
