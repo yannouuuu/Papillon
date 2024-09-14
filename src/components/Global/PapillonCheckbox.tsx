@@ -2,12 +2,13 @@ import { View, Animated, Easing, type ViewStyle, type StyleProp } from "react-na
 import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "@react-navigation/native";
 
-import Reanimated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import Reanimated, { LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { PressableScale } from "react-native-pressable-scale";
 import { Svg, Circle, G } from "react-native-svg";
 import { Check } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import PapillonSpinner from "./PapillonSpinner";
+import { animPapillon } from "@/utils/ui/animations";
 
 interface CheckboxProps {
   checked?: boolean
@@ -52,82 +53,86 @@ const PapillonCheckbox: React.FC<CheckboxProps> = ({
   }, [checked, hasPressed]);
 
   return (
-    <PressableScale
-      style={[{
-        width: 26,
-        height: 26,
-        borderRadius: 300,
-        backgroundColor: theme.colors.text + "00",
-        justifyContent: "center",
-        alignItems: "center",
-      }, style]}
-      onPress={pressAction}
-      activeScale={0.8}
-      weight="light"
+    <Reanimated.View
+      layout={animPapillon(LinearTransition)}
     >
-      <Reanimated.View
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
+      <PressableScale
+        style={[{
+          width: 26,
+          height: 26,
           borderRadius: 300,
-          borderColor: theme.colors.text + "22",
-          borderWidth: 2,
-        }}
-      />
-
-      {loading && !checked && (
-        <Reanimated.View
-          entering={ZoomIn.springify().mass(1).damping(20).stiffness(300).delay(100)}
-          exiting={ZoomOut.duration(100)}
-        >
-          <PapillonSpinner size={26} strokeWidth={4} color={color} />
-        </Reanimated.View>
-      )}
-
-      {checked && (
+          backgroundColor: theme.colors.text + "00",
+          justifyContent: "center",
+          alignItems: "center",
+        }, style]}
+        onPress={pressAction}
+        activeScale={0.8}
+        weight="light"
+      >
         <Reanimated.View
           style={{
+            position: "absolute",
             width: "100%",
             height: "100%",
             borderRadius: 300,
-            backgroundColor: color || theme.colors.primary,
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 100,
+            borderColor: theme.colors.text + "22",
+            borderWidth: 2,
           }}
+        />
 
-          entering={loaded ?
-            ZoomIn
-              .springify()
-              .mass(1)
-              .damping(20)
-              .stiffness(300)
-            : void 0}
+        {loading && !checked && (
+          <Reanimated.View
+            entering={ZoomIn.springify().mass(1).damping(20).stiffness(300).delay(100)}
+            exiting={ZoomOut.duration(100)}
+          >
+            <PapillonSpinner size={26} strokeWidth={4} color={color} />
+          </Reanimated.View>
+        )}
 
-          exiting={ZoomOut.duration(100)}
-        >
-          {checked && (
-            <Reanimated.View
-              entering={loaded ?
-                ZoomIn
-                  .springify()
-                  .mass(1)
-                  .damping(20)
-                  .stiffness(300)
-                  .delay(100)
-                : void 0}
-            >
-              <Check
-                size={18}
-                strokeWidth={3.5}
-                color="#fff"
-              />
-            </Reanimated.View>
-          )}
-        </Reanimated.View>
-      )}
-    </PressableScale>
+        {checked && (
+          <Reanimated.View
+            style={{
+              width: "100%",
+              height: "100%",
+              borderRadius: 300,
+              backgroundColor: color || theme.colors.primary,
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 100,
+            }}
+
+            entering={loaded ?
+              ZoomIn
+                .springify()
+                .mass(1)
+                .damping(20)
+                .stiffness(300)
+              : void 0}
+
+            exiting={ZoomOut.duration(100)}
+          >
+            {checked && (
+              <Reanimated.View
+                entering={loaded ?
+                  ZoomIn
+                    .springify()
+                    .mass(1)
+                    .damping(20)
+                    .stiffness(300)
+                    .delay(100)
+                  : void 0}
+              >
+                <Check
+                  size={18}
+                  strokeWidth={3.5}
+                  color="#fff"
+                />
+              </Reanimated.View>
+            )}
+          </Reanimated.View>
+        )}
+      </PressableScale>
+    </Reanimated.View>
   );
 };
 

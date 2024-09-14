@@ -7,7 +7,9 @@ import { useTheme } from "@react-navigation/native";
 import type { Homework } from "@/services/shared/Homework";
 import { NativeItem, NativeText } from "@/components/Global/NativeComponents";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
+import Reanimated, { LinearTransition } from "react-native-reanimated";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import { animPapillon } from "@/utils/ui/animations";
 
 const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
   const theme = useTheme();
@@ -42,12 +44,7 @@ const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
     };
   });
 
-  const [needsExpansion, setNeedsExpansion] = useState(false);
-
-  const onTextLayout = useCallback(e => {
-    const linesNumber = e.nativeEvent.lines.length;
-    setNeedsExpansion(linesNumber > 3);
-  }, []);
+  const [needsExpansion, setNeedsExpansion] = useState(parsedContent.length > 100);
 
   return (
     <NativeItem
@@ -57,42 +54,56 @@ const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
       exiting={FadeOut}
       separator={index !== total - 1}
       leading={
-        <PapillonCheckbox
-          checked={homework.done}
-          loading={isLoading}
-          onPress={handlePress}
-          style={{ marginRight: 1 }}
-          color={subjectData.color}
-          loaded={mainLoaded}
-        />
+        <Reanimated.View
+          layout={animPapillon(LinearTransition)}
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <PapillonCheckbox
+            checked={homework.done}
+            loading={isLoading}
+            onPress={handlePress}
+            style={{ marginRight: 1 }}
+            color={subjectData.color}
+            loaded={mainLoaded}
+          />
+        </Reanimated.View>
       }
     >
-      <TouchableOpacity
-        onPress={() => needsExpansion && setExpanded(!expanded)}
+      <Reanimated.View
+        layout={animPapillon(LinearTransition)}
         style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
       >
-        <View style={{ flex: 1 }}>
+        <Reanimated.View style={{ flex: 1, gap: 4 }} layout={animPapillon(LinearTransition)}>
           <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
             {subjectData.pretty}
           </NativeText>
-          <NativeText
-            variant="default"
-            numberOfLines={expanded ? undefined : 3}
-            onTextLayout={onTextLayout}
-          >
-            {parsedContent}
-          </NativeText>
-        </View>
+          <Reanimated.View layout={animPapillon(LinearTransition)}>
+            <NativeText
+              variant="default"
+              numberOfLines={expanded ? undefined : 3}
+            >
+              {parsedContent}
+            </NativeText>
+          </Reanimated.View>
+        </Reanimated.View>
         {needsExpansion && (
-          <Animated.View style={[{ marginLeft: 8 }, rotateStyle]}>
-            {expanded ? (
-              <ChevronUp size={20} color={theme.colors.text} />
-            ) : (
-              <ChevronDown size={20} color={theme.colors.text} />
-            )}
-          </Animated.View>
+          <TouchableOpacity
+            onPress={() => setExpanded(!expanded)}
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Animated.View style={[{ marginLeft: 8 }, rotateStyle]}>
+              {expanded ? (
+                <ChevronUp size={22} strokeWidth={2.5} opacity={0.6} color={theme.colors.text} />
+              ) : (
+                <ChevronDown size={22} strokeWidth={2.5} opacity={0.6} color={theme.colors.text} />
+              )}
+            </Animated.View>
+          </TouchableOpacity>
         )}
-      </TouchableOpacity>
+      </Reanimated.View>
     </NativeItem>
   );
 };
