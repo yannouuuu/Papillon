@@ -18,6 +18,7 @@ import { BlurView } from "expo-blur";
 import Reanimated, { FadeIn, FadeInLeft, FadeInRight, FadeOut, FadeOutLeft, FadeOutRight, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
+import AnimatedNumber from "@/components/Global/AnimatedNumber";
 
 type HomeworksPageProps = {
   index: number;
@@ -78,19 +79,22 @@ const WeekView = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const [loadedWeeks, setLoadedWeeks] = useState<number[]>([]);
+
   const updateHomeworks = useCallback(async (force = false, showLoading = true) => {
     if(!account) return;
-    if(homeworks[selectedWeek] && !force) return;
 
     if (showLoading) {
       setRefreshing(true);
     }
     setLoading(true);
     console.log("[Homeworks]: updating cache...", selectedWeek, epochWNToDate(selectedWeek));
-    await updateHomeworkForWeekInCache(account, epochWNToDate(selectedWeek));
-    console.log("[Homeworks]: updated cache !", epochWNToDate(selectedWeek));
-    setLoading(false);
-    setRefreshing(false);
+    updateHomeworkForWeekInCache(account, epochWNToDate(selectedWeek))
+      .then(() => {
+        console.log("[Homeworks]: updated cache !", epochWNToDate(selectedWeek));
+        setLoading(false);
+        setRefreshing(false);
+      });
   }, [account, selectedWeek]);
 
   // on page change, load the homeworks
@@ -162,6 +166,10 @@ const WeekView = () => {
             </NativeList>
           </View>
         ))}
+
+        {groupedHomework && Object.keys(groupedHomework).length === 0 &&
+          <HomeworksNoHomeworksItem />
+        }
       </ScrollView>
     );
   };
@@ -306,23 +314,18 @@ const WeekView = () => {
                   Semaine
                 </Reanimated.Text>
 
-                <Reanimated.Text
-                  key={"wptxt"+oldSelectedWeek}
-                  style={[styles.weekPickerText, styles.weekPickerTextNbr,
-                    {
-                      color: showPickerButtons ? theme.colors.primary : theme.colors.text,
-                    }
-                  ]}
+                <Reanimated.View
                   layout={animPapillon(LinearTransition)}
-                  entering={
-                    animPapillon(direction === "left" ? FadeInLeft : FadeInRight)
-                  }
-                  exiting={
-                    animPapillon(direction === "left" ? FadeOutRight : FadeOutLeft)
-                  }
                 >
-                  {oldSelectedWeek % 52}
-                </Reanimated.Text>
+                  <AnimatedNumber
+                    value={((selectedWeek % 52) + 1).toString()}
+                    style={[styles.weekPickerText, styles.weekPickerTextNbr,
+                      {
+                        color: showPickerButtons ? theme.colors.primary : theme.colors.text,
+                      }
+                    ]}
+                  />
+                </Reanimated.View>
 
                 {loading &&
                   <PapillonSpinner
@@ -410,7 +413,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     height: 40,
     borderRadius: 80,
-    gap: 5,
+    gap: 6,
     backgroundColor: "rgba(0, 0, 0, 0.05)",
     alignSelf: "flex-start",
     overflow: "hidden",
@@ -427,9 +430,9 @@ const styles = StyleSheet.create({
   },
 
   weekPickerTextNbr: {
-    fontSize: 16,
+    fontSize: 16.5,
     fontFamily: "semibold",
-    marginTop: -1,
+    marginTop: -1.5,
   },
 
   weekButton: {
