@@ -280,7 +280,7 @@ const WeekView = () => {
                 }]}
                 tint={theme.dark ? "dark" : "light"}
               >
-                {showPickerButtons &&
+                {showPickerButtons && !loading &&
                   <Reanimated.View
                     entering={animPapillon(FadeIn)}
                     exiting={animPapillon(FadeOut)}
