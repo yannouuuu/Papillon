@@ -19,6 +19,7 @@ import Reanimated, { FadeIn, FadeInLeft, FadeInRight, FadeOut, FadeOutLeft, Fade
 import { animPapillon } from "@/utils/ui/animations";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
+import { LinearGradient } from "expo-linear-gradient";
 
 type HomeworksPageProps = {
   index: number;
@@ -81,17 +82,19 @@ const WeekView = () => {
 
   const [loadedWeeks, setLoadedWeeks] = useState<number[]>([]);
 
-  const updateHomeworks = useCallback(async (force = false, showLoading = true) => {
+  const updateHomeworks = useCallback(async (force = false, showRefreshing = true, showLoading = true) => {
     if(!account) return;
 
     if (!force && loadedWeeks.includes(selectedWeek)) {
       return;
     }
 
-    if (showLoading) {
+    if (showRefreshing) {
       setRefreshing(true);
     }
-    setLoading(true);
+    if (showLoading) {
+      setLoading(true);
+    }
     console.log("[Homeworks]: updating cache...", selectedWeek, epochWNToDate(selectedWeek));
     updateHomeworkForWeekInCache(account, epochWNToDate(selectedWeek))
       .then(() => {
@@ -164,7 +167,7 @@ const WeekView = () => {
                   homework={homework}
                   onDonePressHandler={async () => {
                     await toggleHomeworkState(account, homework);
-                    await updateHomeworks(true, false);
+                    await updateHomeworks(true, false, homework.done);
                   }}
                 />
               ))}
@@ -233,6 +236,20 @@ const WeekView = () => {
 
   return (
     <View>
+      <LinearGradient
+        pointerEvents="none"
+        colors={[theme.colors.background + "ee", theme.colors.background + "00"]}
+        locations={[0.4, 1]}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: insets.top + 90,
+          zIndex: 90,
+        }}
+      />
+
       <Reanimated.View
         style={[styles.header, {
           top: insets.top,
