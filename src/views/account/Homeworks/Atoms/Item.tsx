@@ -7,7 +7,7 @@ import { useTheme } from "@react-navigation/native";
 import type { Homework } from "@/services/shared/Homework";
 import { NativeItem, NativeText } from "@/components/Global/NativeComponents";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
-import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, useAnimatedStyle, withTiming } from "react-native-reanimated";
 
 const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
   const theme = useTheme();
@@ -51,6 +51,10 @@ const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
 
   return (
     <NativeItem
+      animated
+      key={homework.content}
+      entering={FadeIn}
+      exiting={FadeOut}
       separator={index !== total - 1}
       leading={
         <PapillonCheckbox

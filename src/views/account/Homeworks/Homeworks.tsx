@@ -4,22 +4,24 @@ import { useHomeworkStore } from "@/stores/homework";
 import { useTheme } from "@react-navigation/native";
 import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import { toggleHomeworkState, updateHomeworkForWeekInCache } from "@/services/homework";
-import { View, Text, FlatList, Dimensions, Button, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, Dimensions, Button, ScrollView, RefreshControl, StyleSheet, ActivityIndicator, TextInput } from "react-native";
 import { dateToEpochWeekNumber, epochWNToDate } from "@/utils/epochWeekNumber";
 
 import HomeworksNoHomeworksItem from "./Atoms/NoHomeworks";
 import HomeworkItem from "./Atoms/Item";
 import { PressableScale } from "react-native-pressable-scale";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Book, ChevronLeft, ChevronRight } from "lucide-react-native";
+import { Book, ChevronLeft, ChevronRight, Search } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 
-import Reanimated, { FadeIn, FadeInLeft, FadeInRight, FadeOut, FadeOutLeft, FadeOutRight, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
+import Reanimated, { Easing, FadeIn, FadeInLeft, FadeInRight, FadeInUp, FadeOut, FadeOutDown, FadeOutLeft, FadeOutRight, FadeOutUp, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { LinearGradient } from "expo-linear-gradient";
+import { se } from "date-fns/locale";
+import MissingItem from "@/components/Global/MissingItem";
 
 type HomeworksPageProps = {
   index: number;
@@ -119,6 +121,8 @@ const WeekView = () => {
     }, 0);
   }, [selectedWeek]);
 
+  const [searchTerms, setSearchTerms] = useState("");
+
   const renderWeek = ({ item }) => {
     const homeworksInWeek = homeworks[item] ?? [];
 
@@ -133,6 +137,19 @@ const WeekView = () => {
         acc[day] = [curr];
       } else {
         acc[day].push(curr);
+      }
+
+      // filter homeworks by search terms
+      if (searchTerms.length > 0) {
+        acc[day] = acc[day].filter(homework => {
+          const content = homework.content.toLowerCase();
+          return content.includes(searchTerms);
+        });
+
+        // remove the day if there are no homeworks left
+        if (acc[day].length === 0) {
+          delete acc[day];
+        }
       }
 
       return acc;
@@ -155,10 +172,15 @@ const WeekView = () => {
         }
       >
         {groupedHomework && Object.keys(groupedHomework).map((day, index) => (
-          <View>
-            <NativeListHeader label={day} />
+          <Reanimated.View
+            key={day}
+            entering={animPapillon(FadeInUp)}
+            exiting={animPapillon(FadeOutDown)}
+            layout={animPapillon(LinearTransition)}
+          >
+            <NativeListHeader animated label={day} />
 
-            <NativeList>
+            <NativeList animated>
               {groupedHomework[day].map((homework, idx) => (
                 <HomeworkItem
                   key={homework.id}
@@ -172,11 +194,29 @@ const WeekView = () => {
                 />
               ))}
             </NativeList>
-          </View>
+          </Reanimated.View>
         ))}
 
         {groupedHomework && Object.keys(groupedHomework).length === 0 &&
-          <HomeworksNoHomeworksItem />
+          <View
+            style={{
+              marginTop: 24,
+              width: "100%",
+            }}
+          >
+            {searchTerms.length > 0 ?
+              <MissingItem
+                emoji="🔍"
+                title="Aucun résultat"
+                description="Aucun devoir ne correspond à votre recherche."
+              />
+              :
+              <MissingItem
+                emoji="📚"
+                title="Aucun devoir"
+                description="Il n'y a aucun devoir pour cette semaine."
+              />}
+          </View>
         }
       </ScrollView>
     );
@@ -233,19 +273,22 @@ const WeekView = () => {
   }, [data, width]);
 
   const [showPickerButtons, setShowPickerButtons] = useState(false);
+  const [searchHasFocus, setSearchHasFocus] = useState(false);
+
+  const SearchRef = useRef(null);
 
   return (
     <View>
       <LinearGradient
         pointerEvents="none"
-        colors={[theme.colors.background + "ee", theme.colors.background + "00"]}
-        locations={[0.4, 1]}
+        colors={[theme.colors.background + "ff", theme.colors.background + "00"]}
+        locations={[0.5, 1]}
         style={{
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
-          height: insets.top + 90,
+          height: insets.top + 100,
           zIndex: 90,
         }}
       />
@@ -261,7 +304,7 @@ const WeekView = () => {
         }]}
         layout={animPapillon(LinearTransition)}
       >
-        {showPickerButtons &&
+        {showPickerButtons && !searchHasFocus &&
           <Reanimated.View
             layout={animPapillon(LinearTransition)}
             entering={animPapillon(ZoomIn)}
@@ -287,8 +330,11 @@ const WeekView = () => {
           </Reanimated.View>
         }
 
+        {!searchHasFocus &&
         <Reanimated.View
           layout={animPapillon(LinearTransition)}
+          entering={animPapillon(FadeIn).delay(100)}
+          exiting={animPapillon(FadeOutLeft)}
         >
           <PressableScale
             style={[styles.weekPickerContainer]}
@@ -365,8 +411,9 @@ const WeekView = () => {
             </Reanimated.View>
           </PressableScale>
         </Reanimated.View>
+        }
 
-        {showPickerButtons &&
+        {showPickerButtons && !searchHasFocus &&
           <Reanimated.View
             layout={animPapillon(LinearTransition)}
             entering={animPapillon(ZoomIn).delay(100)}
@@ -391,6 +438,86 @@ const WeekView = () => {
             </PressableScale>
           </Reanimated.View>
         }
+
+        {showPickerButtons && !searchHasFocus &&
+          <Reanimated.View
+            layout={animPapillon(LinearTransition)}
+            style={{
+              flex: 1
+            }}
+          />
+        }
+
+        <Reanimated.View
+          layout={
+            LinearTransition.duration(250).easing(Easing.bezier(0.5, 0, 0, 1).factory())
+          }
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1,
+            backgroundColor: theme.colors.background + "ff",
+            borderColor: theme.colors.border + "dd",
+            borderWidth: 1,
+            borderRadius: 800,
+            paddingHorizontal: 14,
+            height: 40,
+            maxWidth: showPickerButtons ? 40 : null,
+            gap: 4,
+            shadowColor: theme.colors.text + "22",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.5,
+            shadowRadius: 4,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              setShowPickerButtons(false);
+              SearchRef.current?.focus();
+            }}
+          >
+            <Search
+              size={20}
+              color={theme.colors.text}
+              strokeWidth={2.5}
+              opacity={0.7}
+            />
+          </TouchableOpacity>
+
+          {!showPickerButtons &&
+          <Reanimated.View
+            layout={animPapillon(LinearTransition)}
+            style={{
+              flex: 1,
+              height: "100%",
+              overflow: "hidden",
+              borderRadius: 80,
+            }}
+            entering={FadeIn.duration(250).delay(20)}
+            exiting={FadeOut.duration(100)}
+          >
+            <TextInput
+              placeholder="Rechercher"
+              value={searchTerms}
+              onChangeText={setSearchTerms}
+              placeholderTextColor={theme.colors.text + "80"}
+              style={{
+                color: theme.colors.text,
+                padding: 8,
+                borderRadius: 80,
+                fontFamily: "medium",
+                fontSize: 16.5,
+                flex: 1,
+              }}
+              onFocus={() => setSearchHasFocus(true)}
+              onBlur={() => setSearchHasFocus(false)}
+              ref={SearchRef}
+            />
+          </Reanimated.View>
+          }
+
+        </Reanimated.View>
       </Reanimated.View>
 
       <FlatList
