@@ -3,7 +3,9 @@ import { useCurrentAccount } from "@/stores/account";
 import { useHomeworkStore } from "@/stores/homework";
 import { useTheme } from "@react-navigation/native";
 import React, { useRef, useState, useCallback, useEffect, useMemo } from "react";
+import { toggleHomeworkState, updateHomeworkForWeekInCache } from "@/services/homework";
 import { View, Text, FlatList, Dimensions, Button, ScrollView, RefreshControl } from "react-native";
+import { dateToEpochWeekNumber, epochWNToDate } from "@/utils/epochWeekNumber";
 
 import HomeworksNoHomeworksItem from "./Atoms/NoHomeworks";
 import HomeworkItem from "./Atoms/Item";
@@ -54,82 +56,6 @@ const HomeworkList: React.FC<HomeworkListProps> = React.memo(({ groupedHomework,
   );
 }, (prevProps, nextProps) => prevProps.groupedHomework === nextProps.groupedHomework && prevProps.loading === nextProps.loading);
 
-
-const HomeworksPage: React.FC<HomeworksPageProps> = React.memo(({ index, isActive, loaded, homeworks, account, updateHomeworks, loading, getDayName }) => {
-  const [refreshing, setRefreshing] = useState(false);
-  if (!loaded) {
-    return <ScrollView
-      style={{ flex: 1, padding: 16, paddingTop: 0 }}
-    >
-
-      <View style={{ padding: 32 }}>
-        <Text style={{ color: "white", fontSize: 16, textAlign: "center" }}>
-          {index}
-        </Text>
-      </View>
-    </ScrollView>;
-  }
-
-  const homeworksInWeek = homeworks[index] ?? [];
-  const sortedHomework = useMemo(
-    () => homeworksInWeek.sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime()),
-    [homeworksInWeek]
-  );
-
-  const groupedHomework = useMemo(
-    () =>
-      sortedHomework.reduce((acc, curr) => {
-        const dayName = getDayName(curr.due);
-        const formattedDate = formatDate(curr.due);
-        const day = `${dayName} ${formattedDate}`;
-
-        if (!acc[day]) {
-          acc[day] = [curr];
-        } else {
-          acc[day].push(curr);
-        }
-
-        return acc;
-      }, {} as Record<string, Homework[]>),
-    [sortedHomework]
-  );
-
-  const handleDonePress = useCallback(
-    async (homework: Homework) => {
-      await toggleHomeworkState(account, homework);
-      await updateHomeworks();
-    },
-    [account, updateHomeworks]
-  );
-
-  const refreshAction = useCallback(async () => {
-    setRefreshing(true);
-    await updateHomeworks();
-    setRefreshing(false);
-  }, [updateHomeworks]);
-
-  return (
-    <ScrollView
-      style={{ flex: 1, padding: 16, paddingTop: 0 }}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={refreshAction}
-        />
-      }
-    >
-      <HomeworkList
-        groupedHomework={groupedHomework}
-        loading={loading}
-        onDonePressHandler={handleDonePress}
-      />
-
-    </ScrollView>
-  );
-}, (prevProps, nextProps) => {
-  return prevProps.index === nextProps.index;
-});
-
 const WeekView = () => {
   const flatListRef = useRef(null);
   const { width } = Dimensions.get("window");
@@ -164,26 +90,82 @@ const WeekView = () => {
     return days[new Date(date).getDay()];
   };
 
-  const renderWeek = useCallback(({ item }) => (
-    <View style={{ width, height: "100%"}}>
-      <Text style={{ fontSize: 24, fontWeight: item === selectedWeek ? "bold" : "normal" }}>
-        Week {item}
-      </Text>
+  const [loading, setLoading] = useState(false);
 
-      <HomeworksPage
-        index={item}
-        isActive={item === selectedWeek}
-        loaded={homeworks[item] !== undefined}
-        homeworks={homeworks}
-        account={account}
-        updateHomeworks={() => {
-          console.log("Updating homeworks for week", item);
+  const updateHomeworks = useCallback(async (force = false, showLoading = true) => {
+    if(!account) return;
+    if(homeworks[selectedWeek] && !force) return;
+
+    if (showLoading) {
+      setLoading(true);
+    }
+    console.log("[Homeworks]: updating cache...", selectedWeek, epochWNToDate(selectedWeek));
+    await updateHomeworkForWeekInCache(account, epochWNToDate(selectedWeek));
+    console.log("[Homeworks]: updated cache !", epochWNToDate(selectedWeek));
+    setLoading(false);
+  }, [account, selectedWeek]);
+
+  // on page change, load the homeworks
+  useEffect(() => {
+    updateHomeworks(true, false);
+  }, [selectedWeek]);
+
+  const renderWeek = ({ item }) => {
+    const homeworksInWeek = homeworks[item] ?? [];
+
+    const sortedHomework = homeworksInWeek.sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime());
+
+    const groupedHomework = sortedHomework.reduce((acc, curr) => {
+      const dayName = getDayName(curr.due);
+      const formattedDate = formatDate(curr.due);
+      const day = `${dayName} ${formattedDate}`;
+
+      if (!acc[day]) {
+        acc[day] = [curr];
+      } else {
+        acc[day].push(curr);
+      }
+
+      return acc;
+    }, {} as Record<string, Homework[]>);
+
+    return (
+      <ScrollView
+        style={{ width, height: "100%"}}
+        contentContainerStyle={{
+          padding: 16,
+          paddingTop: 0,
         }}
-        loading={false}
-        getDayName={getDayName}
-      />
-    </View>
-  ), [width, selectedWeek]);
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => updateHomeworks(true)}
+          />
+        }
+      >
+        {groupedHomework && Object.keys(groupedHomework).map((day, index) => (
+          <View>
+            <NativeListHeader label={day} />
+
+            <NativeList>
+              {groupedHomework[day].map((homework, idx) => (
+                <HomeworkItem
+                  key={homework.id}
+                  index={idx}
+                  total={groupedHomework[day].length}
+                  homework={homework}
+                  onDonePressHandler={async () => {
+                    await toggleHomeworkState(account, homework);
+                    await updateHomeworks(true, false);
+                  }}
+                />
+              ))}
+            </NativeList>
+          </View>
+        ))}
+      </ScrollView>
+    );
+  };
 
   const onEndReached = () => {
     const lastWeek = data[data.length - 1];

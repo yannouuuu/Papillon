@@ -9,12 +9,7 @@ import { NativeItem, NativeText } from "@/components/Global/NativeComponents";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 
-const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }: {
-  homework: Homework,
-  onDonePressHandler: () => unknown,
-  index: number,
-  total: number
-}) => {
+const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
   const theme = useTheme();
   const [subjectData, setSubjectData] = useState(getSubjectData(homework.subject));
 
@@ -96,6 +91,6 @@ const HomeworkItem = React.memo(({ homework, onDonePressHandler, index, total }:
       </TouchableOpacity>
     </NativeItem>
   );
-}, (prevProps, nextProps) => prevProps.index === nextProps.index);
+};
 
 export default HomeworkItem;
