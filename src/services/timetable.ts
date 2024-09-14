@@ -12,6 +12,12 @@ export async function updateTimetableForWeekInCache <T extends Account> (account
       useTimetableStore.getState().updateClasses(weekNumber, timetable);
       break;
     }
+    case AccountService.EcoleDirecte: {
+      const { getTimetableForWeek } = await import("./ecoledirecte/timetable");
+      const timetable = await getTimetableForWeek(account, weekNumber);
+      useTimetableStore.getState().updateClasses(weekNumber, timetable);
+      break;
+    }
     default: {
       throw new Error("Service not implemented.");
     }
