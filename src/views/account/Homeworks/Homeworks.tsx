@@ -84,6 +84,10 @@ const WeekView = () => {
   const updateHomeworks = useCallback(async (force = false, showLoading = true) => {
     if(!account) return;
 
+    if (!force && loadedWeeks.includes(selectedWeek)) {
+      return;
+    }
+
     if (showLoading) {
       setRefreshing(true);
     }
@@ -94,8 +98,9 @@ const WeekView = () => {
         console.log("[Homeworks]: updated cache !", epochWNToDate(selectedWeek));
         setLoading(false);
         setRefreshing(false);
+        setLoadedWeeks(prev => [...prev, selectedWeek]);
       });
-  }, [account, selectedWeek]);
+  }, [account, selectedWeek, loadedWeeks]);
 
   // on page change, load the homeworks
   useEffect(() => {
@@ -107,7 +112,7 @@ const WeekView = () => {
 
     setTimeout(() => {
       setOldSelectedWeek(selectedWeek);
-      updateHomeworks(true, false);
+      updateHomeworks(false, false);
     }, 0);
   }, [selectedWeek]);
 
