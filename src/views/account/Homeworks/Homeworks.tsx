@@ -11,7 +11,7 @@ import HomeworksNoHomeworksItem from "./Atoms/NoHomeworks";
 import HomeworkItem from "./Atoms/Item";
 import { PressableScale } from "react-native-pressable-scale";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Book, ChevronLeft, ChevronRight, Search } from "lucide-react-native";
+import { Book, ChevronLeft, ChevronRight, Search, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 
@@ -171,6 +171,20 @@ const WeekView = () => {
           />
         }
       >
+        {searchTerms.toLowerCase().includes(String.fromCharCode(97, 110, 97, 235, 108)) &&
+          <Reanimated.Text
+            style={{
+              fontSize: 240,
+              textAlign: "center",
+            }}
+            entering={animPapillon(ZoomIn)}
+            exiting={animPapillon(FadeOutUp)}
+          >
+            🍔
+            {/* Merci d'avoir leaké le code de Papillon <3 */}
+          </Reanimated.Text>
+        }
+
         {groupedHomework && Object.keys(groupedHomework).map((day, index) => (
           <Reanimated.View
             key={day}
@@ -198,11 +212,12 @@ const WeekView = () => {
         ))}
 
         {groupedHomework && Object.keys(groupedHomework).length === 0 &&
-          <View
+          <Reanimated.View
             style={{
               marginTop: 24,
               width: "100%",
             }}
+            layout={animPapillon(LinearTransition)}
           >
             {searchTerms.length > 0 ?
               <MissingItem
@@ -216,7 +231,7 @@ const WeekView = () => {
                 title="Aucun devoir"
                 description="Il n'y a aucun devoir pour cette semaine."
               />}
-          </View>
+          </Reanimated.View>
         }
       </ScrollView>
     );
@@ -517,6 +532,26 @@ const WeekView = () => {
           </Reanimated.View>
           }
 
+          {searchTerms.length > 0 && searchHasFocus &&
+          <TouchableOpacity
+            onPress={() => {
+              setSearchTerms("");
+            }}
+          >
+            <Reanimated.View
+              layout={animPapillon(LinearTransition)}
+              entering={FadeIn.duration(100)}
+              exiting={FadeOut.duration(100)}
+            >
+              <X
+                size={20}
+                color={theme.colors.text}
+                strokeWidth={2.5}
+                opacity={0.7}
+              />
+            </Reanimated.View>
+          </TouchableOpacity>
+          }
         </Reanimated.View>
       </Reanimated.View>
 
