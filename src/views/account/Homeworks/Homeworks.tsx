@@ -11,7 +11,7 @@ import HomeworksNoHomeworksItem from "./Atoms/NoHomeworks";
 import HomeworkItem from "./Atoms/Item";
 import { PressableScale } from "react-native-pressable-scale";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Book, ChevronLeft, ChevronRight, Search, X } from "lucide-react-native";
+import { Book, CheckSquare, ChevronLeft, ChevronRight, Search, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 
@@ -73,6 +73,8 @@ const WeekView = () => {
   const [selectedWeek, setSelectedWeek] = useState(currentWeek);
   const [direction, setDirection] = useState<"left" | "right">("right");
   const [oldSelectedWeek, setOldSelectedWeek] = useState(selectedWeek);
+
+  const [hideDone, setHideDone] = useState(false);
 
   const getItemLayout = useCallback((_, index) => ({
     length: width,
@@ -153,11 +155,16 @@ const WeekView = () => {
           const content = homework.content.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
           return content.includes(searchTerms.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
         });
+      }
 
-        // remove the day if there are no homeworks left
-        if (acc[day].length === 0) {
-          delete acc[day];
-        }
+      // if hideDone is enabled, filter out the done homeworks
+      if (hideDone) {
+        acc[day] = acc[day].filter(homework => !homework.done);
+      }
+
+      // remove all empty days
+      if (acc[day].length === 0) {
+        delete acc[day];
       }
 
       return acc;
@@ -309,7 +316,7 @@ const WeekView = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          gap: 10,
+          gap: 8,
         }]}
         layout={animPapillon(LinearTransition)}
       >
@@ -370,13 +377,13 @@ const WeekView = () => {
                     entering={animPapillon(FadeIn)}
                     exiting={animPapillon(FadeOut)}
                     style={{
-                      marginRight: 5,
+                      marginRight: 2,
                     }}
                   >
                     <Book
                       color={showPickerButtons ? theme.colors.primary : theme.colors.text}
-                      size={20}
-                      strokeWidth={2.5}
+                      size={18}
+                      strokeWidth={2.6}
                     />
                   </Reanimated.View>
                 }
@@ -388,7 +395,7 @@ const WeekView = () => {
                 ]}
                 layout={animPapillon(LinearTransition)}
                 >
-                  Semaine
+                  {width > 370 ? "Semaine" : "sem."}
                 </Reanimated.Text>
 
                 <Reanimated.View
@@ -457,6 +464,44 @@ const WeekView = () => {
           />
         }
 
+        {showPickerButtons && !searchHasFocus &&
+        <Reanimated.View
+          layout={animPapillon(LinearTransition)}
+          entering={animPapillon(FadeInRight)}
+          exiting={animPapillon(FadeOutRight)}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: hideDone ? theme.colors.primary : theme.colors.background + "ff",
+            borderColor: theme.colors.border + "dd",
+            borderWidth: 1,
+            borderRadius: 800,
+            height: 40,
+            width: showPickerButtons ? 40 : null,
+            minWidth: showPickerButtons ? 40 : null,
+            maxWidth: showPickerButtons ? 40 : null,
+            gap: 4,
+            shadowColor: "#00000022",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.6,
+            shadowRadius: 4,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              setHideDone(!hideDone);
+            }}
+          >
+            <CheckSquare
+              size={20}
+              color={hideDone ? "#fff" : theme.colors.text}
+              strokeWidth={2.5}
+              opacity={hideDone ? 1 : 0.7}
+            />
+          </TouchableOpacity>
+        </Reanimated.View>
+        }
+
         <Reanimated.View
           layout={
             LinearTransition.duration(250).easing(Easing.bezier(0.5, 0, 0, 1).factory())
@@ -472,6 +517,8 @@ const WeekView = () => {
             borderRadius: 800,
             paddingHorizontal: 14,
             height: 40,
+            width: showPickerButtons ? 40 : null,
+            minWidth: showPickerButtons ? 40 : null,
             maxWidth: showPickerButtons ? 40 : null,
             gap: 4,
             shadowColor: "#00000022",
@@ -602,7 +649,7 @@ const styles = StyleSheet.create({
   },
 
   weekPickerTextIntl: {
-    fontSize: 15,
+    fontSize: 14.5,
     fontFamily: "medium",
     opacity: 0.7,
   },
