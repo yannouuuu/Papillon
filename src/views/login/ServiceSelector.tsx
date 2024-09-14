@@ -15,6 +15,7 @@ import { useTheme } from "@react-navigation/native";
 import GetV6Data from "@/utils/login/GetV6Data";
 import { Check, Undo2 } from "lucide-react-native";
 import Constants from "expo-constants";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
   const theme = useTheme();
@@ -38,26 +39,29 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
     }, 1);
   }, []);
 
-  const handleConfirmation = () => {
-    switch (service) {
-      case "pronote":
+  const services = [
+    {
+      name: "pronote",
+      title: "PRONOTE",
+      image: require("../../../assets/images/service_pronote.png"),
+      login: () => {
         navigation.navigate("PronoteAuthenticationSelector");
         playSound();
-        break;
-      case "ed":
-        navigation.navigate("EcoleDirecteCredentials");
-        playSound();
-        break;
-      case "skolengo":
-        // TODO : Remove this alert when Skolengo is fully supported
-        if(__DEV__) {
+      },
+    },
+    {
+      name: "ed",
+      title: "ÉcoleDirecte",
+      image: require("../../../assets/images/service_ed.png"),
+      login: () => {
+        if (__DEV__) {
           showAlert({
             title: "[DEBUG] Service en développement",
-            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponible.",
+            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
             actions: [
               {
                 title: "Annuler",
-                onPress: () => {},
+                onPress: () => { },
                 icon: <Undo2 />,
                 primary: false,
               },
@@ -73,11 +77,39 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
             ]
           });
         } else UnsupportedAlert();
-        break;
-      default:
-        UnsupportedAlert();
-    }
-  };
+      }
+    },
+    {
+      name: "skolengo",
+      title: "Skolengo",
+      image: require("../../../assets/images/service_skolengo.png"),
+      login: () => {
+        if (__DEV__) {
+          showAlert({
+            title: "[DEBUG] Service en développement",
+            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
+            actions: [
+              {
+                title: "Annuler",
+                onPress: () => { },
+                icon: <Undo2 />,
+                primary: false,
+              },
+              {
+                title: "Continuer",
+                onPress: () => {
+                  navigation.navigate("SkolengoAuthenticationSelector");
+                  playSound();
+                },
+                icon: <Check />,
+                primary: true,
+              }
+            ]
+          });
+        } else UnsupportedAlert();
+      }
+    },
+  ];
 
   const UnsupportedAlert = () => {
     showAlert({
@@ -117,80 +149,92 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
         offsetTop={"20%"}
       />
 
-      <Reanimated.View
-        style={styles.list}
-        layout={LinearTransition}
+      <View
+        style={{
+          width: "100%",
+          flex: 1,
+          alignItems: "center",
+          marginTop: -36,
+          zIndex: 1000,
+        }}
       >
-        <Reanimated.View
-          style={{ width: "100%" }}
-          layout={LinearTransition}
-          entering={FlipInXDown.springify().delay(100)}
-        >
-          <DuoListPressable
-            leading={
-              <Image
-                source={require("../../../assets/images/service_pronote.png")}
-                style={styles.image}
-                resizeMode="contain"
-              />
-            }
-            text="PRONOTE"
-            enabled={service === "pronote"}
-            onPress={() => setService("pronote")}
-          />
-        </Reanimated.View>
+        <LinearGradient
+          colors={[colors.background, colors.background + "00"]}
+          style={{
+            width: "100%",
+            height: 40,
+            position: "absolute",
+            top: 0,
+            zIndex: 100,
+          }}
+        />
 
-        <Reanimated.View
-          style={{ width: "100%" }}
-          layout={LinearTransition}
-          entering={FlipInXDown.springify().delay(200)}
-        >
-          <DuoListPressable
-            leading={
-              <Image
-                source={require("../../../assets/images/service_ed.png")}
-                style={styles.image}
-                resizeMode="contain"
-              />
-            }
-            text="ÉcoleDirecte"
-            enabled={service === "ed"}
-            onPress={() => setService("ed")}
-          />
-        </Reanimated.View>
+        <LinearGradient
+          colors={[colors.background + "00", colors.background]}
+          style={{
+            width: "100%",
+            height: 40,
+            position: "absolute",
+            bottom: 0,
+            zIndex: 100,
+          }}
+        />
 
-        <Reanimated.View
-          style={{ width: "100%" }}
+        <Reanimated.ScrollView
+          style={styles.list}
+          contentContainerStyle={{
+            alignItems: "center",
+            gap: 9,
+            paddingHorizontal: 20,
+            paddingTop: 30,
+            paddingBottom: 60,
+          }}
           layout={LinearTransition}
-          entering={FlipInXDown.springify().delay(300)}
         >
-          <DuoListPressable
-            leading={
-              <Image
-                source={require("../../../assets/images/service_skolengo.png")}
-                style={styles.image}
-                resizeMode="contain"
+          {services.map((srv, i) => (
+            <Reanimated.View
+              style={{ width: "100%" }}
+              layout={LinearTransition}
+              entering={FlipInXDown.springify().delay(100 * i)}
+              key={srv.name}
+            >
+              <DuoListPressable
+                key={srv.name}
+                leading={
+                  <Image
+                    source={srv.image}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                }
+                text={srv.title}
+                enabled={srv.name === service}
+                onPress={() => setService(srv.name as Services)}
               />
-            }
-            text="Skolengo"
-            enabled={service === "skolengo"}
-            onPress={() => setService("skolengo")}
-          />
-        </Reanimated.View>
-      </Reanimated.View>
+            </Reanimated.View>
+          ))}
+        </Reanimated.ScrollView>
+      </View>
 
       <View style={styles.buttons}>
         <ButtonCta
           primary
           value="Confirmer"
           disabled={service === null}
-          onPress={handleConfirmation}
+          onPress={services.find((srv) => srv.name === service)?.login}
         />
 
         {v6Data && v6Data.restore && (
           <ButtonCta
             value="Importer mon compte"
             onPress={() => navigation.navigate("PronoteV6Import", { data: v6Data.data })}
+          />
+        )}
+
+        {__DEV__ && (
+          <ButtonCta
+            value="Fournisseur d'identité"
+            onPress={() => navigation.navigate("IdentityProviderSelector")}
           />
         )}
       </View>
@@ -208,9 +252,6 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
     width: "100%",
-    alignItems: "center",
-    gap: 9,
-    paddingHorizontal: 20,
   },
 
   buttons: {

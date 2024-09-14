@@ -1,5 +1,5 @@
 import type { Screen } from "@/router/helpers/types";
-import { ScrollView, Share, ShareContent } from "react-native";
+import { ActivityIndicator, ScrollView, Share, ShareContent } from "react-native";
 import {
   NativeIcon,
   NativeItem,
@@ -8,38 +8,38 @@ import {
   NativeText,
 } from "@/components/Global/NativeComponents";
 import React, { useEffect, useState } from "react";
-import { get_brute_logs, get_logs, Log } from "@/utils/logger/logger";
+import { get_brute_logs, get_logs, Log, delete_logs } from "@/utils/logger/logger";
 import {
   CircleAlert,
   CircleX,
   Code,
+  Delete,
   ShareIcon,
   TriangleAlert,
 } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PressableScale } from "react-native-pressable-scale";
+import { FadeInDown, FadeInUp, FadeOutDown, FadeOutUp } from "react-native-reanimated";
+import { animPapillon } from "@/utils/ui/animations";
 
 const SettingsDevLogs: Screen<"SettingsDevLogs"> = ({ navigation }) => {
   const [logs, setLogs] = useState<Log[]>([]);
   const insets = useSafeAreaInsets();
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    get_logs().then(setLogs);
+    get_logs().then((logs) => {
+      setLogs(logs);
+      setLoading(false);
+    });
 
     navigation.setOptions({
       headerRight: (props) => (
         <PressableScale
-          onPress={() => {
-            get_brute_logs().then((logs) => {
-              const shareContent: ShareContent = {
-                message: "Hello",
-                title: "Partager vos logs",
-              };
-              Share.share(shareContent);
-            });
-          }}
+          onPress={() => delete_logs()}
         >
-          <ShareIcon />
+          <Delete />
         </PressableScale>
       ),
     });
@@ -50,47 +50,79 @@ const SettingsDevLogs: Screen<"SettingsDevLogs"> = ({ navigation }) => {
       contentContainerStyle={{
         padding: 16,
         paddingBottom: 16 + insets.bottom,
+        paddingTop: 0,
       }}
     >
-      <NativeListHeader label={"Logs"} />
-      <NativeList>
-        {logs.map((log, index) => (
+      <NativeListHeader animated label={"Logs"} />
+
+      {loading && (
+        <NativeList
+          animated
+          entering={animPapillon(FadeInDown)}
+          exiting={animPapillon(FadeOutUp)}
+        >
           <NativeItem
-            key={index}
             leading={
-              <NativeIcon
-                icon={
-                  log.type === "ERROR" ? (
-                    <CircleX />
-                  ) : log.type === "WARN" ? (
-                    <TriangleAlert />
-                  ) : log.type === "INFO" ? (
-                    <CircleAlert />
-                  ) : (
-                    <Code />
-                  )
-                }
-                color={
-                  log.type === "ERROR"
-                    ? "#BE0B00"
-                    : log.type === "WARN"
-                      ? "#CF6B0F"
-                      : log.type === "INFO"
-                        ? "#0E7CCB"
-                        : "#AAA"
-                }
-                style={{
-                  marginLeft: -6,
-                }}
-              />
+              <ActivityIndicator />
             }
+            animated
           >
-            <NativeText variant="title">{log.message}</NativeText>
-            <NativeText variant="subtitle">{log.date}</NativeText>
-            <NativeText variant="subtitle">{log.from}</NativeText>
+            <NativeText variant="title">
+              Obtention des logs...
+            </NativeText>
+            <NativeText variant="subtitle">
+              Cela peut prendre plusieurs secondes, veuillez patienter.
+            </NativeText>
           </NativeItem>
-        ))}
-      </NativeList>
+        </NativeList>
+      )}
+
+      {logs.length !== 0 && (
+        <NativeList
+          animated
+          entering={animPapillon(FadeInDown)}
+          exiting={animPapillon(FadeOutUp)}
+        >
+          {logs.map((log, index) => (
+            <NativeItem
+              animated
+              key={index}
+              leading={
+                <NativeIcon
+                  icon={
+                    log.type === "ERROR" ? (
+                      <CircleX />
+                    ) : log.type === "WARN" ? (
+                      <TriangleAlert />
+                    ) : log.type === "INFO" ? (
+                      <CircleAlert />
+                    ) : (
+                      <Code />
+                    )
+                  }
+                  color={
+                    log.type === "ERROR"
+                      ? "#BE0B00"
+                      : log.type === "WARN"
+                        ? "#CF6B0F"
+                        : log.type === "INFO"
+                          ? "#0E7CCB"
+                          : "#AAA"
+                  }
+                  style={{
+                    marginLeft: -6,
+                  }}
+                />
+              }
+            >
+              <NativeText variant="title">{log.message}</NativeText>
+              <NativeText variant="subtitle">{log.date}</NativeText>
+              <NativeText variant="subtitle">{log.from}</NativeText>
+            </NativeItem>
+          ))}
+        </NativeList>
+
+      )}
     </ScrollView>
   );
 };

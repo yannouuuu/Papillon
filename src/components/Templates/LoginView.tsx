@@ -1,32 +1,52 @@
 import React, { useState } from "react";
-import { ActivityIndicator, Image, type ImageSourcePropType, KeyboardAvoidingView, ScrollView, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  type ImageSourcePropType,
+  KeyboardAvoidingView,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { NativeItem, NativeList, NativeListHeader, NativeText } from "../Global/NativeComponents";
+import {
+  NativeItem,
+  NativeList,
+  NativeListHeader,
+  NativeText,
+} from "../Global/NativeComponents";
 import { AlertTriangle, Eye, EyeOff, Info } from "lucide-react-native";
 import { useTheme } from "@react-navigation/native";
 import ButtonCta from "../FirstInstallation/ButtonCta";
 
 export interface LoginViewCustomInput {
-  identifier: string,
-  title: string,
-  placeholder?: string,
-  secureTextEntry?: boolean,
-  value?: string,
-};
+  identifier: string;
+  title: string;
+  placeholder?: string;
+  secureTextEntry?: boolean;
+  value?: string;
+}
 
 const LoginView: React.FC<{
   serviceIcon: ImageSourcePropType;
   serviceName: string;
   loading?: boolean;
   error?: string | null;
-  onLogin: (username: string, password: string, customFields: Record<string, string>) => unknown
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  onLogin: (
+    username: string,
+    password: string,
+    customFields: Record<string, string>
+  ) => unknown;
   customFields?: LoginViewCustomInput[];
 }> = ({
   serviceIcon,
   serviceName,
   loading = false,
   error = null,
+  autoCapitalize = "none",
   onLogin,
   customFields = [],
 }) => {
@@ -36,10 +56,14 @@ const LoginView: React.FC<{
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const [customFieldsInputs, setCustomFields] = useState<LoginViewCustomInput[]>(customFields.map((field) => ({
-    ...field,
-    value: "",
-  })));
+  const [customFieldsInputs, setCustomFields] = useState<
+    LoginViewCustomInput[]
+  >(
+    customFields.map((field) => ({
+      ...field,
+      value: "",
+    }))
+  );
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -106,11 +130,10 @@ const LoginView: React.FC<{
         </View>
 
         <NativeList inline>
-          <NativeItem
-            icon={<Info />}
-          >
+          <NativeItem icon={<Info />}>
             <NativeText variant="subtitle">
-              Papillon n'est pas affilié à {serviceName}. La politique de confidentialité de {serviceName} s'applique.
+              Papillon n'est pas affilié à {serviceName}. La politique de
+              confidentialité de {serviceName} s'applique.
             </NativeText>
           </NativeItem>
         </NativeList>
@@ -121,12 +144,8 @@ const LoginView: React.FC<{
               backgroundColor: "#eb403422",
             }}
           >
-            <NativeItem
-              icon={<AlertTriangle />}
-            >
-              <NativeText variant="subtitle">
-                {error}
-              </NativeText>
+            <NativeItem icon={<AlertTriangle />}>
+              <NativeText variant="subtitle">{error}</NativeText>
             </NativeItem>
           </NativeList>
         )}
@@ -138,6 +157,7 @@ const LoginView: React.FC<{
               value={username}
               onChangeText={setUsername}
               placeholder="Nom d'utilisateur"
+              autoCapitalize={autoCapitalize}
               placeholderTextColor={theme.colors.text + "55"}
               style={{
                 fontSize: 16,
@@ -164,6 +184,7 @@ const LoginView: React.FC<{
                 onChangeText={setPassword}
                 placeholder="Mot de passe"
                 placeholderTextColor={theme.colors.text + "55"}
+                autoCapitalize={autoCapitalize}
                 style={{
                   fontSize: 16,
                   fontFamily: "medium",
@@ -173,19 +194,12 @@ const LoginView: React.FC<{
                 secureTextEntry={!showPassword}
               />
 
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ?
-                  <EyeOff
-                    color={theme.colors.text + "55"}
-                  />
-                  :
-                  <Eye
-                    color={theme.colors.text + "55"}
-
-                  />
-                }
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                {showPassword ? (
+                  <EyeOff color={theme.colors.text + "55"} />
+                ) : (
+                  <Eye color={theme.colors.text + "55"} />
+                )}
               </TouchableOpacity>
             </View>
           </NativeItem>
@@ -200,18 +214,21 @@ const LoginView: React.FC<{
                 <TextInput
                   value={field.value}
                   onChangeText={(text) => {
-                    setCustomFields(customFieldsInputs.map((f, i) => {
-                      if (i === index) {
-                        return {
-                          ...f,
-                          value: text,
-                        };
-                      }
-                      return f;
-                    }));
+                    setCustomFields(
+                      customFieldsInputs.map((f, i) => {
+                        if (i === index) {
+                          return {
+                            ...f,
+                            value: text,
+                          };
+                        }
+                        return f;
+                      })
+                    );
                   }}
                   placeholder={field.placeholder}
                   placeholderTextColor={theme.colors.text + "55"}
+                  autoCapitalize={autoCapitalize}
                   style={{
                     fontSize: 16,
                     fontFamily: "medium",
@@ -234,7 +251,6 @@ const LoginView: React.FC<{
           }}
           icon={loading ? <ActivityIndicator /> : void 0}
         />
-
       </ScrollView>
     </KeyboardAvoidingView>
   );

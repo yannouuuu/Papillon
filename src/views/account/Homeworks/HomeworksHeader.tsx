@@ -8,14 +8,15 @@ import Reanimated, {
   ZoomIn,
   ZoomOut
 } from "react-native-reanimated";
+import { epochWMToCalendarWeekNumber } from "@/utils/epochWeekNumber";
 
-const HeaderCalendar: React.FC<{ weekNumber: number, oldPageIndex: number, showPicker: () => void, changeIndex: (index: number) => void }> = ({ weekNumber, oldPageIndex, showPicker, changeIndex }) => {
+const HeaderCalendar: React.FC<{ epochWeekNumber: number, oldPageIndex: number, showPicker: () => void, changeIndex: (index: number) => void }> = ({ epochWeekNumber, oldPageIndex, showPicker, changeIndex }) => {
   const { colors } = useTheme();
 
   const dims = Dimensions.get("window");
   const tablet = dims.width > 600;
 
-  const index = oldPageIndex + weekNumber;
+  const index = epochWeekNumber;
 
   return (
     <Reanimated.View
@@ -34,50 +35,46 @@ const HeaderCalendar: React.FC<{ weekNumber: number, oldPageIndex: number, showP
           gap: 0,
         }}
       >
-        {weekNumber > 0 ?
-          <HeaderWeekComponent
-            weekNumber={weekNumber - 2}
-            active={false}
-            key={index - 2}
-            location="left"
-            onPress={() => changeIndex(weekNumber - 2)}
-          />
-          : <View style={{ width: 120 }} />}
-        {weekNumber > 0 ?
-          <HeaderWeekComponent
-            weekNumber={weekNumber - 1}
-            active={false}
-            key={index - 1}
-            location="left"
-            onPress={() => changeIndex(weekNumber - 1)}
-          />
-          : <View style={{ width: 120 }} />}
         <HeaderWeekComponent
-          weekNumber={weekNumber}
+          epochWeekNumber={epochWeekNumber - 2}
+          active={false}
+          key={index - 2}
+          location="left"
+          onPress={() => changeIndex(epochWeekNumber - 2)}
+        />
+        <HeaderWeekComponent
+          epochWeekNumber={epochWeekNumber - 1}
+          active={false}
+          key={index - 1}
+          location="left"
+          onPress={() => changeIndex(epochWeekNumber - 1)}
+        />
+        <HeaderWeekComponent
+          epochWeekNumber={epochWeekNumber}
           active={true}
           key={index}
           onPress={showPicker}
         />
         <HeaderWeekComponent
-          weekNumber={weekNumber + 1}
+          epochWeekNumber={epochWeekNumber + 1}
           active={false}
           key={index + 1}
           location="right"
-          onPress={() => changeIndex(weekNumber + 1)}
+          onPress={() => changeIndex(epochWeekNumber + 1)}
         />
         <HeaderWeekComponent
-          weekNumber={weekNumber + 2}
+          epochWeekNumber={epochWeekNumber + 2}
           active={false}
           key={index + 2}
           location="right"
-          onPress={() => changeIndex(weekNumber + 2)}
+          onPress={() => changeIndex(epochWeekNumber + 2)}
         />
       </Reanimated.View>
     </Reanimated.View>
   );
 };
 
-const HeaderWeekComponent: React.FC<{ weekNumber: number, active: boolean, location?: string, onPress?: () => void }> = ({ weekNumber, active, location, onPress }) => {
+const HeaderWeekComponent: React.FC<{ epochWeekNumber: number, active: boolean, location?: string, onPress?: () => void }> = ({ epochWeekNumber, active, location, onPress }) => {
   const { colors } = useTheme();
 
   return (
@@ -142,7 +139,7 @@ const HeaderWeekComponent: React.FC<{ weekNumber: number, active: boolean, locat
             }}
             layout={LinearTransition.duration(200)}
           >
-            Semaine {weekNumber}
+            Semaine {epochWMToCalendarWeekNumber(epochWeekNumber)}
           </Reanimated.Text>
         </Reanimated.View>
       </TouchableOpacity>

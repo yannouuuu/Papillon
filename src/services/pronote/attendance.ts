@@ -6,6 +6,7 @@ import pronote from "pawnote";
 import { decodeAttachment } from "./attachment";
 import { ObservationType } from "../shared/Observation";
 import { decodePeriod } from "./period";
+import { info } from "@/utils/logger/logger";
 
 const getTab = (account: PronoteAccount): pronote.Tab => {
   if (!account.instance)
@@ -20,7 +21,7 @@ const getTab = (account: PronoteAccount): pronote.Tab => {
 
 export const getAttendancePeriods = (account: PronoteAccount): { periods: Period[], default: string } => {
   const tab = getTab(account);
-  console.info("PRONOTE->getAttendancePeriods(): OK");
+  info("PRONOTE->getAttendancePeriods(): OK", "pronote");
 
   return {
     default: tab.defaultPeriod!.name,
@@ -35,7 +36,7 @@ export async function getAttendance (account: PronoteAccount, periodName: string
     throw new Error("La période sélectionnée n'a pas été trouvée.");
 
   const items = await pronote.notebook(account.instance!, period);
-  console.info(`PRONOTE->getAttendance(): OK pour ${periodName}`);
+  info(`PRONOTE->getAttendance(): OK pour ${periodName}`, "pronote");
 
   const attendance: Attendance = {
     observations: items.observations.map(observation => {

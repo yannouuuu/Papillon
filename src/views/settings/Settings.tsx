@@ -24,6 +24,7 @@ import {
   Paperclip,
   Puzzle,
   Route,
+  Scroll,
   Settings as SettingsLucide,
   Sparkles,
   SwatchBook,
@@ -88,6 +89,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           icon: <Bell />,
           color: "#CF0029",
           label: "Notifications",
+          description: "Disponible prochainement",
           onPress: () => navigation.navigate("SettingsNotifications"),
           disabled: !defined("enable_notifications"),
         },
@@ -95,6 +97,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           icon: <Cable />,
           color: "#D79400",
           label: "Services externes",
+          description: "Disponible prochainement",
           onPress: () => navigation.navigate("SettingsExternalServices"),
           disabled: !defined("enable_external_services"),
         },
@@ -162,7 +165,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           color: "#58A3C3",
           label: "Papillon Magic",
           onPress: () => navigation.navigate("SettingsMagic"),
-        }
+        },
       ],
     },
     {
@@ -173,6 +176,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           icon: <HandCoins />,
           color: "#CBA024",
           label: "Soutenir Papillon",
+          description: "Disponible prochainement",
           onPress: () => {},
           disabled: true,
         },
@@ -362,7 +366,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           }}
         >
           version {AppJSON.expo.version} {"\n"}
-          fabriqué avec ❤️ par l'équipe Papillon
+          fabriqué avec ❤️ par les contributeurs de Papillon
         </Text>
       </Reanimated.ScrollView>
     </>

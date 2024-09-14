@@ -2,7 +2,7 @@ import { useTheme } from "@react-navigation/native";
 import React, { useEffect, useLayoutEffect } from "react";
 import { View, Text, StatusBar, TouchableOpacity, Platform } from "react-native";
 
-import { defaultTabs } from "@/views/settings/SettingsTabs";
+import { defaultTabs } from "@/consts/DefaultTabs";
 import LottieView from "lottie-react-native";
 import { X } from "lucide-react-native";
 import MissingItem from "@/components/Global/MissingItem";

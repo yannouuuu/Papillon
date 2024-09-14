@@ -3,7 +3,7 @@ import { Screen } from "@/router/helpers/types";
 import { useCurrentAccount } from "@/stores/account";
 import { useTheme } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import { TextCursorInput, User2, UserCircle2, WholeWord } from "lucide-react-native";
+import { Camera, Plus, TextCursorInput, User2, UserCircle2, WholeWord } from "lucide-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Image, KeyboardAvoidingView, ScrollView, Switch, TextInput } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -101,7 +101,7 @@ const SettingsProfile: Screen<"SettingsProfile"> = ({ navigation }) => {
           <NativeItem
             chevron={true}
             onPress={() => updateProfilePic()}
-            leading={
+            leading={profilePic &&
               <Image
                 source={{ uri: profilePic }}
                 style={{
@@ -113,17 +113,19 @@ const SettingsProfile: Screen<"SettingsProfile"> = ({ navigation }) => {
                 }}
               />
             }
+            icon={!profilePic && <Camera />}
             trailing={
               <ActivityIndicator animating={loadingPic} />
             }
           >
-            <NativeText style={{
-              fontFamily: "semibold",
-              fontSize: 16,
-              lineHeight: 18,
-            }}>
-              Changer la photo de profil
+            <NativeText variant="title">
+              {profilePic ? "Changer la photo de profil" : "Ajouter une photo de profil"}
             </NativeText>
+            {!profilePic && (
+              <NativeText variant="subtitle">
+                Personnalisez votre compte en ajoutant une photo de profil.
+              </NativeText>
+            )}
           </NativeItem>
         </NativeList>
 

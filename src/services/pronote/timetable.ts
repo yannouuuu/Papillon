@@ -2,6 +2,9 @@ import type { PronoteAccount } from "@/stores/account/types";
 import type { Timetable, TimetableClass } from "../shared/Timetable";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import pronote from "pawnote";
+import { info } from "@/utils/logger/logger";
+
+export const pronoteFirstDate = new Date("2024-09-01");
 
 const decodeTimetableClass = (c: pronote.TimetableClassLesson | pronote.TimetableClassDetention | pronote.TimetableClassActivity): TimetableClass => {
   const base = {
@@ -45,7 +48,7 @@ export const getTimetableForWeek = async (account: PronoteAccount, weekNumber: n
     throw new ErrorServiceUnauthenticated("pronote");
 
   if (weekNumber < 1 || weekNumber > 62) {
-    console.info("PRONOTE->getTimetableForWeek(): Le numéro de semaine est en dehors des bornes (1<>62), une liste vide est retournée.");
+    info("PRONOTE->getTimetableForWeek(): Le numéro de semaine est en dehors des bornes (1<>62), une liste vide est retournée.", "pronote");
     return [];
   }
 

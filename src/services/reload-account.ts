@@ -17,6 +17,9 @@ export async function reload <T extends Account> (account: T): Promise<Reconnect
       const { reloadInstance } = await import("./pronote/reload-instance");
       return await reloadInstance(account.authentication) as Reconnected<T>;
     }
+    case AccountService.Local: {
+      return { instance: account.identityProvider.rawData || true, authentication: true };
+    }
     case AccountService.Turboself: { // should be done automatically though
       const { reload } = await import("./turboself/reload");
       const auth = await reload(account);

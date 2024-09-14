@@ -1,15 +1,22 @@
 import { type Account, AccountService } from "@/stores/account/types";
 import { useTimetableStore } from "@/stores/timetable";
+import { epochWNToPronoteWN } from "@/utils/epochWeekNumber";
 
 /**
  * Updates the state and cache for the timetable of given week number.
  */
-export async function updateTimetableForWeekInCache <T extends Account> (account: T, weekNumber: number): Promise<void> {
+export async function updateTimetableForWeekInCache <T extends Account> (account: T, epochWeekNumber: number): Promise<void> {
   switch (account.service) {
     case AccountService.Pronote: {
       const { getTimetableForWeek } = await import("./pronote/timetable");
+      const weekNumber = epochWNToPronoteWN(epochWeekNumber, account);
       const timetable = await getTimetableForWeek(account, weekNumber);
-      useTimetableStore.getState().updateClasses(weekNumber, timetable);
+      useTimetableStore.getState().updateClasses(epochWeekNumber, timetable);
+      break;
+    }
+    case AccountService.Local: {
+      const timetable = [];
+      useTimetableStore.getState().updateClasses(epochWeekNumber, []);
       break;
     }
     case AccountService.EcoleDirecte: {

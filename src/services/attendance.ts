@@ -17,6 +17,19 @@ export async function updateAttendancePeriodsInCache <T extends Account> (accoun
 
       break;
     }
+    case AccountService.Local: {
+      periods = [
+        {
+          name: "Toutes",
+          startTimestamp: new Date("2021-09-01").getTime(),
+          endTimestamp: new Date("2022-06-30").getTime(),
+        },
+      ];
+
+      defaultPeriod = "Toutes";
+
+      break;
+    }
     default:
       throw new Error("Service not implemented");
   }
@@ -31,6 +44,16 @@ export async function updateAttendanceInCache <T extends Account> (account: T, p
     case AccountService.Pronote: {
       const { getAttendance } = await import("./pronote/attendance");
       attendance = await getAttendance(account, periodName);
+
+      break;
+    }
+    case AccountService.Local: {
+      attendance = {
+        delays: [],
+        absences: [],
+        punishments: [],
+        observations: []
+      };
 
       break;
     }

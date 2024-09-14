@@ -19,7 +19,7 @@ const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
-  const [clickedOnVersion, setClickedOnVersion] = React.useState<number>(0);
+  const [clickedOnVersion, setClickedOnVersion] = useState<number>(0);
   const [contributors, setContributors] = useState<Contributor[]>([]);
 
   const fetchContributors = async () => {
@@ -134,7 +134,10 @@ const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
             ver. {AppJSON.expo.version} {Constants.appOwnership === "expo" ? "(Expo Go)" : ""} {__DEV__ ? "(debug)" : ""}
           </NativeText>
         </NativeItem>
-        <NativeItem>
+        <NativeItem
+          onPress={() => navigation.navigate("SettingsDevLogs")}
+          chevron={false}
+        >
           <NativeText variant="title">
             Version des dépendances
           </NativeText>
