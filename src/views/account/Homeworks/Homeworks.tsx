@@ -581,7 +581,11 @@ const WeekView = ({ route, navigation }) => {
           <TouchableOpacity
             onPress={() => {
               setShowPickerButtons(false);
-              SearchRef.current?.focus();
+
+              setTimeout(() => {
+                // #TODO : change timeout method or duration
+                SearchRef.current?.focus();
+              }, 20);
             }}
           >
             <Search
@@ -606,7 +610,7 @@ const WeekView = ({ route, navigation }) => {
           >
             <TextInput
               placeholder={
-                hideDone ? "Non terminé" :
+                (hideDone && !searchHasFocus) ? "Non terminé" :
                   "Rechercher"
               }
               value={searchTerms}
