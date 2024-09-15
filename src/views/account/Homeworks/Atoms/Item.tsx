@@ -49,6 +49,8 @@ const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
   return (
     <NativeItem
       animated
+      onPress={needsExpansion ? () => setExpanded(!expanded) : undefined}
+      chevron={false}
       key={homework.content}
       entering={FadeIn}
       exiting={FadeOut}
@@ -77,7 +79,12 @@ const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
           <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
             {subjectData.pretty}
           </NativeText>
-          <Reanimated.View layout={animPapillon(LinearTransition)}>
+          <Reanimated.View
+            layout={animPapillon(LinearTransition)}
+            key={parsedContent + expanded}
+            entering={expanded && FadeIn.duration(200)}
+            exiting={FadeOut.duration(200).delay(50)}
+          >
             <NativeText
               variant="default"
               numberOfLines={expanded ? undefined : 3}
