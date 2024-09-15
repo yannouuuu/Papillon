@@ -515,7 +515,7 @@ const WeekView = ({ route, navigation }) => {
           />
         }
 
-        {showPickerButtons && !searchHasFocus &&
+        {showPickerButtons && !searchHasFocus && width > 330 &&
         <Reanimated.View
           layout={animPapillon(LinearTransition)}
           entering={animPapillon(FadeInLeft).delay(100)}
