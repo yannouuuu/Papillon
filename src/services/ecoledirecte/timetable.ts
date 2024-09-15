@@ -61,8 +61,7 @@ export const getTimetableForWeek = async (account: EcoleDirecteAccount, weekNumb
   const endDate = new Date();
   endDate.setDate(date + 7);
 
-  // TODO: put real values for arguments
-  const timetable = await ecoledirecte.studentTimetable(account.instance, account.instance, startDate, endDate);
+  const timetable = await ecoledirecte.studentTimetable(account.authentication.session, account.authentication.account, startDate, endDate);
   // TODO: parse timetable
 
   return timetable.map(decodeTimetableClass);
