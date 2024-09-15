@@ -187,6 +187,7 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
                       width: "100%",
                       height: 50,
                     }}
+                    key={index}
                     layout={LinearTransition}
                     entering={FlipInXDown.springify().delay(50 * index)}
                   >
