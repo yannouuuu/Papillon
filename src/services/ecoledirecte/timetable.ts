@@ -47,7 +47,7 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
       break;
   }
 
-  throw new Error("pronote: unknown class type");
+  throw new Error("ecoledirecte: unknown class type");
 };
 
 export const getTimetableForWeek = async (account: EcoleDirecteAccount, weekNumber: number): Promise<Timetable> => {
