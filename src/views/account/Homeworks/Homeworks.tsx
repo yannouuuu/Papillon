@@ -234,8 +234,8 @@ const WeekView = () => {
               :
               hideDone ?
                 <MissingItem
-                  emoji="📚"
-                  title="Aucun devoir"
+                  emoji="🌴"
+                  title="Il ne reste rien à faire"
                   description="Il n'y a aucun devoir non terminé pour cette semaine."
                 />
                 :
