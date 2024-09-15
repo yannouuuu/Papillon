@@ -6,6 +6,7 @@ import {useTheme} from "@react-navigation/native";
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import {
   ActivityIndicator,
+  Button,
   Dimensions,
   Platform,
   Pressable,
@@ -444,6 +445,11 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
 
               <Reanimated.View
                 style={[paddingTopItemStyle]}
+              />
+
+              <Button
+                onPress={() => navigation.navigate("ChangelogScreen")}
+                title="force open ChangelogScreen"
               />
 
 

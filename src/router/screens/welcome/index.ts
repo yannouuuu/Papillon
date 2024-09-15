@@ -5,6 +5,7 @@ import FirstInstallation from "@/views/welcome/FirstInstallation";
 import ColorSelector from "@/views/welcome/ColorSelector";
 import DevMenu from "@/views/welcome/DevMenu";
 import AccountCreated from "@/views/welcome/AccountCreated";
+import ChangelogScreen from "@/views/welcome/ChangelogScreen";
 
 export default [
   createScreen("AccountSelector", AccountSelector, {
@@ -31,6 +32,10 @@ export default [
     headerTransparent: true,
     headerBackVisible: false,
     headerTitle: ""
+  }),
+  createScreen("ChangelogScreen", ChangelogScreen, {
+    headerTitle: "Quoi de neuf ?",
+    presentation: "modal"
   }),
 ] as const;
 
