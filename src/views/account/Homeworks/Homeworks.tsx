@@ -41,7 +41,7 @@ const formatDate = (date: string | number | Date): string => {
   });
 };
 
-const WeekView = () => {
+const WeekView = ({ route, navigation }) => {
   const flatListRef = useRef(null);
   const { width } = Dimensions.get("window");
   const finalWidth = width - (width > 600 ? (
@@ -49,6 +49,8 @@ const WeekView = () => {
       320
   ) : 0);
   const insets = useSafeAreaInsets();
+
+  const outsideNav = route.params?.outsideNav;
 
   const theme = useTheme();
   const account = useCurrentAccount(store => store.account!);
@@ -179,14 +181,14 @@ const WeekView = () => {
         style={{ width: finalWidth, height: "100%"}}
         contentContainerStyle={{
           padding: 16,
-          paddingTop: insets.top + 56,
+          paddingTop: outsideNav ? 72 : insets.top + 56,
         }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => updateHomeworks(true)}
-            progressViewOffset={insets.top + 56}
+            progressViewOffset={outsideNav ? 72 : insets.top + 56}
           />
         }
       >
@@ -316,14 +318,29 @@ const WeekView = () => {
           top: 0,
           left: 0,
           right: 0,
-          height: insets.top + 100,
+          height: outsideNav ? 100 : insets.top + 100,
           zIndex: 90,
         }}
       />
 
+      {outsideNav &&
+        <View
+          style={{
+            position: "absolute",
+            top: 10,
+            alignSelf: "center",
+            height: 5,
+            width: 50,
+            backgroundColor: theme.colors.text + "22",
+            borderRadius: 80,
+            zIndex: 10000,
+          }}
+        />
+      }
+
       <Reanimated.View
         style={[styles.header, {
-          top: insets.top,
+          top: outsideNav ? 24 : insets.top,
           zIndex: 100,
           flexDirection: "row",
           justifyContent: "space-between",
@@ -498,7 +515,7 @@ const WeekView = () => {
           />
         }
 
-        {showPickerButtons && !searchHasFocus &&
+        {showPickerButtons && !searchHasFocus && width > 330 &&
         <Reanimated.View
           layout={animPapillon(LinearTransition)}
           entering={animPapillon(FadeInLeft).delay(100)}
@@ -564,7 +581,11 @@ const WeekView = () => {
           <TouchableOpacity
             onPress={() => {
               setShowPickerButtons(false);
-              SearchRef.current?.focus();
+
+              setTimeout(() => {
+                // #TODO : change timeout method or duration
+                SearchRef.current?.focus();
+              }, 20);
             }}
           >
             <Search
@@ -589,7 +610,7 @@ const WeekView = () => {
           >
             <TextInput
               placeholder={
-                hideDone ? "Non terminé" :
+                (hideDone && !searchHasFocus) ? "Non terminé" :
                   "Rechercher"
               }
               value={searchTerms}
