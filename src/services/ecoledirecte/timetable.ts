@@ -12,35 +12,39 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
     backgroundColor: c.color
   };
 
-  if (c.kind === TimetableItemKind.COURS) {
-    return {
-      type: "lesson",
-      id: c.id,
-      subject: c.subject_short_name,
-      title: c.subject_name,
-      room: c.room || void 0,
-      teacher: c.teacher ?? void 0,
-      // TODO: add more states
-      status: c.updated ? "Cours modifié": "",
-      ...base
-    } satisfies TimetableClass;
-  }
-  // else if (c.is === "activity") {
-  //   return {
-  //     type: "activity",
-  //     title: c.title,
-  //     ...base
-  //   } satisfies TimetableClass;
-  // }
-  else if (c.kind === TimetableItemKind.PERMANENCE) {
-    return {
-      type: "detention",
-      subject: c.subject_name,
-      id: c.id,
-      title: c.subject_name ?? "Sans titre",
-      room: c.room || void 0,
-      ...base
-    } satisfies TimetableClass;
+  switch (c.kind) {
+    case TimetableItemKind.COURS:
+      return {
+        type: "lesson",
+        id: c.id,
+        subject: c.subject_short_name,
+        title: c.subject_name,
+        room: c.room || void 0,
+        teacher: c.teacher ?? void 0,
+        // TODO: add more states
+        status: c.updated ? "Cours modifié": "",
+        ...base
+      } satisfies TimetableClass;
+    case TimetableItemKind.PERMANENCE:
+      return {
+        type: "detention",
+        subject: c.subject_name,
+        id: c.id,
+        title: c.subject_name ?? "Sans titre",
+        room: c.room || void 0,
+        ...base
+      };
+    case TimetableItemKind.CONGE:
+      return {
+        type: "vacation",
+        subject: c.subject_name,
+        id: c.id,
+        title: "Congés",
+        room: void 0,
+        ...base
+      };
+    default:
+      break;
   }
 
   throw new Error("pronote: unknown class type");
