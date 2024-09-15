@@ -1,7 +1,7 @@
 export interface TimetableClass {
   subject: string
   id: number
-  type: "lesson" | "activity" | "detention"
+  type: "lesson" | "activity" | "detention" | "vacation"
   title: string
   startTimestamp: number
   endTimestamp: number
