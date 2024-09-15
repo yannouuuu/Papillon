@@ -1,6 +1,8 @@
 import { Easing, withTiming } from "react-native-reanimated";
 
 const animPapillon = (animation: any) => {
+  if (!animation) return;
+
   return animation.springify().mass(1).damping(20).stiffness(300);
 };
 
