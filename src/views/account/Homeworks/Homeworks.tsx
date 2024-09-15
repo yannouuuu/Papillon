@@ -11,7 +11,7 @@ import HomeworksNoHomeworksItem from "./Atoms/NoHomeworks";
 import HomeworkItem from "./Atoms/Item";
 import { PressableScale } from "react-native-pressable-scale";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Book, CheckSquare, ChevronLeft, ChevronRight, Search, X } from "lucide-react-native";
+import { Book, Check, CheckCircle, CheckCircle2, CheckSquare, ChevronLeft, ChevronRight, CircleDashed, CircleDotDashed, Search, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 
@@ -20,7 +20,7 @@ import { animPapillon } from "@/utils/ui/animations";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { LinearGradient } from "expo-linear-gradient";
-import { se } from "date-fns/locale";
+import * as Haptics from "expo-haptics";
 import MissingItem from "@/components/Global/MissingItem";
 
 type HomeworksPageProps = {
@@ -223,6 +223,7 @@ const WeekView = () => {
               width: "100%",
             }}
             layout={animPapillon(LinearTransition)}
+            key={searchTerms + hideDone}
           >
             {searchTerms.length > 0 ?
               <MissingItem
@@ -231,11 +232,18 @@ const WeekView = () => {
                 description="Aucun devoir ne correspond à votre recherche."
               />
               :
-              <MissingItem
-                emoji="📚"
-                title="Aucun devoir"
-                description="Il n'y a aucun devoir pour cette semaine."
-              />}
+              hideDone ?
+                <MissingItem
+                  emoji="📚"
+                  title="Aucun devoir"
+                  description="Il n'y a aucun devoir non terminé pour cette semaine."
+                />
+                :
+                <MissingItem
+                  emoji="📚"
+                  title="Aucun devoir"
+                  description="Il n'y a aucun devoir pour cette semaine."
+                />}
           </Reanimated.View>
         }
       </ScrollView>
@@ -359,6 +367,11 @@ const WeekView = () => {
           <PressableScale
             style={[styles.weekPickerContainer]}
             onPress={() => setShowPickerButtons(!showPickerButtons)}
+            onLongPress={() => {
+              setHideDone(!hideDone);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }}
+            delayLongPress={200}
           >
             <Reanimated.View
               layout={animPapillon(LinearTransition)}
@@ -390,6 +403,23 @@ const WeekView = () => {
                       strokeWidth={2.6}
                     />
                   </Reanimated.View>
+                }
+
+                {!showPickerButtons && hideDone &&
+                    <Reanimated.View
+                      entering={animPapillon(ZoomIn)}
+                      exiting={animPapillon(FadeOut)}
+                      style={{
+                        marginRight: 2,
+                      }}
+                    >
+                      <CircleDashed
+                        color={showPickerButtons ? theme.colors.primary : theme.colors.text}
+                        size={18}
+                        strokeWidth={3}
+                        opacity={0.7}
+                      />
+                    </Reanimated.View>
                 }
 
                 <Reanimated.Text style={[styles.weekPickerText, styles.weekPickerTextIntl,
@@ -558,7 +588,10 @@ const WeekView = () => {
             exiting={FadeOut.duration(100)}
           >
             <TextInput
-              placeholder="Rechercher"
+              placeholder={
+                hideDone ? "Non terminé" :
+                  "Rechercher"
+              }
               value={searchTerms}
               onChangeText={setSearchTerms}
               placeholderTextColor={theme.colors.text + "80"}
