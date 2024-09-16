@@ -30,6 +30,8 @@ import Reanimated, {
 } from "react-native-reanimated";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import AccountSwitcher from "@/components/Home/AccountSwitcher";
 import ContextMenu from "@/components/Home/AccountSwitcherContextMenu";
 import Header from "@/components/Home/Header";
@@ -104,6 +106,23 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
   const backdropStyle = backdropStyleAnim(translationY, headerHeight);
   const paddingTopItemStyle = paddingTopItemStyleAnim(translationY, insets, headerHeight, overHeaderHeight);
   const accountSwitcherStyle = accountSwitcherAnim(translationY, insets, headerHeight);
+
+  const [updatedRecently, setUpdatedRecently] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem("lastUpdate")
+      .then((value) => {
+        if (value) {
+          const currentVersion = PackageJSON.version;
+          if (value !== currentVersion) {
+            setUpdatedRecently(true);
+          }
+        }
+        else {
+          setUpdatedRecently(true);
+        }
+      });
+  }, []);
 
   const openAccSwitcher = useCallback(() => {
     scrollRef.current?.scrollTo({ y: headerHeight, animated: true });
@@ -448,32 +467,37 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                 style={[paddingTopItemStyle]}
               />
 
-              <NativeList animated>
-                <NativeItem
-                  leading={
-                    <Gift
-                      color={theme.colors.primary}
-                      size={28}
-                      strokeWidth={2}
-                    />
-                  }
-                  onPress={() => navigation.navigate("ChangelogScreen")}
-                  style={{
-                    backgroundColor: "#ffa200" + "20",
-                  }}
-                  androidStyle={{
-                    backgroundColor: "#ffa200" + "20",
-                  }}
+              {updatedRecently && (
+                <NativeList
+                  animated
+                  entering={animPapillon(FadeInUp)}
+                  exiting={animPapillon(FadeOutDown)}
                 >
-                  <NativeText variant="title">
-                    Papillon {PackageJSON.version} est arrivé !
-                  </NativeText>
-                  <NativeText variant="subtitle">
-                    Découvrez les nouveautés de cette nouvelle version en appuyant ici.
-                  </NativeText>
-                </NativeItem>
-              </NativeList>
-
+                  <NativeItem
+                    leading={
+                      <Gift
+                        color={theme.colors.primary}
+                        size={28}
+                        strokeWidth={2}
+                      />
+                    }
+                    onPress={() => navigation.navigate("ChangelogScreen")}
+                    style={{
+                      backgroundColor: "#ffa200" + "20",
+                    }}
+                    androidStyle={{
+                      backgroundColor: "#ffa200" + "20",
+                    }}
+                  >
+                    <NativeText variant="title">
+                      Papillon {PackageJSON.version} est arrivé !
+                    </NativeText>
+                    <NativeText variant="subtitle">
+                      Découvrez les nouveautés de cette nouvelle version en appuyant ici.
+                    </NativeText>
+                  </NativeItem>
+                </NativeList>
+              )}
 
               {!account.instance &&
                   <Reanimated.View
