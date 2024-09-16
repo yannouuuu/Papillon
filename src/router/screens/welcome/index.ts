@@ -35,7 +35,8 @@ export default [
   }),
   createScreen("ChangelogScreen", ChangelogScreen, {
     headerTitle: "Quoi de neuf ?",
-    presentation: "modal"
+    presentation: "modal",
+    headerLargeTitle: true,
   }),
 ] as const;
 

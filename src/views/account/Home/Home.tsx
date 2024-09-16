@@ -4,6 +4,7 @@ import {useCurrentAccount} from "@/stores/account";
 import getCorners from "@/utils/ui/corner-radius";
 import {useTheme} from "@react-navigation/native";
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
+import PackageJSON from "../../../../package.json";
 import {
   ActivityIndicator,
   Button,
@@ -44,7 +45,7 @@ import {
 } from "./Animations/HomeAnimations";
 
 import {NativeItem, NativeList, NativeText} from "@/components/Global/NativeComponents";
-import {WifiOff} from "lucide-react-native";
+import {Gift, Sparkles, WifiOff} from "lucide-react-native";
 
 import NetInfo from "@react-native-community/netinfo";
 import {getErrorTitle} from "@/utils/format/get_papillon_error_title";
@@ -447,10 +448,31 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                 style={[paddingTopItemStyle]}
               />
 
-              <Button
-                onPress={() => navigation.navigate("ChangelogScreen")}
-                title="force open ChangelogScreen"
-              />
+              <NativeList animated>
+                <NativeItem
+                  leading={
+                    <Gift
+                      color={theme.colors.primary}
+                      size={28}
+                      strokeWidth={2}
+                    />
+                  }
+                  onPress={() => navigation.navigate("ChangelogScreen")}
+                  style={{
+                    backgroundColor: "#ffa200" + "20",
+                  }}
+                  androidStyle={{
+                    backgroundColor: "#ffa200" + "20",
+                  }}
+                >
+                  <NativeText variant="title">
+                    Papillon {PackageJSON.version} est arrivé !
+                  </NativeText>
+                  <NativeText variant="subtitle">
+                    Découvrez les nouveautés de cette nouvelle version en appuyant ici.
+                  </NativeText>
+                </NativeItem>
+              </NativeList>
 
 
               {!account.instance &&

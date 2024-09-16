@@ -98,6 +98,7 @@ const ChangelogScreen = ({ route, navigation }) => {
           paddingTop: 0
         }
       ]}
+      contentInsetAdjustmentBehavior="automatic"
     >
       {loading && (
         <NativeList
