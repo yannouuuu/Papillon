@@ -11,7 +11,7 @@ import Reanimated, { LinearTransition } from "react-native-reanimated";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 
-const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
+const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }) => {
   const theme = useTheme();
   const [subjectData, setSubjectData] = useState(getSubjectData(homework.subject));
 
@@ -49,7 +49,7 @@ const HomeworkItem = ({ homework, onDonePressHandler, index, total }) => {
   return (
     <NativeItem
       animated
-      onPress={needsExpansion ? () => setExpanded(!expanded) : undefined}
+      onPress={() => navigation.navigate("HomeworksDocument", { homework })}
       chevron={false}
       key={homework.content}
       entering={FadeIn}

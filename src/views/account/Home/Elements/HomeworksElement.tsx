@@ -11,7 +11,7 @@ import { PapillonNavigation } from "@/router/refs";
 import RedirectButton from "@/components/Home/RedirectButton";
 import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 
-const HomeworksElement = () => {
+const HomeworksElement = ({ navigation }) => {
   const account = useCurrentAccount(store => store.account!);
   const homeworks = useHomeworkStore(store => store.homeworks);
 
@@ -49,6 +49,7 @@ const HomeworksElement = () => {
       <NativeList>
         {homeworks[dateToEpochWeekNumber(actualDay)]?.filter(hw => new Date(hw.due).getDate() === actualDay.getDate()).map((hw, index) => (
           <HomeworkItem
+            navigation={navigation}
             homework={hw}
             key={index}
             index={index}

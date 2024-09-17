@@ -501,7 +501,9 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                     entering={animPapillon(FadeInUp)}
                     exiting={animPapillon(FadeOutDown)}
                   >
-                    <Element />
+                    <Element
+                      navigation={navigation}
+                    />
                   </Reanimated.View>
                 ))}
               </Reanimated.View>

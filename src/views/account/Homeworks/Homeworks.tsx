@@ -206,6 +206,7 @@ const WeekView = ({ route, navigation }) => {
                 <HomeworkItem
                   key={homework.id}
                   index={idx}
+                  navigation={navigation}
                   total={groupedHomework[day].length}
                   homework={homework}
                   onDonePressHandler={async () => {
