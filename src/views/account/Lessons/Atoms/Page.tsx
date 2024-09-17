@@ -31,19 +31,23 @@ const getDuration = (minutes: number): string => {
   return `${durationHours} h ${lz(durationRemainingMinutes)} min`;
 };
 
-export const Page = ({ day, date, current, refreshAction, loading, weekExists }) => {
+export const Page = ({ day, date, current, paddingTop, refreshAction, loading, weekExists }) => {
   return (
     <ScrollView
       style={{
         flex: 1,
         width: "100%",
-        height: "100%"
+        height: "100%",
       }}
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingTop: paddingTop
+      }}
       refreshControl={
         <RefreshControl
           refreshing={loading}
           onRefresh={refreshAction}
+          progressViewOffset={paddingTop}
         />
       }
     >
