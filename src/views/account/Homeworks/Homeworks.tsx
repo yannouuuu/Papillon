@@ -70,7 +70,7 @@ const WeekView = ({ route, navigation }) => {
     const start = new Date(1970, 0, 0);
     const diff = now - start;
     const oneWeek = 1000 * 60 * 60 * 24 * 7;
-    return Math.floor(diff / oneWeek);
+    return Math.floor(diff / oneWeek) + 1;
   };
 
   const currentWeek = getCurrentWeekNumber();
