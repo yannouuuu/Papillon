@@ -24,7 +24,7 @@ import { BlurView } from "expo-blur";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { CalendarCheck, CalendarClock } from "lucide-react-native";
+import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, History, ListRestart, Loader, Plus, Rewind } from "lucide-react-native";
 
 const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
@@ -222,7 +222,7 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
           }}
         />
 
-        {pickerDate.getTime() !== today.getTime() &&
+        {(pickerDate.getTime() == today.getTime()) == false &&
         <Reanimated.View
           layout={animPapillon(LinearTransition)}
           entering={animPapillon(FadeInLeft).delay(100)}
@@ -260,6 +260,43 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
           </TouchableOpacity>
         </Reanimated.View>
         }
+
+        <Reanimated.View
+          layout={animPapillon(LinearTransition)}
+          entering={animPapillon(FadeInLeft).delay(100)}
+          exiting={animPapillon(FadeOutLeft)}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: theme.colors.background + "ff",
+            borderColor: theme.colors.border + "dd",
+            borderWidth: 1,
+            borderRadius: 800,
+            height: 40,
+            width: 40,
+            minWidth: 40,
+            minHeight: 40,
+            gap: 4,
+            shadowColor: "#00000022",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.6,
+            shadowRadius: 4,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              // set date to today
+              alert("Not implemented yet");
+            }}
+          >
+            <Plus
+              size={20}
+              color={theme.colors.text}
+              strokeWidth={2.5}
+              opacity={1}
+            />
+          </TouchableOpacity>
+        </Reanimated.View>
       </Reanimated.View>
 
       {outsideNav &&

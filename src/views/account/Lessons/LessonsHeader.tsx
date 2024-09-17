@@ -184,7 +184,10 @@ const LessonsDateModal: React.FC<LessonsDateModalProps> = ({
               locale="fr-FR"
               accentColor={colors.primary}
               onChange={(event, selectedDate) => {
-                onDateSelect(selectedDate);
+                const newSelectedDate = selectedDate || currentDate;
+                // set hours to 0
+                newSelectedDate.setHours(0, 0, 0, 0);
+                onDateSelect(newSelectedDate);
                 // setShowDatePicker(false);
               }}
             />
