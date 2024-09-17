@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
-import { Image, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Linking, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import PackageJSON from "../../../package.json";
 import datasets from "@/consts/datasets.json";
@@ -15,6 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { PressableScale } from "react-native-pressable-scale";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Feature {
   title: string;
@@ -46,6 +48,10 @@ const ChangelogScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
+  const acknowledgeUpdate = async () => {
+    AsyncStorage.setItem("changelog.lastUpdate", PackageJSON.version);
+  };
+
   useEffect(() => {
     if(!changelog) {
       setLoading(true);
@@ -56,6 +62,7 @@ const ChangelogScreen = ({ route, navigation }) => {
             setChangelog(json);
             setLoading(false);
             setNotFound(false);
+            acknowledgeUpdate();
           }
         })
         .catch((err) => {
@@ -68,6 +75,7 @@ const ChangelogScreen = ({ route, navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
+        Platform.OS == "ios" &&
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={{
@@ -206,6 +214,7 @@ const ChangelogScreen = ({ route, navigation }) => {
               {changelog.features.map((feature: Feature, index) => {
                 return (
                   <ChangelogFeature
+                    key={index}
                     feature={feature}
                     navigation={navigation}
                     theme={theme}
@@ -237,6 +246,7 @@ const ChangelogScreen = ({ route, navigation }) => {
               {changelog.bugfixes.map((feature: Feature, index) => {
                 return (
                   <ChangelogFeature
+                    key={index}
                     feature={feature}
                     navigation={navigation}
                     theme={theme}

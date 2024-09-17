@@ -110,7 +110,7 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
   const [updatedRecently, setUpdatedRecently] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem("lastUpdate")
+    AsyncStorage.getItem("changelog.lastUpdate")
       .then((value) => {
         if (value) {
           const currentVersion = PackageJSON.version;
