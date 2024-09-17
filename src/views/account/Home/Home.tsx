@@ -54,6 +54,7 @@ import {getErrorTitle} from "@/utils/format/get_papillon_error_title";
 import {Elements} from "./ElementIndex";
 import {animPapillon} from "@/utils/ui/animations";
 import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
+import { useFlagsStore } from "@/stores/flags";
 
 let headerHeight = Dimensions.get("window").height / 2.75;
 if (headerHeight < 275) {
@@ -108,6 +109,7 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
   const accountSwitcherStyle = accountSwitcherAnim(translationY, insets, headerHeight);
 
   const [updatedRecently, setUpdatedRecently] = useState(false);
+  const defined = useFlagsStore(state => state.defined);
 
   useEffect(() => {
     AsyncStorage.getItem("changelog.lastUpdate")
@@ -467,7 +469,7 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                 style={[paddingTopItemStyle]}
               />
 
-              {updatedRecently && (
+              {(defined("force_changelog") || updatedRecently) && (
                 <NativeList
                   animated
                   entering={animPapillon(FadeInUp)}
