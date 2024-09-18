@@ -11,10 +11,10 @@ import { AccountService } from "@/stores/account/types";
 import { updateTimetableForWeekInCache } from "@/services/timetable";
 import { Page } from "./Atoms/Page";
 import { LessonsDateModal } from "./LessonsHeader";
-import { set } from "lodash";
+import { set, size } from "lodash";
 import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 
-import Reanimated, { FadeIn, FadeInDown, FadeInLeft, FadeOut, FadeOutLeft, FadeOutRight, FadeOutUp, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
+import Reanimated, { FadeIn, FadeInDown, FadeInLeft, FadeOut, FadeOutDown, FadeOutLeft, FadeOutRight, FadeOutUp, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
@@ -25,6 +25,7 @@ import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, History, ListRestart, Loader, Plus, Rewind } from "lucide-react-native";
+import { PapillonHeaderAction, PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
 
 const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
@@ -110,34 +111,9 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
         flex: 1,
       }}
     >
-      <LinearGradient
-        colors={[theme.colors.background + "ff", theme.colors.background + "00"]}
-        locations={[0.5, 1]}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: outsideNav ? 70 : insets.top + 70,
-          zIndex: 90,
-        }}
-      />
 
-      <Reanimated.View
-        style={[{
-          paddingHorizontal: 16,
-          paddingVertical: 8,
-          position: "absolute",
-          left: 0,
-          top: outsideNav ? 24 : insets.top,
-          zIndex: 100,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 8,
-        }]}
-        layout={animPapillon(LinearTransition)}
-      >
+
+      <PapillonModernHeader outsideNav={outsideNav}>
         <Reanimated.View
           layout={animPapillon(LinearTransition)}
         >
@@ -223,96 +199,25 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
         />
 
         {(pickerDate.getTime() == today.getTime()) == false &&
-        <Reanimated.View
-          layout={animPapillon(LinearTransition)}
-          entering={animPapillon(FadeInLeft).delay(100)}
-          exiting={animPapillon(FadeOutLeft)}
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: theme.colors.background + "ff",
-            borderColor: theme.colors.border + "dd",
-            borderWidth: 1,
-            borderRadius: 800,
-            height: 40,
-            width: 40,
-            minWidth: 40,
-            minHeight: 40,
-            gap: 4,
-            shadowColor: "#00000022",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.6,
-            shadowRadius: 4,
-          }}
-        >
-          <TouchableOpacity
+          <PapillonHeaderAction
+            icon={<CalendarClock />}
             onPress={() => {
               // set date to today
               setSelectedDate(new Date(today));
             }}
-          >
-            <CalendarClock
-              size={20}
-              color={theme.colors.text}
-              strokeWidth={2.5}
-              opacity={1}
-            />
-          </TouchableOpacity>
-        </Reanimated.View>
+            entering={animPapillon(ZoomIn)}
+            exiting={FadeOut.duration(130)}
+          />
         }
 
-        <Reanimated.View
-          layout={animPapillon(LinearTransition)}
-          entering={animPapillon(FadeInLeft).delay(100)}
-          exiting={animPapillon(FadeOutLeft)}
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: theme.colors.background + "ff",
-            borderColor: theme.colors.border + "dd",
-            borderWidth: 1,
-            borderRadius: 800,
-            height: 40,
-            width: 40,
-            minWidth: 40,
-            minHeight: 40,
-            gap: 4,
-            shadowColor: "#00000022",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.6,
-            shadowRadius: 4,
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              // set date to today
-              alert("Not implemented yet");
-            }}
-          >
-            <Plus
-              size={20}
-              color={theme.colors.text}
-              strokeWidth={2.5}
-              opacity={1}
-            />
-          </TouchableOpacity>
-        </Reanimated.View>
-      </Reanimated.View>
-
-      {outsideNav &&
-        <View
-          style={{
-            position: "absolute",
-            top: 10,
-            alignSelf: "center",
-            height: 5,
-            width: 50,
-            backgroundColor: theme.colors.text + "22",
-            borderRadius: 80,
-            zIndex: 10000,
+        <PapillonHeaderAction
+          icon={<Plus />}
+          onPress={() => {
+            // set date to today
+            alert("Not implemented yet");
           }}
         />
-      }
+      </PapillonModernHeader>
 
       <InfiniteDatePager
         initialDate={selectedDate}
