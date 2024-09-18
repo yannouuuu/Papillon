@@ -161,17 +161,17 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                       <PapillonAvatar
                         source={account.personalization.profilePictureB64 ? { uri: account.personalization.profilePictureB64 } : defaultProfilePicture(account.service)}
                         badgeOffset={4}
-                        badge={account.service !== AccountService.Local &&
-                        <Image
-                          source={defaultProfilePicture(account.service)}
-                          style={{
-                            width: 22,
-                            height: 22,
-                            borderRadius: 12,
-                            borderColor: theme.colors.card,
-                            borderWidth: 2,
-                          }}
-                        />
+                        badge={
+                          <Image
+                            source={defaultProfilePicture(account.service, account.identityProvider && account.identityProvider.name)}
+                            style={{
+                              width: 22,
+                              height: 22,
+                              borderRadius: 12,
+                              borderColor: theme.colors.card,
+                              borderWidth: 2,
+                            }}
+                          />
                         }
                       />
                     }
@@ -189,7 +189,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                     }}
                   >
                     <NativeText variant="title" numberOfLines={1}>
-                      {account.name}
+                      {account.studentName.first} {account.studentName.last}
                     </NativeText>
                     <NativeText variant="subtitle" numberOfLines={1}>
                       {account.schoolName ?
