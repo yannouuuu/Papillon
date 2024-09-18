@@ -5,6 +5,7 @@ import { error } from "@/utils/logger/logger";
 import { translateToWeekNumber } from "pawnote";
 import { pronoteFirstDate } from "./pronote/timetable";
 import { dateToEpochWeekNumber, epochWNToPronoteWN } from "@/utils/epochWeekNumber";
+import { checkIfSkoSupported } from "./skolengo/default-personalization";
 
 /**
  * Updates the state and cache for the homework of given week number.
@@ -17,6 +18,16 @@ export async function updateHomeworkForWeekInCache <T extends Account> (account:
       case AccountService.Pronote: {
         const { getHomeworkForWeek } = await import("./pronote/homework");
         const weekNumber = translateToWeekNumber(date, account.instance?.instance.firstDate || pronoteFirstDate);
+        homeworks = await getHomeworkForWeek(account, weekNumber);
+        break;
+      }
+      case AccountService.Skolengo: {
+        if(!checkIfSkoSupported(account, "Homeworks")) {
+          error("[updateHomeworkForWeekInCache]: This Skolengo instance doesn't support Homeworks.", "skolengo");
+          break;
+        }
+        const { getHomeworkForWeek } = await import("./skolengo/data/homework");
+        const weekNumber = dateToEpochWeekNumber(date);
         homeworks = await getHomeworkForWeek(account, weekNumber);
         break;
       }
