@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { Check, ChevronDown, ChevronUp } from "lucide-react-native";
+import { Check, ChevronDown, ChevronUp, FileText, Paperclip } from "lucide-react-native";
 import parse_homeworks from "@/utils/format/format_pronote_homeworks";
 import { getSubjectData } from "@/services/shared/Subject";
 import { useTheme } from "@react-navigation/native";
@@ -92,6 +92,38 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
               {parsedContent}
             </NativeText>
           </Reanimated.View>
+
+          {homework.attachments.length > 0 && (
+            <Reanimated.View
+              layout={animPapillon(LinearTransition)}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                marginTop: 4,
+                borderWidth: 1,
+                alignSelf: "flex-start",
+                borderColor: theme.colors.text + "33",
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                borderRadius: 8,
+                borderCurve: "continuous",
+              }}
+            >
+              <Paperclip
+                size={18}
+                strokeWidth={2.5}
+                opacity={0.6}
+                color={theme.colors.text}
+              />
+              <NativeText variant="subtitle" numberOfLines={1}>
+                {homework.attachments.length > 1 ?
+                  `${homework.attachments.length} pièces jointes` :
+                  homework.attachments[0].name
+                }
+              </NativeText>
+            </Reanimated.View>
+          )}
         </Reanimated.View>
         {needsExpansion && (
           <TouchableOpacity
