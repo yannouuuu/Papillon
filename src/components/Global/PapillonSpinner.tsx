@@ -9,7 +9,7 @@ import { Check } from "lucide-react-native";
 import * as Haptics from "expo-haptics";
 import { animPapillon } from "@/utils/ui/animations";
 
-const PapillonSpinner = ({ size = 50, color = "#000000", strokeWidth = 4, style, entering, exiting }) => {
+const PapillonSpinner = ({ size = 50, color = "#000000", strokeWidth = 4, style, entering, exiting, animated = true }) => {
   const animatedValue = useRef(new Animated.Value(0));
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const PapillonSpinner = ({ size = 50, color = "#000000", strokeWidth = 4, style,
   return (
     <Reanimated.View
       style={style}
-      layout={animPapillon(LinearTransition)}
+      layout={animated && animPapillon(LinearTransition)}
       entering={entering}
       exiting={exiting}
     >
