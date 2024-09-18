@@ -1,6 +1,7 @@
 import { AddonPlacementManifest } from "@/addons/types";
 import type { Chat } from "@/services/shared/Chat";
 import type { Grade } from "@/services/shared/Grade";
+import { Homework } from "@/services/shared/Homework";
 import type { AccountService } from "@/stores/account/types";
 import { Log } from "@/utils/logger/logger";
 import type { CurrentPosition } from "@/utils/native/location";
@@ -56,7 +57,9 @@ export type RouteParameters = {
   HomeScreen?: { onboard: boolean };
   NoteReaction: undefined;
   Lessons?: { outsideNav?: boolean };
+
   Homeworks?: { outsideNav?: boolean };
+  HomeworksDocument: { homework: Homework };
 
   News?: { outsideNav?: boolean };
   NewsItem: undefined;
