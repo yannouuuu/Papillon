@@ -35,9 +35,9 @@ const HomeworksElement = ({ navigation }) => {
     [account, updateHomeworks]
   );
 
-  // if (!homeworks[dateToEpochWeekNumber(actualDay)] || homeworks[dateToEpochWeekNumber(actualDay)]?.filter(hw => new Date(hw.due).getDate() === actualDay.getDate()).length === 0) {
-  //   return null;
-  // }
+  if (!homeworks[dateToEpochWeekNumber(actualDay)] || homeworks[dateToEpochWeekNumber(actualDay)]?.filter(hw => new Date(hw.due).getDate() === actualDay.getDate()).length === 0) {
+    return null;
+  }
   const startTime = Date.now() / 1000; // Convertir en millisecondes
   const endTime = startTime + 7 * 24 * 60 * 60 * 1000; // Ajouter 7 jours en millisecondes
 
