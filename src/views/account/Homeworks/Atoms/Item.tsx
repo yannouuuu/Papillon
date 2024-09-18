@@ -106,8 +106,9 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
                 borderColor: theme.colors.text + "33",
                 paddingHorizontal: 8,
                 paddingVertical: 4,
-                borderRadius: 8,
+                borderRadius: 9,
                 borderCurve: "continuous",
+                marginRight: 16,
               }}
             >
               <Paperclip
