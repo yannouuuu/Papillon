@@ -50,6 +50,7 @@ import {getErrorTitle} from "@/utils/format/get_papillon_error_title";
 import {Elements} from "./ElementIndex";
 import {animPapillon} from "@/utils/ui/animations";
 import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
+import InsetsBottomView from "@/components/Global/InsetsBottomView";
 
 let headerHeight = Dimensions.get("window").height / 2.75;
 if (headerHeight < 275) {
@@ -490,7 +491,6 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                 </Reanimated.View>
               }
 
-
               <Reanimated.View
                 layout={animPapillon(LinearTransition)}
               >
@@ -507,6 +507,8 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                   </Reanimated.View>
                 ))}
               </Reanimated.View>
+
+              <InsetsBottomView />
             </Reanimated.View>
           )}
         </Reanimated.View>
