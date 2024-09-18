@@ -16,7 +16,8 @@ interface PapillonPickerProps {
   data: string[]
   selected: string
   contentContainerStyle?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>
-  delay?: number
+  delay?: number,
+  direction?: "left" | "right"
   onSelectionChange?: (item: string) => unknown
 }
 
@@ -26,6 +27,7 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
   selected,
   contentContainerStyle,
   delay,
+  direction = "left",
   onSelectionChange,
 }) => {
   const theme = useTheme();
@@ -64,6 +66,11 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
         <Reanimated.View
           style={[
             styles.picker,
+            direction === "left" ? {
+              left: 0,
+            } : {
+              right: 0,
+            },
             {
               backgroundColor: Platform.OS === "ios" ? theme.colors.card + 50 : theme.colors.card,
               borderColor: theme.colors.text + "35",
@@ -135,7 +142,6 @@ const styles = StyleSheet.create({
   picker: {
     position: "absolute",
     top: 0,
-    right: 0,
     borderWidth: 0.5,
     zIndex: 10000000000,
 

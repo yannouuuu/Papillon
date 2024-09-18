@@ -23,6 +23,7 @@ export const screens = [
   }),
   createScreen("Homeworks", Homeworks, {
     headerTitle: "Devoirs",
+    headerShown: false,
     tabBarLabel: "Devoirs",
     tabBarLottie: require("@/../assets/lottie/tab_book_2.json"),
   }),
