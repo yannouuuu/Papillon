@@ -169,14 +169,6 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
             exiting={FadeOut.duration(130)}
           />
         }
-
-        <PapillonHeaderAction
-          icon={<Plus />}
-          onPress={() => {
-            // set date to today
-            alert("Not implemented yet");
-          }}
-        />
       </PapillonModernHeader>
 
       <InfiniteDatePager
