@@ -138,6 +138,7 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 paddingHorizontal: 20,
+                backgroundColor: theme.colors.card,
               }}
             >
               <ActivityIndicator
@@ -187,16 +188,20 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                 zIndex: 1,
               },
             ]}
-            onShouldStartLoadWithRequest={(e) => !(e.url.includes(REDIRECT_URI))}
-            source={{ uri: pageUrl || "" }}
-            setSupportMultipleWindows={false}
-            onError={(e) => console.error("Skolengo webview error", e)}
-            onLoadEnd={(e) => {
-              if(e.nativeEvent.url.includes(REDIRECT_URI)) {
-                const url = new URL(e.nativeEvent.url);
+            onHttpError={() => setShowWebView(false)}
+            onShouldStartLoadWithRequest={(e) => {
+              if (e.url.startsWith("http://") || e.url.startsWith("https://")) {
+                if (!showWebView) setShowWebView(true);
+                return true;
+              }
+
+              if (e.url.includes(REDIRECT_URI)) {
+                setShowWebView(false);
+                const url = new URL(e.url);
                 const code = url.searchParams.get("code");
-                if(!code || !discovery)
-                  return showAlert({
+
+                if (!code || !discovery) {
+                  showAlert({
                     title: "Erreur",
                     message: "Impossible de récupérer le code d'authentification.",
                     actions: [
@@ -206,7 +211,10 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                       }
                     ]
                   });
-                setShowWebView(false);
+
+                  return false;
+                }
+
                 setLoginStep("Récupératon du token d'authentification...");
                 AuthSession.exchangeCodeAsync(
                   {
@@ -218,16 +226,18 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                   discovery!
                 ).then(async (token) => {
                   setLoginStep("Initialisation du compte...");
-                  setShowWebView(false);
-                  const newTok = authTokenToSkolengoTokenSet(token);
-                  // need that if the user have ressources from Pronote
+                  const newToken = authTokenToSkolengoTokenSet(token);
+
+                  // Need that if the user have ressources from PRONOTE
                   await wait(1000);
+
                   setLoginStep("Obtention du compte...");
                   const skolengoAccount = await getSkolengoAccount({
                     school: route.params.school,
-                    tokenSet: newTok,
+                    tokenSet: newToken,
                     discovery: discovery!
                   });
+
                   setLoginStep("Finalisation du compte...");
                   createStoredAccount(skolengoAccount);
                   switchTo(skolengoAccount);
@@ -242,11 +252,14 @@ const SkolengoWebview: Screen<"SkolengoWebview"> = ({ route, navigation }) => {
                     });
                   });
                 });
-              } else if(!showWebView) {
-                setShowWebView(true);
               }
+
+              return true;
             }}
-            //incognito={true} // prevent to keep cookies on webview load
+            source={{ uri: pageUrl || "" }}
+            setSupportMultipleWindows={false}
+            originWhitelist={["http://*", "https://*", "skoapp-prod://*"]}
+            incognito={true} // Prevent to keep cookies on webview load.
             userAgent="Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Mobile Safari/537.36"
           />
         </View>
