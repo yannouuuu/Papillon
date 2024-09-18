@@ -68,7 +68,9 @@ const WeekView = ({ route, navigation }) => {
   // Function to get the current week number since epoch
   const getCurrentWeekNumber = () => {
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
     const start = new Date(1970, 0, 0);
+    start.setHours(0, 0, 0, 0);
     const diff = now - start;
     const oneWeek = 1000 * 60 * 60 * 24 * 7;
     return Math.floor(diff / oneWeek) + 1;
