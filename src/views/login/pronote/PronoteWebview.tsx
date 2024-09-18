@@ -381,7 +381,8 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                     webViewRef.current?.injectJavaScript(INJECT_PRONOTE_CURRENT_LOGIN_STATE);
                   }, 250);*/
                 }
-                else {
+
+                if (url.split("?")[0].includes("mobile.eleve.html") == false) {
                   setShowWebView(true);
                 }
               }
