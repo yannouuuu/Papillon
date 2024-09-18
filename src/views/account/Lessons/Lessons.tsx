@@ -25,7 +25,7 @@ import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, History, ListRestart, Loader, Plus, Rewind } from "lucide-react-native";
-import { PapillonHeaderAction, PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
+import { PapillonHeaderAction, PapillonHeaderSelector, PapillonHeaderSeparator, PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
 
 const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
@@ -111,92 +111,52 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
         flex: 1,
       }}
     >
-
-
       <PapillonModernHeader outsideNav={outsideNav}>
-        <Reanimated.View
-          layout={animPapillon(LinearTransition)}
+        <PapillonHeaderSelector
+          loading={loading}
+          onPress={() => setShowDatePicker(true)}
         >
-          <PressableScale
-            style={[styles.weekPickerContainer]}
-            onPress={() => setShowDatePicker(true)}
+          <Reanimated.View
+            layout={animPapillon(LinearTransition)}
           >
             <Reanimated.View
-              layout={animPapillon(LinearTransition)}
-              style={[{
-                backgroundColor: theme.colors.text + 16,
-                overflow: "hidden",
-                borderRadius: 80,
-              }]}
+              key={pickerDate.toLocaleDateString("fr-FR", { weekday: "short" })}
+              entering={FadeIn.duration(150)}
+              exiting={FadeOut.duration(150)}
             >
-              <BlurView
-                style={[styles.weekPicker, {
-                  backgroundColor: "transparent",
-                }]}
-                tint={theme.dark ? "dark" : "light"}
-              >
-                <Reanimated.View
-                  layout={animPapillon(LinearTransition)}
-                >
-                  <Reanimated.View
-                    key={pickerDate.toLocaleDateString("fr-FR", { weekday: "short" })}
-                    entering={FadeIn.duration(150)}
-                    exiting={FadeOut.duration(150)}
-                  >
-                    <Reanimated.Text style={[styles.weekPickerText, styles.weekPickerTextIntl,
-                      {
-                        color: theme.colors.text,
-                      }
-                    ]}
-                    >
-                      {pickerDate.toLocaleDateString("fr-FR", { weekday: "long" })}
-                    </Reanimated.Text>
-                  </Reanimated.View>
-                </Reanimated.View>
-
-
-                <AnimatedNumber
-                  value={pickerDate.getDate().toString()}
-                  style={[styles.weekPickerText, styles.weekPickerTextNbr,
-                    {
-                      color: theme.colors.text,
-                    }
-                  ]}
-                />
-
-                <Reanimated.Text style={[styles.weekPickerText, styles.weekPickerTextIntl,
-                  {
-                    color: theme.colors.text,
-                  }
-                ]}
-                layout={animPapillon(LinearTransition)}
-                >
-                  {pickerDate.toLocaleDateString("fr-FR", { month: "long" })}
-                </Reanimated.Text>
-
-                {loading &&
-                  <PapillonSpinner
-                    size={18}
-                    color={theme.colors.text}
-                    strokeWidth={2.8}
-                    entering={animPapillon(ZoomIn)}
-                    exiting={animPapillon(ZoomOut)}
-                    style={{
-                      marginLeft: 5,
-                    }}
-                  />
+              <Reanimated.Text style={[styles.weekPickerText, styles.weekPickerTextIntl,
+                {
+                  color: theme.colors.text,
                 }
-              </BlurView>
+              ]}
+              >
+                {pickerDate.toLocaleDateString("fr-FR", { weekday: "long" })}
+              </Reanimated.Text>
             </Reanimated.View>
-          </PressableScale>
-        </Reanimated.View>
+          </Reanimated.View>
 
-        <Reanimated.View
+
+          <AnimatedNumber
+            value={pickerDate.getDate().toString()}
+            style={[styles.weekPickerText, styles.weekPickerTextNbr,
+              {
+                color: theme.colors.text,
+              }
+            ]}
+          />
+
+          <Reanimated.Text style={[styles.weekPickerText, styles.weekPickerTextIntl,
+            {
+              color: theme.colors.text,
+            }
+          ]}
           layout={animPapillon(LinearTransition)}
-          style={{
-            flex: 1
-          }}
-        />
+          >
+            {pickerDate.toLocaleDateString("fr-FR", { month: "long" })}
+          </Reanimated.Text>
+        </PapillonHeaderSelector>
+
+        <PapillonHeaderSeparator />
 
         {(pickerDate.getTime() == today.getTime()) == false &&
           <PapillonHeaderAction

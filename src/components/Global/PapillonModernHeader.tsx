@@ -26,7 +26,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, History, ListRestart, Loader, Plus, Rewind } from "lucide-react-native";
 
-export const PapillonModernHeader: React.FC = ({ children, outsideNav }) => {
+export const PapillonModernHeader: React.FC<{
+  children: React.ReactNode,
+  outsideNav?: boolean,
+}> = ({ children, outsideNav }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -116,6 +119,8 @@ export const PapillonHeaderAction: React.FC<{
       exiting={exiting && exiting}
     >
       <PressableScale
+        activeScale={0.85}
+        weight="light"
         onPress={onPress}
         style={[{
           alignItems: "center",
@@ -137,6 +142,73 @@ export const PapillonHeaderAction: React.FC<{
       >
         {newIcon}
         {children}
+      </PressableScale>
+    </Reanimated.View>
+  );
+};
+
+export const PapillonHeaderSeparator: React.FC = () => {
+  return (
+    <Reanimated.View
+      layout={animPapillon(LinearTransition)}
+      style={{
+        flex: 1
+      }}
+    />
+  );
+};
+
+export const PapillonHeaderSelector: React.FC<{
+  children: React.ReactNode,
+  onPress?: () => void,
+  onLongPress?: () => void,
+  loading?: boolean,
+}> = ({
+  children,
+  onPress,
+  onLongPress,
+  loading = false,
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Reanimated.View
+      layout={animPapillon(LinearTransition)}
+    >
+      <PressableScale
+        onPress={onPress}
+        onLongPress={onLongPress}
+      >
+        <Reanimated.View
+          layout={animPapillon(LinearTransition)}
+          style={[{
+            backgroundColor: theme.colors.text + 16,
+            overflow: "hidden",
+            borderRadius: 80,
+          }]}
+        >
+          <BlurView
+            style={[styles.weekPicker, {
+              backgroundColor: "transparent",
+            }]}
+            tint={theme.dark ? "dark" : "light"}
+          >
+            {children}
+
+            {loading &&
+              <PapillonSpinner
+                size={18}
+                color={theme.colors.text}
+                strokeWidth={2.8}
+                entering={animPapillon(ZoomIn)}
+                exiting={animPapillon(ZoomOut)}
+                style={{
+                  marginLeft: 5,
+                }}
+              />
+            }
+          </BlurView>
+        </Reanimated.View>
       </PressableScale>
     </Reanimated.View>
   );
