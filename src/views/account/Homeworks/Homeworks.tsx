@@ -22,6 +22,7 @@ import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import MissingItem from "@/components/Global/MissingItem";
+import { PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
 
 type HomeworksPageProps = {
   index: number;
@@ -310,46 +311,7 @@ const WeekView = ({ route, navigation }) => {
 
   return (
     <View>
-      <LinearGradient
-        pointerEvents="none"
-        colors={[theme.colors.background + "ff", theme.colors.background + "00"]}
-        locations={[0.5, 1]}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: outsideNav ? 100 : insets.top + 100,
-          zIndex: 90,
-        }}
-      />
-
-      {outsideNav &&
-        <View
-          style={{
-            position: "absolute",
-            top: 10,
-            alignSelf: "center",
-            height: 5,
-            width: 50,
-            backgroundColor: theme.colors.text + "22",
-            borderRadius: 80,
-            zIndex: 10000,
-          }}
-        />
-      }
-
-      <Reanimated.View
-        style={[styles.header, {
-          top: outsideNav ? 24 : insets.top,
-          zIndex: 100,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 8,
-        }]}
-        layout={animPapillon(LinearTransition)}
-      >
+      <PapillonModernHeader outsideNav={outsideNav}>
         {showPickerButtons && !searchHasFocus &&
           <Reanimated.View
             layout={animPapillon(LinearTransition)}
@@ -653,7 +615,7 @@ const WeekView = ({ route, navigation }) => {
           </TouchableOpacity>
           }
         </Reanimated.View>
-      </Reanimated.View>
+      </PapillonModernHeader>
 
       <FlatList
         ref={flatListRef}
