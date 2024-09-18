@@ -36,7 +36,7 @@ export const PapillonModernHeader: React.FC<{
   return (
     <>
       <LinearGradient
-        colors={[theme.colors.background + "ff", theme.colors.background + "00"]}
+        colors={[theme.colors.background + "EE", theme.colors.background + "00"]}
         locations={[0.5, 1]}
         style={{
           position: "absolute",
