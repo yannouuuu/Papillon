@@ -2,7 +2,7 @@ import { WidgetProps } from "@/components/Home/Widget";
 import WidgetHeader from "@/components/Home/WidgetHeader";
 import ColorIndicator from "@/components/Lessons/ColorIndicator";
 import { getSubjectData } from "@/services/shared/Subject";
-import { TimetableClass } from "@/services/shared/Timetable";
+import { TimetableClass, TimetableClassStatus } from "@/services/shared/Timetable";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { useTheme } from "@react-navigation/native";
@@ -36,7 +36,7 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
     const allCourses = Object.values(timetables).flat();
 
     let updatedNextCourse = allCourses
-      .filter(c => c.endTimestamp > today && c.status !== "Cours annulé")
+      .filter(c => c.endTimestamp > today && c.status !== TimetableClassStatus.CANCELED)
       .sort((a, b) => a.startTimestamp - b.startTimestamp)[0];
 
     setNextCourse(updatedNextCourse);
