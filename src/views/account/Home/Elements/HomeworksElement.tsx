@@ -66,6 +66,7 @@ const HomeworksElement = ({ navigation }) => {
             homework={hw}
             key={index}
             index={index}
+            navigation={navigation}
             total={homeworks[dateToEpochWeekNumber(actualDay) + 1].length}
             onDonePressHandler={() => {
               handleDonePress(hw);
