@@ -140,12 +140,13 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
             refreshing={isRefreshing}
             onRefresh={() => setIsRefreshing(true)}
             colors={Platform.OS === "android" ? [theme.colors.primary] : void 0}
-            progressViewOffset={outsideNav ? 42 : insets.top + 42}
+            progressViewOffset={outsideNav ? 72 : insets.top + 56}
           />
         }
         contentContainerStyle={{
-          paddingTop: outsideNav ? 42 : insets.top + 42,
+          paddingTop: outsideNav ? 64 : insets.top + 42,
         }}
+        scrollIndicatorInsets={{ top: outsideNav ? 64 : insets.top + 16 }}
       >
         <Suspense fallback={<ActivityIndicator />}>
           <View style={{ padding: 16, overflow: "visible", paddingTop: 0, paddingBottom: 16 + insets.bottom }}>
