@@ -11,6 +11,7 @@ import GradeDocument from "@/views/account/Grades/Document";
 import RestaurantHistory from "@/views/account/Restaurant/Modals/History";
 import ChatCreate from "@/views/account/Chat/Modals/ChatCreate";
 import Chat from "@/views/account/Chat/Modals/Chat";
+import HomeworksDocument from "@/views/account/Homeworks/Document";
 
 export default [
   createScreen("NoteReaction", NoteReaction, {
@@ -41,6 +42,10 @@ export default [
   }),
   createScreen("AddonPage", AddonPage, {
     headerTitle: "Extension",
+  }),
+  createScreen("HomeworksDocument", HomeworksDocument, {
+    headerTitle: "Devoir",
+    presentation: "modal",
   }),
   createScreen("GradeSubject", GradeSubjectScreen, {
     headerTitle: "Détail de la matière",

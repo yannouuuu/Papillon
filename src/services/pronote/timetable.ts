@@ -1,5 +1,5 @@
 import type { PronoteAccount } from "@/stores/account/types";
-import type { Timetable, TimetableClass } from "../shared/Timetable";
+import { TimetableClassStatus, type Timetable, type TimetableClass } from "../shared/Timetable";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import pronote from "pawnote";
 import { info } from "@/utils/logger/logger";
@@ -20,7 +20,7 @@ const decodeTimetableClass = (c: pronote.TimetableClassLesson | pronote.Timetabl
       title: c.subject!.name,
       room: c.classrooms.join(", ") || void 0,
       teacher: c.teacherNames?.join(", ") ?? void 0,
-      status: c.status,
+      status: c.status === "Cours annulé" || c.status === "Prof. absent" || c.status === "Classe absente" || c.status === "Prof./pers. absent" || c.status === "Sortie pédagogique" ? TimetableClassStatus.CANCELED : void 0,
       ...base
     } satisfies TimetableClass;
   }

@@ -62,7 +62,6 @@ export const useCurrentAccount = create<CurrentAccountStore>()((set, get) => ({
 
   switchTo: async (account) => {
     log(`reading ${account.name}`, "switchTo");
-
     set({ account });
     useAccounts.setState({ lastOpenedAccountID: account.localID });
 

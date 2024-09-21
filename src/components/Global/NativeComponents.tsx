@@ -354,6 +354,9 @@ interface NativeTextProps {
   style?: StyleProp<TextStyle>;
   numberOfLines?: number;
   ellipsizeMode?: "head" | "middle" | "tail" | "clip";
+  animated?: boolean;
+  entering?: EntryOrExitLayoutType;
+  exiting?: EntryOrExitLayoutType;
 }
 
 export const NativeText: React.FC<NativeTextProps> = (props) => {
@@ -401,16 +404,19 @@ export const NativeText: React.FC<NativeTextProps> = (props) => {
   }
 
   return (
-    <Text
+    <Reanimated.Text
       {...props}
       style={[{
         fontFamily: "medium",
         fontSize: 16,
         color: props.color || colors.text,
       }, fontStyle, props.style]}
+      layout={props.animated && animPapillon(LinearTransition)}
+      entering={props.entering}
+      exiting={props.exiting}
     >
       {props.children}
-    </Text>
+    </Reanimated.Text>
   );
 };
 

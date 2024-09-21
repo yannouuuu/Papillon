@@ -15,11 +15,13 @@ import Reanimated, {
   FadeInUp,
   FadeOutUp,
   LinearTransition,
+  ZoomIn,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { animPapillon } from "@/utils/ui/animations";
 import { Screen } from "@/router/helpers/types";
 import { AccountService } from "@/stores/account/types";
+import PapillonSpinner from "@/components/Global/PapillonSpinner";
 
 const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
   const theme = useTheme();
@@ -32,7 +34,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
 
   const accounts = useAccounts((store) => store.accounts);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(null);
 
   useEffect(() => {
     void async function () {
@@ -125,27 +127,6 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
       </Reanimated.View>
 
       <Reanimated.ScrollView>
-        {loading && (
-          <NativeList
-            animated
-            entering={animPapillon(FadeInUp)}
-            exiting={animPapillon(FadeOutUp)}
-          >
-            <NativeItem
-              trailing={<ActivityIndicator />}
-              animated
-              style={{
-                paddingVertical: 2,
-                paddingHorizontal: 4,
-              }}
-            >
-              <NativeText variant="subtitle">
-                Chargement de vos données...
-              </NativeText>
-            </NativeItem>
-          </NativeList>
-        )}
-
         {accounts.filter((account) => !account.isExternal).length > 0 && (
           <Reanimated.View
             entering={animPapillon(FadeInDown)}
@@ -161,25 +142,36 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                       <PapillonAvatar
                         source={account.personalization.profilePictureB64 ? { uri: account.personalization.profilePictureB64 } : defaultProfilePicture(account.service)}
                         badgeOffset={4}
-                        badge={account.service !== AccountService.Local &&
-                        <Image
-                          source={defaultProfilePicture(account.service)}
-                          style={{
-                            width: 22,
-                            height: 22,
-                            borderRadius: 12,
-                            borderColor: theme.colors.card,
-                            borderWidth: 2,
-                          }}
-                        />
+                        badge={
+                          <Image
+                            source={defaultProfilePicture(account.service, account.identityProvider && account.identityProvider.name)}
+                            style={{
+                              width: 22,
+                              height: 22,
+                              borderRadius: 12,
+                              borderColor: theme.colors.card,
+                              borderWidth: 2,
+                            }}
+                          />
                         }
                       />
                     }
+                    trailing={
+                      loading === account.localID && (
+                        <PapillonSpinner
+                          size={24}
+                          strokeWidth={3.5}
+                          color={theme.colors.primary}
+                          animated
+                          entering={animPapillon(ZoomIn)}
+                        />
+                      )
+                    }
                     onPress={async () => {
                       if (currentAccount?.localID !== account.localID) {
-                        setLoading(true);
+                        setLoading(account.localID);
                         await switchTo(account);
-                        setLoading(false);
+                        setLoading(null);
                       }
 
                       navigation.reset({
@@ -188,17 +180,27 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                       });
                     }}
                   >
-                    <NativeText variant="title" numberOfLines={1}>
-                      {account.name}
-                    </NativeText>
-                    <NativeText variant="subtitle" numberOfLines={1}>
-                      {account.schoolName ?
-                        account.schoolName :
-                        account.identityProvider ?
-                          account.identityProvider.name :
-                          "Compte local"
-                      }
-                    </NativeText>
+                    <Reanimated.View
+                      style={{
+                        flex: 1,
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        gap: 3,
+                      }}
+                      layout={animPapillon(LinearTransition)}
+                    >
+                      <NativeText animated variant="title" numberOfLines={1}>
+                        {account.studentName.first} {account.studentName.last}
+                      </NativeText>
+                      <NativeText animated variant="subtitle" numberOfLines={1}>
+                        {account.schoolName ?
+                          account.schoolName :
+                          account.identityProvider ?
+                            account.identityProvider.name :
+                            "Compte local"
+                        }
+                      </NativeText>
+                    </Reanimated.View>
                   </NativeItem>
                 );
               })}

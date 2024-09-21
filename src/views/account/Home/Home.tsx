@@ -55,6 +55,7 @@ import {Elements} from "./ElementIndex";
 import {animPapillon} from "@/utils/ui/animations";
 import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
 import { useFlagsStore } from "@/stores/flags";
+import InsetsBottomView from "@/components/Global/InsetsBottomView";
 
 let headerHeight = Dimensions.get("window").height / 2.75;
 if (headerHeight < 275) {
@@ -544,7 +545,6 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                 </Reanimated.View>
               }
 
-
               <Reanimated.View
                 layout={animPapillon(LinearTransition)}
               >
@@ -555,10 +555,14 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                     entering={animPapillon(FadeInUp)}
                     exiting={animPapillon(FadeOutDown)}
                   >
-                    <Element />
+                    <Element
+                      navigation={navigation}
+                    />
                   </Reanimated.View>
                 ))}
               </Reanimated.View>
+
+              <InsetsBottomView />
             </Reanimated.View>
           )}
         </Reanimated.View>
