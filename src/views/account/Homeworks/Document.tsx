@@ -96,6 +96,7 @@ const HomeworksDocument = ({ route, navigation }) => {
               fontSize: 16,
               lineHeight: 22,
               fontFamily: "medium",
+              color: theme.colors.text,
             }}
             parse={
               [
