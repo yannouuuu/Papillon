@@ -285,11 +285,9 @@ const SkolengoInstanceSelector: Screen<"SkolengoInstanceSelector"> = ({
                     }
                     text={instance.name}
                     onPress={async () => {
-                      console.log(instance);
                       navigation.navigate("SkolengoWebview", {
                         school: instance,
                       });
-                      /* loginSkolengoWorkflow(instance); */
                     }}
                   />
                 </Reanimated.View>

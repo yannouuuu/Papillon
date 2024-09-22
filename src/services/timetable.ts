@@ -1,6 +1,8 @@
 import { type Account, AccountService } from "@/stores/account/types";
 import { useTimetableStore } from "@/stores/timetable";
 import { epochWNToPronoteWN } from "@/utils/epochWeekNumber";
+import { checkIfSkoSupported } from "./skolengo/default-personalization";
+import { error } from "@/utils/logger/logger";
 
 /**
  * Updates the state and cache for the timetable of given week number.
@@ -19,10 +21,14 @@ export async function updateTimetableForWeekInCache <T extends Account> (account
       useTimetableStore.getState().updateClasses(epochWeekNumber, []);
       break;
     }
-    case AccountService.EcoleDirecte: {
-      const { getTimetableForWeek } = await import("./ecoledirecte/timetable");
-      const timetable = await getTimetableForWeek(account, weekNumber);
-      useTimetableStore.getState().updateClasses(weekNumber, timetable);
+    case AccountService.Skolengo: {
+      if(!checkIfSkoSupported(account, "Lessons")) {
+        error("[updateTimetableForWeekInCache]: This Skolengo instance doesn't support Lessons.", "skolengo");
+        break;
+      }
+      const { getTimetableForWeek } = await import("./skolengo/data/timetable");
+      const timetable = await getTimetableForWeek(account, epochWeekNumber);
+      useTimetableStore.getState().updateClasses(epochWeekNumber, timetable);
       break;
     }
     default: {
