@@ -62,13 +62,13 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
         isExternal: false,
         linkedExternalLocalIDs: [],
 
-        name: account.last_name + " " + account.first_name,
+        name: account.lastName + " " + account.firstName,
         studentName: {
-          first: account.first_name,
-          last: account.last_name,
+          first: account.firstName,
+          last: account.lastName,
         },
         className: "", // TODO ?
-        schoolName: account.school_name,
+        schoolName: account.schoolName,
 
         authentication: {
           session: currentSession,
