@@ -1,13 +1,12 @@
-import type { EcoleDirecteAccount } from "@/stores/account/types";
-import type { Timetable, TimetableClass } from "../shared/Timetable";
-import { ErrorServiceUnauthenticated } from "../shared/errors";
-import { TimetableItemKind } from "pawdirecte";
-import ecoledirecte from "pawdirecte";
+import type {EcoleDirecteAccount} from "@/stores/account/types";
+import {Timetable, TimetableClass, TimetableClassStatus} from "../shared/Timetable";
+import {ErrorServiceUnauthenticated} from "../shared/errors";
+import ecoledirecte, {TimetableItemKind} from "pawdirecte";
 
 const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => {
   const base = {
-    startTimestamp: c.start_date.getTime(),
-    endTimestamp: c.end_date.getTime(),
+    startTimestamp: c.startDate.getTime(),
+    endTimestamp: c.startDate.getTime(),
     additionalNotes: c.notes,
     backgroundColor: c.color
   };
@@ -17,27 +16,27 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
       return {
         type: "lesson",
         id: c.id,
-        subject: c.subject_short_name,
-        title: c.subject_name,
+        subject: c.subjectShortName,
+        title: c.subjectName,
         room: c.room || void 0,
         teacher: c.teacher ?? void 0,
         // TODO: add more states
-        status: c.updated ? "Cours modifié": "",
+        status: c.updated ? TimetableClassStatus.MODIFIED: void 0,
         ...base
       } satisfies TimetableClass;
     case TimetableItemKind.PERMANENCE:
       return {
         type: "detention",
-        subject: c.subject_name,
+        subject: c.subjectName,
         id: c.id,
-        title: c.subject_name ?? "Sans titre",
+        title: c.subjectName ?? "Sans titre",
         room: c.room || void 0,
         ...base
       };
     case TimetableItemKind.CONGE:
       return {
         type: "vacation",
-        subject: c.subject_name,
+        subject: c.subjectName,
         id: c.id,
         title: "Congés",
         room: void 0,
