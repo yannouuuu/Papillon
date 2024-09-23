@@ -9,6 +9,8 @@ import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { AccountService, LocalAccount } from "@/stores/account/types";
 import defaultPersonalization from "@/services/local/default-personalization";
 import uuid from "@/utils/uuid-v4";
+import PapillonSpinner from "@/components/Global/PapillonSpinner";
+import { NativeText } from "@/components/Global/NativeComponents";
 
 const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
   const mainURL = "https://sesame.univ-rennes1.fr/comptes/";
@@ -17,6 +19,8 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
 
   const createStoredAccount = useAccounts(store => store.create);
   const switchTo = useCurrentAccount(store => store.switchTo);
+
+  const [isExtractingData, setIsExtractingData] = React.useState(false);
 
   const loginUnivData = async (data: any) => {
     if (data?.user?.uid !== null) {
@@ -67,6 +71,40 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         flex: 1,
       }}
     >
+      {isExtractingData && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "white",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            gap: 6,
+          }}
+        >
+          <PapillonSpinner
+            size={48}
+            strokeWidth={5}
+            color="#29947a"
+            style={{
+              marginBottom: 16,
+            }}
+          />
+
+          <NativeText variant="title">
+            Connexion au compte Sésame
+          </NativeText>
+
+          <NativeText variant="subtitle">
+            Extraction des données...
+          </NativeText>
+        </View>
+      )}
+
       <WebView
         source={{ uri: mainURL }}
         style={{
@@ -76,6 +114,12 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         ref={webViewRef}
         startInLoadingState={true}
         incognito={true}
+        onLoadStart={(e) => {
+          if (e.nativeEvent.url === "https://sesame.univ-rennes1.fr/comptes/api/auth/data") {
+            setIsExtractingData(true);
+          }
+        }}
+
         onLoadEnd={(e) => {
           if (e.nativeEvent.title === "Sésame" && e.nativeEvent.url === mainURL) {
             webViewRef.current?.injectJavaScript(`
