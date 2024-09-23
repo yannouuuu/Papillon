@@ -1,15 +1,14 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { Check, ChevronDown, ChevronUp, FileText, Paperclip } from "lucide-react-native";
-import parse_homeworks from "@/utils/format/format_pronote_homeworks";
+import React, { useEffect, useState, useCallback } from "react";
+import { Paperclip } from "lucide-react-native";
 import { getSubjectData } from "@/services/shared/Subject";
 import { useTheme } from "@react-navigation/native";
-import type { Homework } from "@/services/shared/Homework";
 import { NativeItem, NativeText } from "@/components/Global/NativeComponents";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
 import Reanimated, { LinearTransition } from "react-native-reanimated";
-import Animated, { FadeIn, FadeOut, useAnimatedStyle, withTiming } from "react-native-reanimated";
+import { FadeIn, FadeOut } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
+import RenderHTML from "react-native-render-html";
+import {View} from "react-native";
 
 const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }) => {
   const theme = useTheme();
@@ -33,18 +32,6 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
     setIsLoading(false);
     setMainLoaded(true);
   }, [homework.done]);
-
-  const parsedContent = useMemo(() => parse_homeworks(homework.content), [homework.content]);
-
-  const [expanded, setExpanded] = useState(false);
-
-  const rotateStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ rotate: withTiming(expanded ? "180deg" : "0deg") }],
-    };
-  });
-
-  const [needsExpansion, setNeedsExpansion] = useState(parsedContent.length > 100);
 
   return (
     <NativeItem
@@ -76,23 +63,41 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
         style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
       >
         <Reanimated.View style={{ flex: 1, gap: 4 }} layout={animPapillon(LinearTransition)}>
-          <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
-            {subjectData.pretty}
-          </NativeText>
+          <View style={{flexDirection: "row"}}>
+            <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
+              {subjectData.pretty}
+            </NativeText>
+            {
+              homework.returnType &&
+                <NativeText variant="subtitle" style={{ color: "#D10000", opacity: 1, marginLeft: "auto" }} numberOfLines={1}>
+                  {
+                    homework.returnType === "file_upload" ? "A rendre sur l'ENT":
+                      homework.returnType === "paper" ? "A rendre en classe":
+                        "A rendre"
+                  }
+                </NativeText>
+            }
+          </View>
           <Reanimated.View
             layout={animPapillon(LinearTransition)}
-            key={parsedContent + expanded}
-            entering={expanded && FadeIn.duration(200)}
+            key={homework.content}
+            entering={FadeIn.duration(200)}
             exiting={FadeOut.duration(200).delay(50)}
           >
-            <NativeText
-              variant="default"
-              numberOfLines={expanded ? undefined : 3}
-            >
-              {parsedContent}
-            </NativeText>
+            <RenderHTML
+              source={{ html: homework.content }}
+              defaultTextProps={{
+                style: {
+                  color: theme.colors.text,
+                  fontFamily: "medium",
+                  fontSize: 16,
+                  lineHeight: 22,
+                },
+                numberOfLines: 3,
+              }}
+              contentWidth={300}
+            />
           </Reanimated.View>
-
           {homework.attachments.length > 0 && (
             <Reanimated.View
               layout={animPapillon(LinearTransition)}
@@ -126,23 +131,6 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
             </Reanimated.View>
           )}
         </Reanimated.View>
-        {needsExpansion && (
-          <TouchableOpacity
-            onPress={() => setExpanded(!expanded)}
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Animated.View style={[{ marginLeft: 8 }, rotateStyle]}>
-              {expanded ? (
-                <ChevronUp size={22} strokeWidth={2.5} opacity={0.6} color={theme.colors.text} />
-              ) : (
-                <ChevronDown size={22} strokeWidth={2.5} opacity={0.6} color={theme.colors.text} />
-              )}
-            </Animated.View>
-          </TouchableOpacity>
-        )}
       </Reanimated.View>
     </NativeItem>
   );
