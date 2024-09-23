@@ -47,7 +47,7 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
           last: data?.user?.infos?.lastName,
         },
         className: "", // TODO ?
-        schoolName: "Université de Rennes",
+        schoolName: data.caccount.data.attachmentDpt.name,
 
         personalization: await defaultPersonalization()
       };

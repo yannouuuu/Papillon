@@ -113,7 +113,10 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
                 <View key={index}>
                   <TouchableOpacity
                     key={index}
-                    onPress={onPressItem ? onPressItem : () => {
+                    onPress={onPressItem ? () => {
+                      setOpened(false);
+                      onPressItem();
+                    } : () => {
                       setOpened(false);
                       handleSelectionChange(item);
                     }}

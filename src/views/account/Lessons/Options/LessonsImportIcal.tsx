@@ -4,7 +4,7 @@ import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { useTheme } from "@react-navigation/native";
 import { Calendar, Info, QrCode, X } from "lucide-react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert, Modal, Platform, TextInput, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -180,6 +180,7 @@ const LessonsImportIcal = () => {
             <PapillonSpinner
               strokeWidth={3}
               size={22}
+              color={theme.colors.text}
             />
           </View>
         }
