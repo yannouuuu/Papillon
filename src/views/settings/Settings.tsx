@@ -182,7 +182,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
         },
         {
           icon: <Scroll />,
-          color: "#a64c14",
+          color: "#49690e",
           label: "Notes de mise à jour",
           onPress: () => navigation.navigate("ChangelogScreen"),
         },
