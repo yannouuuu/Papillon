@@ -16,7 +16,7 @@ export const fetchIcalData = async (account: Account, force = false): Promise<Ti
     await fetch(ical.url).then(res => res.text()).then(text => {
       const parsed = icalParser.parseString(text).events;
       for (const event of parsed) {
-        courses.push(reduceIcalToCourse(event, identityProvider));
+        courses.push(reduceIcalToCourse(event, identityProvider, ical.url));
       }
     });
   }

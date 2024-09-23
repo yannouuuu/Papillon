@@ -1,7 +1,8 @@
 const lesson_formats = require("../data/lesson_formats.json");
 
 const uppercaseFirst = (txt: string): string => {
-  return txt.charAt(0).toUpperCase() + txt.slice(1);
+  let newTxt = txt.charAt(0).toUpperCase() + txt.slice(1);
+  return newTxt;
 };
 
 function removeSpaces (text: string): string {
@@ -44,12 +45,24 @@ function findObjectByPronoteString (pronoteString = "") {
     }
   }
 
-  // Return null if no match is found
+  // Return a new object if no match is found
   return {
     label: removeSpaces(processedString),
-    pretty: uppercaseFirst(processedString),
+    pretty: formatPretty(processedString),
     formats: {}
   };
+}
+
+function formatPretty (text: string): string {
+  const upperCaseTerms = ["CM", "TD", "TP", "LV1", "LV2", "LV3"];
+  let words = text.split(" ");
+  words = words.map(word => {
+    if (upperCaseTerms.includes(word.toUpperCase())) {
+      return word.toUpperCase();
+    }
+    return uppercaseFirst(word);
+  });
+  return words.join(" ");
 }
 
 function getCourseSpeciality (pronoteString = ""): string | null {
@@ -63,7 +76,7 @@ function getCourseSpeciality (pronoteString = ""): string | null {
   newPrnString = newPrnString.replace("expression", "expr.");
   newPrnString = newPrnString.replace("compréhension", "comp.");
   newPrnString = newPrnString.replace("ecrit", "écrit");
-  newPrnString = uppercaseFirst(newPrnString);
+  newPrnString = formatPretty(newPrnString);
 
   return newPrnString;
 }
