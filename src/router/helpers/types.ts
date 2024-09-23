@@ -17,6 +17,7 @@ export type RouteParameters = {
   ColorSelector?: { settings: boolean };
   DevMenu: undefined;
   AccountCreated: undefined;
+  ChangelogScreen: undefined;
 
   // login.index
   ServiceSelector: undefined;

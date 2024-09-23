@@ -192,6 +192,7 @@ interface NativeItemProps {
   subtitle?: string;
   endPadding?: number;
   disabled?: boolean;
+  pointerEvents?: any;
 }
 
 export const NativeItem: React.FC<NativeItemProps> = ({
@@ -216,6 +217,7 @@ export const NativeItem: React.FC<NativeItemProps> = ({
   subtitle,
   endPadding,
   disabled,
+  pointerEvents
 }) => {
   const theme = useTheme();
   const { colors } = theme;
@@ -225,6 +227,7 @@ export const NativeItem: React.FC<NativeItemProps> = ({
       layout={animated && animPapillon(LinearTransition)}
       entering={entering && entering}
       exiting={exiting && exiting}
+      pointerEvents={pointerEvents}
     >
       <NativePressable
         onPress={!disabled ? onPress : () => {}}
