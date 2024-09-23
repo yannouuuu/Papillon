@@ -181,6 +181,12 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           disabled: true,
         },
         {
+          icon: <Scroll />,
+          color: "#a64c14",
+          label: "Notes de mise à jour",
+          onPress: () => navigation.navigate("ChangelogScreen"),
+        },
+        {
           icon: <Info />,
           color: "#888888",
           label: "À propos de Papillon",
