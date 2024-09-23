@@ -78,7 +78,6 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
 
     try {
       await updateTimetableForWeekInCache(account, weekNumber, force);
-      await fetchIcalData(account, force);
       currentlyLoadingWeeks.current.add(weekNumber);
     }
     finally {
