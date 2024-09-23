@@ -14,7 +14,7 @@ const LessonsImportIcal = () => {
   const account = useCurrentAccount(store => store.account!);
   const mutateProperty = useCurrentAccount(store => store.mutateProperty);
 
-  const [url, setUrl] = React.useState("https://planning.univ-rennes1.fr/jsp/custom/modules/plannings/pn8d0kn8.shu");
+  const [url, setUrl] = React.useState("");
 
   const saveIcal = async () => {
     const oldUrls = account.personalization.icalURLs || [];
@@ -46,14 +46,14 @@ const LessonsImportIcal = () => {
         paddingTop: 0,
       }}
     >
-      <NativeListHeader label="Import from iCal" />
+      <NativeListHeader label="Utiliser un lien iCal" />
 
       <NativeList>
         <NativeItem>
           <TextInput
             value={url}
             onChangeText={setUrl}
-            placeholder="URL"
+            placeholder="Adresse URL du calendrier"
             placeholderTextColor={theme.colors.text + 88}
             style={{
               flex: 1,
