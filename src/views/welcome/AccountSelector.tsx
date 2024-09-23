@@ -99,6 +99,14 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
         flex: 1,
       }}
     >
+      {isFocused && (
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+      )}
+
       <Reanimated.View
         style={{
           width: "100%",
