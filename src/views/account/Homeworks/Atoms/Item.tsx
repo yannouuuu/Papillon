@@ -9,6 +9,7 @@ import { FadeIn, FadeOut } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 import RenderHTML from "react-native-render-html";
 import {View} from "react-native";
+import { HomeworkReturnType } from "@/services/shared/Homework";
 
 const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }) => {
   const theme = useTheme();
@@ -71,9 +72,15 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
               homework.returnType &&
                 <NativeText variant="subtitle" style={{ color: "#D10000", opacity: 1, marginLeft: "auto" }} numberOfLines={1}>
                   {
-                    homework.returnType === "file_upload" ? "A rendre sur l'ENT":
-                      homework.returnType === "paper" ? "A rendre en classe":
-                        "A rendre"
+                    homework.returnType && (
+                      <NativeText variant="subtitle" style={{ color: "#D10000", opacity: 1, marginLeft: "auto" }} numberOfLines={1}>
+                        {homework.returnType === HomeworkReturnType.FileUpload
+                          ? "À rendre sur l'ENT"
+                          : homework.returnType === HomeworkReturnType.Paper
+                            ? "À rendre en classe"
+                            : null}
+                      </NativeText>
+                    )
                   }
                 </NativeText>
             }

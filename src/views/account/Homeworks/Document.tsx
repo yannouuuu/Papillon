@@ -1,7 +1,7 @@
 import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
 import React, { useEffect, useState } from "react";
 import {View, ScrollView, Text, TouchableOpacity, Alert} from "react-native";
-import { Homework } from "@/services/shared/Homework";
+import { Homework, HomeworkReturnType } from "@/services/shared/Homework";
 import { getSubjectData } from "@/services/shared/Subject";
 
 import { formatDistance } from "date-fns";
@@ -109,9 +109,9 @@ const HomeworksDocument = ({ route }) => {
                   >
                     <NativeText variant="subtitle" style={{color: "#FFF", opacity: 1}}>
                       {
-                        homework.returnType === "file_upload" ? "A rendre sur l'ENT":
-                          homework.returnType === "paper" ? "A rendre en classe":
-                            "A rendre"
+                        homework.returnType === HomeworkReturnType.FileUpload ? "A rendre sur l'ENT":
+                          homework.returnType === HomeworkReturnType.Paper ? "A rendre en classe":
+                            null
                       }
                     </NativeText>
                   </TouchableOpacity>
