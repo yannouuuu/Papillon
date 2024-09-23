@@ -8,6 +8,7 @@ import Reanimated, { LinearTransition } from "react-native-reanimated";
 import { FadeIn, FadeOut } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 import RenderHTML from "react-native-render-html";
+import {View} from "react-native";
 
 const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }) => {
   const theme = useTheme();
@@ -62,9 +63,21 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
         style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
       >
         <Reanimated.View style={{ flex: 1, gap: 4 }} layout={animPapillon(LinearTransition)}>
-          <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
-            {subjectData.pretty}
-          </NativeText>
+          <View style={{flexDirection: "row"}}>
+            <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
+              {subjectData.pretty}
+            </NativeText>
+            {
+              homework.returnType &&
+                <NativeText variant="subtitle" style={{ color: "#D10000", opacity: 1, marginLeft: "auto" }} numberOfLines={1}>
+                  {
+                    homework.returnType === "file_upload" ? "A rendre sur l'ENT":
+                      homework.returnType === "paper" ? "A rendre en classe":
+                        "A rendre"
+                  }
+                </NativeText>
+            }
+          </View>
           <Reanimated.View
             layout={animPapillon(LinearTransition)}
             key={homework.content}
@@ -85,7 +98,6 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
               contentWidth={300}
             />
           </Reanimated.View>
-
           {homework.attachments.length > 0 && (
             <Reanimated.View
               layout={animPapillon(LinearTransition)}
