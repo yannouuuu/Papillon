@@ -45,8 +45,9 @@ export default [
     headerTitle: "Extension",
   }),
   createScreen("LessonsImportIcal", LessonsImportIcal, {
-    headerTitle: "Importer un calendrier",
+    headerTitle: "Importer un iCal",
     presentation: "modal",
+    headerLargeTitle: true,
   }),
   createScreen("HomeworksDocument", HomeworksDocument, {
     headerTitle: "Devoir",

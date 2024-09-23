@@ -3,24 +3,38 @@ import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/componen
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { useTheme } from "@react-navigation/native";
-import { Calendar } from "lucide-react-native";
+import { Calendar, Info, QrCode, X } from "lucide-react-native";
 import React from "react";
-import { Alert, TextInput, View } from "react-native";
+import { Alert, Modal, Platform, TextInput, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import * as Clipboard from "expo-clipboard";
+
+import { CameraView } from "expo-camera";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import PapillonSpinner from "@/components/Global/PapillonSpinner";
 
 const ical = require("cal-parser");
 
 const LessonsImportIcal = () => {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
 
   const account = useCurrentAccount(store => store.account!);
   const mutateProperty = useCurrentAccount(store => store.mutateProperty);
 
   const [url, setUrl] = React.useState("");
 
+  const [cameraVisible, setCameraVisible] = React.useState(false);
+
+  const scanIcalQRCode = async () => {
+    setCameraVisible(true);
+  };
+
+  const [loading, setLoading] = React.useState(false);
+
   const saveIcal = async () => {
+    setLoading(true);
     const oldUrls = account.personalization.icalURLs || [];
 
     fetch(url)
@@ -40,6 +54,12 @@ const LessonsImportIcal = () => {
             url,
           }]
         });
+      })
+      .catch(() => {
+        Alert.alert("Erreur", "Impossible de récupérer les données du calendrier. Vérifiez l'URL et réessayez.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -49,16 +69,98 @@ const LessonsImportIcal = () => {
         padding: 16,
         paddingTop: 0,
       }}
+      contentInsetAdjustmentBehavior="automatic"
     >
+      <Modal
+        visible={cameraVisible}
+        animationType="slide"
+        presentationStyle="formSheet"
+        onRequestClose={() => setCameraVisible(false)}
+      >
+        <TouchableOpacity
+          onPress={() => setCameraVisible(false)}
+          style={{
+            padding: 8,
+            position: "absolute",
+            top: 16,
+            right: 16,
+            zIndex: 999,
+            borderRadius: 100,
+            backgroundColor: "#ffffff39",
+            opacity: 1,
+          }}
+        >
+          <X size={20} strokeWidth={2.5} color={"#fff"} />
+        </TouchableOpacity>
+
+        <View style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: 10,
+          height: "100%",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "transparent",
+        }}>
+          <View style={{
+            width: 260,
+            maxWidth: "90%",
+            aspectRatio: 1,
+            borderWidth: 3,
+            borderColor: "#fff",
+            borderRadius: 8,
+          }}/>
+        </View>
+
+        <CameraView
+          style={{
+            flex: 1,
+          }}
+          barcodeScannerSettings={{
+            barcodeTypes: ["qr"],
+          }}
+          onBarcodeScanned={({ data }) => {
+            setUrl(data);
+            setCameraVisible(false);
+          }}
+        />
+      </Modal>
+
+      <NativeList>
+        <NativeItem
+          icon={<Info />}
+        >
+          <NativeText variant="subtitle">
+            Les liens iCal permettent d'importer des calendriers en temps réel depuis un agenda compatible.
+          </NativeText>
+        </NativeItem>
+      </NativeList>
+
       <NativeListHeader label="Utiliser un lien iCal" />
 
       <NativeList>
-        <NativeItem>
+        <NativeItem
+          trailing={
+            <TouchableOpacity
+              style={{
+                marginRight: 8,
+              }}
+              onPress={() => scanIcalQRCode()}
+            >
+              <QrCode
+                size={24}
+                color={theme.colors.primary}
+              />
+            </TouchableOpacity>
+          }
+        >
           <TextInput
             value={url}
             onChangeText={setUrl}
             placeholder="Adresse URL du calendrier"
-            placeholderTextColor={theme.colors.text + 88}
+            placeholderTextColor={theme.colors.text + 50}
             style={{
               flex: 1,
               paddingHorizontal: 6,
@@ -73,7 +175,15 @@ const LessonsImportIcal = () => {
 
       <ButtonCta
         value="Importer"
-        primary
+        icon={loading &&
+          <View>
+            <PapillonSpinner
+              strokeWidth={3}
+              size={22}
+            />
+          </View>
+        }
+        primary={!loading}
         style={{
           marginTop: 16,
         }}
