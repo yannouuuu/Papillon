@@ -64,13 +64,13 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
         style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
       >
         <Reanimated.View style={{ flex: 1, gap: 4 }} layout={animPapillon(LinearTransition)}>
-          <View style={{flexDirection: "row"}}>
+          <View style={{ flexDirection: "row", gap: 10 }}>
             <NativeText variant="overtitle" style={{ color: subjectData.color }} numberOfLines={1}>
               {subjectData.pretty}
             </NativeText>
             {
               homework.returnType &&
-                <NativeText variant="subtitle" style={{ color: "#D10000", opacity: 1, marginLeft: "auto" }} numberOfLines={1}>
+                <NativeText variant="subtitle" style={{ color: "#D10000", opacity: 1, flex: 1 }} numberOfLines={1}>
                   {
                     homework.returnType && (
                       <NativeText variant="subtitle" style={{ color: "#D10000", opacity: 1, marginLeft: "auto" }} numberOfLines={1}>
