@@ -1,20 +1,19 @@
 import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
-import React, { useEffect, useMemo, useState } from "react";
-import { View, ScrollView, Text, Linking } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, ScrollView, Text } from "react-native";
 import { Homework } from "@/services/shared/Homework";
 import { getSubjectData } from "@/services/shared/Subject";
-import parse_homeworks from "@/utils/format/format_pronote_homeworks";
 
-import { format, formatDistance, formatRelative, subDays } from "date-fns";
+import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
-import { FileIcon, FileText, Link, Paperclip } from "lucide-react-native";
-
-import ParsedText from "react-native-parsed-text";
+import { FileText, Link, Paperclip } from "lucide-react-native";
 
 import * as WebBrowser from "expo-web-browser";
 import { useTheme } from "@react-navigation/native";
+import RenderHTML from "react-native-render-html";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 
-const HomeworksDocument = ({ route, navigation }) => {
+const HomeworksDocument = ({ route }) => {
   const theme = useTheme();
 
   const homework: Homework = route.params.homework || {};
@@ -39,14 +38,14 @@ const HomeworksDocument = ({ route, navigation }) => {
     fetchSubjectData();
   }, [homework.subject]);
 
-  const parsedContent = useMemo(() => parse_homeworks(homework.content), [homework.content]);
-
   return (
     <ScrollView
-      style={{
+      contentContainerStyle={{
         padding: 16,
         paddingTop: 0,
+        paddingBottom: useSafeAreaInsets().bottom + 16,
       }}
+      style={{flex: 1}}
     >
       <NativeList inset>
         <NativeItem
@@ -90,36 +89,18 @@ const HomeworksDocument = ({ route, navigation }) => {
           </NativeText>
         </NativeItem>
         <NativeItem>
-          <ParsedText
-            style={{
-              fontSize: 16,
-              lineHeight: 22,
-              fontFamily: "medium",
-              color: theme.colors.text,
+          <RenderHTML
+            source={{ html: homework.content }}
+            defaultTextProps={{
+              style: {
+                color: theme.colors.text,
+                fontFamily: "medium",
+                fontSize: 16,
+                lineHeight: 22,
+              },
             }}
-            parse={
-              [
-                {
-                  type: "url",
-                  style: {
-                    color: theme.colors.primary,
-                    textDecorationLine: "underline",
-                  },
-                  onPress: (url) => openUrl(url),
-                },
-                {
-                  type: "email",
-                  style: {
-                    color: theme.colors.primary,
-                    textDecorationLine: "underline",
-                  },
-                  onPress: (url) => Linking.openURL("mailto:" + url),
-                },
-              ]
-            }
-          >
-            {parsedContent}
-          </ParsedText>
+            contentWidth={300}
+          />
         </NativeItem>
       </NativeList>
 
