@@ -1,10 +1,14 @@
 import ButtonCta from "@/components/FirstInstallation/ButtonCta";
 import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
 import { useCurrentAccount } from "@/stores/account";
+import { useTimetableStore } from "@/stores/timetable";
 import { useTheme } from "@react-navigation/native";
+import { Calendar } from "lucide-react-native";
 import React from "react";
-import { TextInput, View } from "react-native";
+import { Alert, TextInput, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+
+import * as Clipboard from "expo-clipboard";
 
 const ical = require("cal-parser");
 
@@ -81,7 +85,38 @@ const LessonsImportIcal = () => {
 
         <NativeList>
           {account.personalization.icalURLs.map((url, index) => (
-            <NativeItem key={index}>
+            <NativeItem
+              key={index}
+              icon={<Calendar />}
+              onPress={() => {
+                Alert.alert(url.name, url.url, [
+                  {
+                    text: "Annuler",
+                    style: "cancel",
+                  },
+                  {
+                    text: "Copier l'URL",
+                    onPress: () => {
+                      Clipboard.setString(url.url);
+                      Alert.alert("Copié", "L'URL a été copiée dans le presse-papiers.");
+                    },
+                  },
+                  {
+                    text: "Supprimer le calendrier",
+                    style: "destructive",
+                    onPress: () => {
+                      useTimetableStore.getState().removeClassesFromSource("ical://"+url.url);
+                      const urls = account.personalization.icalURLs || [];
+                      urls.splice(index, 1);
+                      mutateProperty("personalization", {
+                        ...account.personalization,
+                        icalURLs: urls,
+                      });
+                    },
+                  },
+                ]);
+              }}
+            >
               <NativeText variant="title">{url.name}</NativeText>
               <NativeText variant="subtitle">{url.url}</NativeText>
             </NativeItem>
