@@ -4,7 +4,7 @@ import { defaultProfilePicture } from "@/utils/ui/default-profile-picture";
 import { useIsFocused, useTheme } from "@react-navigation/native";
 import { PlusIcon } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import {ActivityIndicator, Image, RefreshControl, StatusBar, Text, TouchableHighlight, View } from "react-native";
+import {ActivityIndicator, Alert, Image, RefreshControl, StatusBar, Text, TouchableHighlight, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -37,6 +37,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
 
   const currentAccount = useCurrentAccount((store) => store.account);
   const switchTo = useCurrentAccount((store) => store.switchTo);
+  const removeAccount = useAccounts((store) => store.remove);
 
   const accounts = useAccounts((store) => store.accounts);
 
@@ -308,6 +309,42 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                         />
                       )
                     }
+                    onLongPress={async () => {
+                      // delete account
+                      Alert.alert(
+                        "Supprimer le compte",
+                        "Êtes-vous sûr de vouloir supprimer ce compte ?",
+                        [
+                          {
+                            text: "Annuler",
+                            style: "cancel",
+                          },
+                          {
+                            text: "Supprimer",
+                            style: "destructive",
+                            onPress: () => {
+                              Alert.alert(
+                                "Êtes-vous sûr ?",
+                                "Voulez-vous supprimer définitivement " + account.studentName.first + " " + account.studentName.last + " ?",
+                                [
+                                  {
+                                    text: "Annuler",
+                                    style: "cancel",
+                                  },
+                                  {
+                                    text: "Supprimer",
+                                    style: "destructive",
+                                    onPress: () => {
+                                      removeAccount(account.localID);
+                                    },
+                                  },
+                                ]
+                              );
+                            },
+                          },
+                        ]
+                      );
+                    }}
                     onPress={async () => {
                       if (currentAccount?.localID !== account.localID) {
                         setLoading(account.localID);
