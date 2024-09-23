@@ -18,7 +18,6 @@ const HomeworksDocument = ({ route, navigation }) => {
   const theme = useTheme();
 
   const homework: Homework = route.params.homework || {};
-  console.log(homework);
 
   const openUrl = (url) => {
     WebBrowser.openBrowserAsync(url, {
