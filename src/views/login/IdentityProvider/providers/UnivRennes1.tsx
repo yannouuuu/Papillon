@@ -11,9 +11,11 @@ import defaultPersonalization from "@/services/local/default-personalization";
 import uuid from "@/utils/uuid-v4";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
 import { NativeText } from "@/components/Global/NativeComponents";
+import { useTheme } from "@react-navigation/native";
 
 const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
   const mainURL = "https://sesame.univ-rennes1.fr/comptes/";
+  const theme = useTheme();
 
   const webViewRef = React.useRef<WebView>(null);
 
@@ -46,8 +48,8 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
           first: data?.user?.infos?.firstName,
           last: data?.user?.infos?.lastName,
         },
-        className: "", // TODO ?
-        schoolName: data.caccount.data.attachmentDpt.name,
+        className: "UR1", // TODO ?
+        schoolName: data.caccount.data.attachmentDpt.name.replace("Institut Universitaire de Technologie", "IUT") + " - Université de Rennes",
 
         personalization: await defaultPersonalization()
       };
@@ -80,7 +82,7 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "white",
+            backgroundColor: theme.colors.card,
             justifyContent: "center",
             alignItems: "center",
             zIndex: 1000,
