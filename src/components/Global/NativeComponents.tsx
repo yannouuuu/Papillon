@@ -349,7 +349,7 @@ export const NativeIcon: React.FC<NativeIconProps> = ({ icon, color, style }) =>
 
 interface NativeTextProps {
   children: ReactNode;
-  variant?: "title" | "titleLarge" | "subtitle" | "overtitle" | "body"| "default";
+  variant?: "title" | "titleLarge" | "subtitle" | "overtitle" | "body"| "default" | "titleLarge2";
   color?: string;
   style?: StyleProp<TextStyle>;
   numberOfLines?: number;
@@ -378,6 +378,13 @@ export const NativeText: React.FC<NativeTextProps> = (props) => {
         fontFamily: "semibold",
         fontSize: 19,
         lineHeight: 24,
+      };
+      break;
+    case "titleLarge2":
+      fontStyle = {
+        fontFamily: "bold",
+        fontSize: 24,
+        lineHeight: 28,
       };
       break;
     case "subtitle":
