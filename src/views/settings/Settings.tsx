@@ -173,17 +173,9 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
       label: "Projet Papillon",
       tabs: [
         {
-          icon: <HandCoins />,
-          color: "#CBA024",
-          label: "Soutenir Papillon",
-          description: "Disponible prochainement",
-          onPress: () => {},
-          disabled: true,
-        },
-        {
           icon: <Scroll />,
-          color: "#49690e",
-          label: "Notes de mise à jour",
+          color: "#c75110",
+          label: "Quoi de neuf ?",
           onPress: () => navigation.navigate("ChangelogScreen"),
         },
         {
