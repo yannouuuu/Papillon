@@ -16,6 +16,13 @@ const IdentityProviderSelector: Screen<"IdentityProviderSelector"> = ({ navigati
       navigate: () => navigation.navigate("UnivRennes1_Login"),
     },
     {
+      name: "univ_rennes2",
+      title: "Université Rennes 2",
+      description: "Utilisez votre compte Sésame pour vous connecter",
+      image: require("@/../assets/images/service_rennes2.png"),
+      navigate: () => navigation.navigate("UnivRennes2_Login"),
+    },
+    {
       name: "univ_limoges",
       title: "Université de Limoges",
       description: "Utilisez votre compte Biome pour vous connecter",
