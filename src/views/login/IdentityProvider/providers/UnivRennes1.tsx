@@ -20,7 +20,8 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
   const createStoredAccount = useAccounts(store => store.create);
   const switchTo = useCurrentAccount(store => store.switchTo);
 
-  const [isExtractingData, setIsExtractingData] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoadingText, setIsLoadingText] = React.useState("Connexion en cours...");
 
   const loginUnivData = async (data: any) => {
     if (data?.user?.uid !== null) {
@@ -71,7 +72,7 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         flex: 1,
       }}
     >
-      {isExtractingData && (
+      {isLoading && (
         <View
           style={{
             position: "absolute",
@@ -92,15 +93,16 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
             color="#29947a"
             style={{
               marginBottom: 16,
+              marginHorizontal: 26,
             }}
           />
 
-          <NativeText variant="title">
+          <NativeText variant="title" style={{textAlign: "center"}}>
             Connexion au compte Sésame
           </NativeText>
 
-          <NativeText variant="subtitle">
-            Extraction des données...
+          <NativeText variant="subtitle" style={{textAlign: "center"}}>
+            {isLoadingText}
           </NativeText>
         </View>
       )}
@@ -116,7 +118,8 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         incognito={true}
         onLoadStart={(e) => {
           if (e.nativeEvent.url === "https://sesame.univ-rennes1.fr/comptes/api/auth/data") {
-            setIsExtractingData(true);
+            setIsLoadingText("Récupération des données...");
+            setIsLoading(true);
           }
         }}
 
@@ -131,6 +134,9 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
             webViewRef.current?.injectJavaScript(`
               window.ReactNativeWebView.postMessage(JSON.stringify({type: "loginData", data: document.querySelector("pre").innerText}));
             `);
+          }
+          else {
+            setIsLoading(false);
           }
         }}
 

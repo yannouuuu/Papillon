@@ -19,13 +19,14 @@ import { animPapillon } from "@/utils/ui/animations";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
 import { PressableScale } from "react-native-pressable-scale";
-import { useTheme } from "@react-navigation/native";
+import { Link, useTheme } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, History, ListRestart, Loader, Plus, Rewind } from "lucide-react-native";
+import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, History, Link2, ListRestart, Loader, Plus, Rewind } from "lucide-react-native";
 import { PapillonHeaderAction, PapillonHeaderSelector, PapillonHeaderSeparator, PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
+import { fetchIcalData } from "@/services/local/ical";
 
 const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
@@ -77,6 +78,7 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
 
     try {
       await updateTimetableForWeekInCache(account, weekNumber, force);
+      await fetchIcalData(account, force);
       currentlyLoadingWeeks.current.add(weekNumber);
     }
     finally {
@@ -157,6 +159,13 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
         </PapillonHeaderSelector>
 
         <PapillonHeaderSeparator />
+
+        <PapillonHeaderAction
+          icon={<Link2 />}
+          onPress={() => {
+            navigation.navigate("LessonsImportIcal");
+          }}
+        />
 
         {(pickerDate.getTime() == today.getTime()) == false &&
           <PapillonHeaderAction

@@ -57,7 +57,9 @@ export type RouteParameters = {
   Home: undefined
   HomeScreen?: { onboard: boolean };
   NoteReaction: undefined;
+
   Lessons?: { outsideNav?: boolean };
+  LessonsImportIcal: undefined;
 
   Homeworks?: { outsideNav?: boolean };
   HomeworksDocument: { homework: Homework };
