@@ -1,20 +1,20 @@
 import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
-import React, { useEffect, useMemo, useState } from "react";
-import { View, ScrollView, Text, Linking } from "react-native";
-import { Homework } from "@/services/shared/Homework";
+import React, { useEffect, useState } from "react";
+import {View, ScrollView, Text, TouchableOpacity, Alert} from "react-native";
+import { Homework, HomeworkReturnType } from "@/services/shared/Homework";
 import { getSubjectData } from "@/services/shared/Subject";
-import parse_homeworks from "@/utils/format/format_pronote_homeworks";
 
-import { format, formatDistance, formatRelative, subDays } from "date-fns";
+import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
-import { FileIcon, FileText, Link, Paperclip } from "lucide-react-native";
-
-import ParsedText from "react-native-parsed-text";
+import { FileText, Link, Paperclip } from "lucide-react-native";
 
 import * as WebBrowser from "expo-web-browser";
 import { useTheme } from "@react-navigation/native";
+import RenderHTML from "react-native-render-html";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {PapillonModernHeader} from "@/components/Global/PapillonModernHeader";
 
-const HomeworksDocument = ({ route, navigation }) => {
+const HomeworksDocument = ({ route }) => {
   const theme = useTheme();
 
   const homework: Homework = route.params.homework || {};
@@ -39,18 +39,11 @@ const HomeworksDocument = ({ route, navigation }) => {
     fetchSubjectData();
   }, [homework.subject]);
 
-  const parsedContent = useMemo(() => parse_homeworks(homework.content), [homework.content]);
-
   return (
-    <ScrollView
-      style={{
-        padding: 16,
-        paddingTop: 0,
-      }}
-    >
-      <NativeList inset>
-        <NativeItem
-          leading={
+    <View style={{flex: 1}}>
+      <PapillonModernHeader outsideNav={true}>
+        <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+          <View style={{backgroundColor: theme.colors.background, borderRadius: 100}}>
             <View
               style={{
                 backgroundColor: subjectData.color + "23",
@@ -73,84 +66,115 @@ const HomeworksDocument = ({ route, navigation }) => {
                 {subjectData.emoji}
               </Text>
             </View>
-          }
-        >
-          <NativeText variant="title">
-            {subjectData.pretty}
-          </NativeText>
-          <NativeText variant="subtitle">
-            {formatDistance(
-              new Date(homework.due),
-              new Date(),
-              {
-                addSuffix: true,
-                locale: fr,
-              }
-            )}
-          </NativeText>
-        </NativeItem>
-        <NativeItem>
-          <ParsedText
-            style={{
-              fontSize: 16,
-              lineHeight: 22,
-              fontFamily: "medium",
-              color: theme.colors.text,
-            }}
-            parse={
-              [
+          </View>
+          <View style={{flex: 1}}>
+            <NativeText variant="title" numberOfLines={1}>
+              {subjectData.pretty}
+            </NativeText>
+            <NativeText variant="subtitle" numberOfLines={1}>
+              {formatDistance(
+                new Date(homework.due),
+                new Date(),
                 {
-                  type: "url",
-                  style: {
-                    color: theme.colors.primary,
-                    textDecorationLine: "underline",
-                  },
-                  onPress: (url) => openUrl(url),
-                },
-                {
-                  type: "email",
-                  style: {
-                    color: theme.colors.primary,
-                    textDecorationLine: "underline",
-                  },
-                  onPress: (url) => Linking.openURL("mailto:" + url),
-                },
-              ]
-            }
-          >
-            {parsedContent}
-          </ParsedText>
-        </NativeItem>
-      </NativeList>
-
-      {homework.attachments.length > 0 && (
-        <View>
-          <NativeListHeader label="Pièces jointes" icon={<Paperclip />} />
-
-          <NativeList>
-            {homework.attachments.map((attachment, index) => (
-              <NativeItem
-                key={index}
-                onPress={() => openUrl(attachment.url)}
-                icon={
-                  attachment.type === "file" ?
-                    <FileText />
-                    :
-                    <Link />
+                  addSuffix: true,
+                  locale: fr,
                 }
-              >
-                <NativeText variant="title"  numberOfLines={2}>
-                  {attachment.name}
-                </NativeText>
-                <NativeText variant="subtitle" numberOfLines={1}>
-                  {attachment.url}
-                </NativeText>
-              </NativeItem>
-            ))}
-          </NativeList>
+              )}
+            </NativeText>
+          </View>
+          <View>
+            {
+              homework.returnType &&
+                <View
+                  style={{
+                    backgroundColor: "#D10000",
+                    borderRadius: 100,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: 8,
+                    paddingHorizontal: 12,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert(
+                        homework.returnType === "file_upload" ? "Vous devez rendre ce devoir sur votre ENT":
+                          homework.returnType === "paper" ? "Vous devrez rendre ce devoir en classe":
+                            "Ce devoir est à rendre",
+                        homework.returnType === "file_upload" ? "Papillon ne permet pas de rendre des devoirs sur l'ENT. Vous devez le faire sur l'ENT de votre établissement":
+                          homework.returnType === "paper" ? "Votre professeur vous indiquera comment rendre ce devoir":
+                            "Votre professeur vous indiquera comment rendre ce devoir",
+                      );
+                    }}
+                  >
+                    <NativeText variant="subtitle" style={{color: "#FFF", opacity: 1}}>
+                      {
+                        homework.returnType === HomeworkReturnType.FileUpload ? "A rendre sur l'ENT":
+                          homework.returnType === HomeworkReturnType.Paper ? "A rendre en classe":
+                            null
+                      }
+                    </NativeText>
+                  </TouchableOpacity>
+                </View>
+            }
+          </View>
         </View>
-      )}
-    </ScrollView>
+      </PapillonModernHeader>
+
+      <ScrollView
+        contentContainerStyle={{
+          padding: 16,
+          paddingTop: 70 + 16,
+          paddingBottom: useSafeAreaInsets().bottom + 16,
+        }}
+        style={{flex: 1}}
+      >
+        <NativeList>
+          <NativeItem>
+            <RenderHTML
+              source={{ html: homework.content }}
+              defaultTextProps={{
+                style: {
+                  color: theme.colors.text,
+                  fontFamily: "medium",
+                  fontSize: 16,
+                  lineHeight: 22,
+                },
+              }}
+              contentWidth={300}
+            />
+          </NativeItem>
+        </NativeList>
+
+        {homework.attachments.length > 0 && (
+          <View>
+            <NativeListHeader label="Pièces jointes" icon={<Paperclip />} />
+
+            <NativeList>
+              {homework.attachments.map((attachment, index) => (
+                <NativeItem
+                  key={index}
+                  onPress={() => openUrl(attachment.url)}
+                  icon={
+                    attachment.type === "file" ?
+                      <FileText />
+                      :
+                      <Link />
+                  }
+                >
+                  <NativeText variant="title"  numberOfLines={2}>
+                    {attachment.name}
+                  </NativeText>
+                  <NativeText variant="subtitle" numberOfLines={1}>
+                    {attachment.url}
+                  </NativeText>
+                </NativeItem>
+              ))}
+            </NativeList>
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 };
 

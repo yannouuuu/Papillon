@@ -52,6 +52,7 @@ export default [
   createScreen("HomeworksDocument", HomeworksDocument, {
     headerTitle: "Devoir",
     presentation: "modal",
+    headerShown: false,
   }),
   createScreen("GradeSubject", GradeSubjectScreen, {
     headerTitle: "Détail de la matière",
