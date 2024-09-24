@@ -277,11 +277,11 @@
     }
   },
   {
-    "label": "sdcmarketing",
+    "label": "marketing",
     "pretty": "Marketing",
     "formats": {
       "default": [
-        "sdcmarketing"
+        "sdc marketing"
       ]
     }
   },
@@ -290,7 +290,7 @@
     "pretty": "Gestion de projet",
     "formats": {
       "default": [
-        "gestiondeprojet"
+        "gestion de projet"
       ]
     }
   },
@@ -299,7 +299,7 @@
     "pretty": "Culture numérique",
     "formats": {
       "default": [
-        "culturenum"
+        "culture num"
       ]
     }
   },
@@ -308,7 +308,7 @@
     "pretty": "Développement web",
     "formats": {
       "default": [
-        "developpementweb"
+        "developpement web"
       ]
     }
   },
@@ -317,7 +317,8 @@
     "pretty": "Traitement de l'information",
     "formats": {
       "default": [
-        "traitementdelinformation"
+        "traitement de l information",
+        "traitement de linformation"
       ]
     }
   },
@@ -326,7 +327,7 @@
     "pretty": "Production graphique",
     "formats": {
       "default": [
-        "prodgraphique"
+        "prod graphique"
       ]
     }
   },
@@ -335,7 +336,7 @@
     "pretty": "Expression & communication",
     "formats": {
       "default": [
-        "expressioncom"
+        "expression com"
       ]
     }
   },
@@ -344,7 +345,8 @@
     "pretty": "Production audiovisuelle",
     "formats": {
       "default": [
-        "prodaudiovisuelle"
+        "prod audiovisuelle",
+        "prod audio visuelle"
       ]
     }
   },
@@ -353,7 +355,7 @@
     "pretty": "Écriture média numérique",
     "formats": {
       "default": [
-        "ecrituremedianum"
+        "ecriture media num"
       ]
     }
   },
@@ -371,7 +373,7 @@
     "pretty": "Éco. & droit du numérique",
     "formats": {
       "default": [
-        "ecoetdroitdunumerique"
+        "eco et droit du numerique"
       ]
     }
   }

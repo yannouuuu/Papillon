@@ -46,14 +46,26 @@ export const reduceIcalToCourse = (course, identityProvider, url) => {
       const cmRegex = /\bCM\s+\w+\b/g;
       const cm = course.summary?.value.match(cmRegex);
 
+      const cmSRegex = /\d{1,2}[a-z]\s[A-Z]{2,}/i;
+      const cmS = course.summary?.value.match(cmSRegex);
+
+      console.log(course.summary?.value, cm, cmS);
+
       // remove ressource from title
       let title = course.summary?.value;
       if (ressource) {
         title = title.replace(ressource[0], "");
-        // remove class
-        title = title.replace(classRegex, "");
+      }
+
+      // remove class
+      title = title.replace(classRegex, "");
+      if(cm && cm.length > 0) {
         // remove CM
         title = title.replace(cmRegex, "");
+      }
+      else {
+        // remove cmS
+        title = title.replace(cmSRegex, "");
       }
 
       returnCourse = {
