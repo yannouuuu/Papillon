@@ -3,6 +3,7 @@ import createScreen from "@/router/helpers/create-screen";
 import IdentityProviderSelector from "@/views/login/IdentityProvider/IdentityProviderSelector";
 import UnivRennes1_Login from "@/views/login/IdentityProvider/providers/UnivRennes1";
 import UnivLimoges_Login from "@/views/login/IdentityProvider/providers/UnivLimoges";
+import UnivRennes2_Login from "@/views/login/IdentityProvider/providers/UnivRennes2";
 
 export default [
   createScreen("IdentityProviderSelector", IdentityProviderSelector, {
@@ -13,6 +14,11 @@ export default [
   createScreen("UnivRennes1_Login", UnivRennes1_Login, {
     headerBackVisible: true,
     headerTitle: "Université de Rennes",
+  }),
+
+  createScreen("UnivRennes2_Login", UnivRennes2_Login, {
+    headerBackVisible: true,
+    headerTitle: "Université de Rennes 2",
   }),
 
   createScreen("UnivLimoges_Login", UnivLimoges_Login, {

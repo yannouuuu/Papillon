@@ -266,5 +266,113 @@
         "vie de classe"
       ]
     }
+  },
+  {
+    "label": "integration",
+    "pretty": "Intégration",
+    "formats": {
+      "default": [
+        "integration"
+      ]
+    }
+  },
+  {
+    "label": "sdcmarketing",
+    "pretty": "Marketing",
+    "formats": {
+      "default": [
+        "sdcmarketing"
+      ]
+    }
+  },
+  {
+    "label": "gestiondeprojet",
+    "pretty": "Gestion de projet",
+    "formats": {
+      "default": [
+        "gestiondeprojet"
+      ]
+    }
+  },
+  {
+    "label": "culturenum",
+    "pretty": "Culture numérique",
+    "formats": {
+      "default": [
+        "culturenum"
+      ]
+    }
+  },
+  {
+    "label": "developpementweb",
+    "pretty": "Développement web",
+    "formats": {
+      "default": [
+        "developpementweb"
+      ]
+    }
+  },
+  {
+    "label": "traitementdelinformation",
+    "pretty": "Traitement de l'information",
+    "formats": {
+      "default": [
+        "traitementdelinformation"
+      ]
+    }
+  },
+  {
+    "label": "prodgraphique",
+    "pretty": "Production graphique",
+    "formats": {
+      "default": [
+        "prodgraphique"
+      ]
+    }
+  },
+  {
+    "label": "expressioncom",
+    "pretty": "Expression & communication",
+    "formats": {
+      "default": [
+        "expressioncom"
+      ]
+    }
+  },
+  {
+    "label": "prodaudiovisuelle",
+    "pretty": "Production audiovisuelle",
+    "formats": {
+      "default": [
+        "prodaudiovisuelle"
+      ]
+    }
+  },
+  {
+    "label": "ecrituremedianum",
+    "pretty": "Écriture média numérique",
+    "formats": {
+      "default": [
+        "ecrituremedianum"
+      ]
+    }
+  },
+  {
+    "label": "methodologie",
+    "pretty": "Méthodologie",
+    "formats": {
+      "default": [
+        "methodologie"
+      ]
+    }
+  },
+  {
+    "label": "ecoetdroitdunumerique",
+    "pretty": "Éco. & droit du numérique",
+    "formats": {
+      "default": [
+        "ecoetdroitdunumerique"
+      ]
+    }
   }
 ]

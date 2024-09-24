@@ -46,6 +46,7 @@ export type RouteParameters = {
   // login.identityProvider
   IdentityProviderSelector: undefined;
   UnivRennes1_Login: undefined;
+  UnivRennes2_Login: undefined;
   UnivLimoges_Login: undefined;
 
   // login.skolengo
@@ -57,7 +58,9 @@ export type RouteParameters = {
   Home: undefined
   HomeScreen?: { onboard: boolean };
   NoteReaction: undefined;
+
   Lessons?: { outsideNav?: boolean };
+  LessonsImportIcal: undefined;
 
   Homeworks?: { outsideNav?: boolean };
   HomeworksDocument: { homework: Homework };

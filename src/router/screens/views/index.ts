@@ -12,6 +12,7 @@ import RestaurantHistory from "@/views/account/Restaurant/Modals/History";
 import ChatCreate from "@/views/account/Chat/Modals/ChatCreate";
 import Chat from "@/views/account/Chat/Modals/Chat";
 import HomeworksDocument from "@/views/account/Homeworks/Document";
+import LessonsImportIcal from "@/views/account/Lessons/Options/LessonsImportIcal";
 
 export default [
   createScreen("NoteReaction", NoteReaction, {
@@ -42,6 +43,11 @@ export default [
   }),
   createScreen("AddonPage", AddonPage, {
     headerTitle: "Extension",
+  }),
+  createScreen("LessonsImportIcal", LessonsImportIcal, {
+    headerTitle: "Importer un iCal",
+    presentation: "modal",
+    headerLargeTitle: true,
   }),
   createScreen("HomeworksDocument", HomeworksDocument, {
     headerTitle: "Devoir",

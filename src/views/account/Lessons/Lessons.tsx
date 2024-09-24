@@ -19,13 +19,15 @@ import { animPapillon } from "@/utils/ui/animations";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
 import { PressableScale } from "react-native-pressable-scale";
-import { useTheme } from "@react-navigation/native";
+import { Link, useTheme } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, History, ListRestart, Loader, Plus, Rewind } from "lucide-react-native";
+import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, Clock, History, Link2, LinkIcon, ListRestart, Loader, MoreHorizontal, MoreVertical, Plus, Rewind } from "lucide-react-native";
 import { PapillonHeaderAction, PapillonHeaderSelector, PapillonHeaderSeparator, PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
+import { fetchIcalData } from "@/services/local/ical";
+import PapillonPicker from "@/components/Global/PapillonPicker";
 
 const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
@@ -158,17 +160,26 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
 
         <PapillonHeaderSeparator />
 
-        {(pickerDate.getTime() == today.getTime()) == false &&
+        <PapillonPicker
+          animated
+          direction="right"
+          delay={0}
+          data={[
+            {
+              icon: <CalendarPlus />,
+              label: "Importer un iCal",
+              onPress: () => {
+                navigation.navigate("LessonsImportIcal");
+              }
+            }
+          ]}
+        >
           <PapillonHeaderAction
-            icon={<CalendarClock />}
-            onPress={() => {
-              // set date to today
-              setSelectedDate(new Date(today));
-            }}
+            icon={<MoreVertical />}
             entering={animPapillon(ZoomIn)}
             exiting={FadeOut.duration(130)}
           />
-        }
+        </PapillonPicker>
       </PapillonModernHeader>
 
       <InfiniteDatePager

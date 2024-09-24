@@ -4,6 +4,7 @@ import { Image, View, StyleSheet, Text } from "react-native";
 import type { Screen } from "@/router/helpers/types";
 import { ScrollView } from "react-native-gesture-handler";
 import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
+import { Info } from "lucide-react-native";
 
 const IdentityProviderSelector: Screen<"IdentityProviderSelector"> = ({ navigation }) => {
   const identityProviders = [
@@ -13,6 +14,13 @@ const IdentityProviderSelector: Screen<"IdentityProviderSelector"> = ({ navigati
       description: "Utilisez votre compte Sésame pour vous connecter",
       image: require("@/../assets/images/service_rennes1.png"),
       navigate: () => navigation.navigate("UnivRennes1_Login"),
+    },
+    {
+      name: "univ_rennes2",
+      title: "Université Rennes 2",
+      description: "Utilisez votre compte Sésame pour vous connecter",
+      image: require("@/../assets/images/service_rennes2.png"),
+      navigate: () => navigation.navigate("UnivRennes2_Login"),
     },
     {
       name: "univ_limoges",
@@ -43,6 +51,17 @@ const IdentityProviderSelector: Screen<"IdentityProviderSelector"> = ({ navigati
             </NativeText>
           </NativeItem>
         ))}
+      </NativeList>
+
+
+      <NativeList inline>
+        <NativeItem
+          icon={<Info />}
+        >
+          <NativeText variant="subtitle">
+            Les founisseurs d'identité ne fournissent pas de données (calendrier, notes, etc...) mais permettent de vous connecter à l'application.
+          </NativeText>
+        </NativeItem>
       </NativeList>
 
     </ScrollView>

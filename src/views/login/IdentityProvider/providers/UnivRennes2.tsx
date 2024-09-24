@@ -3,6 +3,47 @@ import { Image, View, StyleSheet, Text } from "react-native";
 
 import { WebView } from "react-native-webview";
 
+function extractStudentDataFromHTML (htmlString) {
+  const data = {
+    title: "",
+    identity: {},
+    formation: {},
+    sesamAccount: {}
+  };
+
+  try {
+    // Extract title
+    const titleMatch = htmlString.match(/<title>(.*?)<\/title>/);
+    if (titleMatch) {
+      data.title = titleMatch[1].trim();
+    }
+
+    // Helper function to extract section data
+    function extractSectionData (sectionName, dataObject) {
+      const sectionRegex = new RegExp(`<h3 class="section-h3">${sectionName}[\\s\\S]*?<dl class="well">[\\s\\S]*?<\/dl>`);
+      const sectionMatch = htmlString.match(sectionRegex);
+      if (sectionMatch) {
+        const divRegex = /<div class="information-dl-div">[\s\S]*?<dt[^>]*>(.*?)<\/dt>[\s\S]*?<dd[^>]*>(.*?)<\/dd>[\s\S]*?<\/div>/g;
+        let divMatch;
+        while ((divMatch = divRegex.exec(sectionMatch[0])) !== null) {
+          const key = divMatch[1].replace(/<[^>]*>/g, "").trim();
+          const value = divMatch[2].replace(/<[^>]*>/g, "").trim();
+          dataObject[key] = value;
+        }
+      }
+    }
+
+    // Extract data for each section
+    extractSectionData("Identité", data.identity);
+    extractSectionData("Formation", data.formation);
+    extractSectionData("Compte Sésame", data.sesamAccount);
+
+  } catch (error) {
+    console.error("Error parsing HTML:", error);
+  }
+
+  return data;
+}
 
 import type { Screen } from "@/router/helpers/types";
 import { useAccounts, useCurrentAccount } from "@/stores/account";
@@ -13,8 +54,8 @@ import PapillonSpinner from "@/components/Global/PapillonSpinner";
 import { NativeText } from "@/components/Global/NativeComponents";
 import { useTheme } from "@react-navigation/native";
 
-const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
-  const mainURL = "https://sesame.univ-rennes1.fr/comptes/";
+const UnivRennes2_Login: Screen<"UnivRennes2_Login"> = ({ navigation }) => {
+  const mainURL = "https://cas.univ-rennes2.fr/login?service=https%3A%2F%2Fservices.univ-rennes2.fr%2Fsesame%2Findex.php%2Flogin%2Fmon-compte-sesame%2Fchanger-mon-mot-de-passe";
   const theme = useTheme();
 
   const webViewRef = React.useRef<WebView>(null);
@@ -26,14 +67,14 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
   const [isLoadingText, setIsLoadingText] = React.useState("Connexion en cours...");
 
   const loginUnivData = async (data: any) => {
-    if (data?.user?.uid !== null) {
+    if (data !== null) {
       const local_account: LocalAccount = {
         authentication: undefined,
         instance: undefined,
 
         identityProvider: {
-          identifier: "univ-rennes1",
-          name: "Université de Rennes",
+          identifier: "univ-rennes2",
+          name: "Université de Rennes 2",
           rawData: data
         },
 
@@ -43,13 +84,13 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         isExternal: false,
         linkedExternalLocalIDs: [],
 
-        name: data?.user?.infos?.lastName + " " + data?.user?.infos?.firstName,
+        name: data?.identity["Nom"] + " " + data?.identity["Prénom(s)"],
         studentName: {
-          first: data?.user?.infos?.firstName,
-          last: data?.user?.infos?.lastName,
+          first: data?.identity["Prénom(s)"],
+          last: data?.identity["Nom"],
         },
-        className: "UR1", // TODO ?
-        schoolName: data.caccount.data.attachmentDpt.name.replace("Institut Universitaire de Technologie", "IUT") + " - Université de Rennes",
+        className: "UR2", // TODO ?
+        schoolName: data?.formation["Formation"] + " - Université de Rennes 2",
 
         personalization: await defaultPersonalization()
       };
@@ -119,22 +160,26 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         startInLoadingState={true}
         incognito={true}
         onLoadStart={(e) => {
-          if (e.nativeEvent.url === "https://sesame.univ-rennes1.fr/comptes/api/auth/data") {
+          if (e.nativeEvent.url === "https://services.univ-rennes2.fr/sesame/index.php/login/mon-compte-sesame/changer-mon-mot-de-passe") {
             setIsLoadingText("Récupération des données...");
             setIsLoading(true);
           }
         }}
 
         onLoadEnd={(e) => {
-          if (e.nativeEvent.title === "Sésame" && e.nativeEvent.url === mainURL) {
+
+          if (e.nativeEvent.url === "https://services.univ-rennes2.fr/sesame/index.php/login/mon-compte-sesame/changer-mon-mot-de-passe") {
             webViewRef.current?.injectJavaScript(`
-              window.location.href = "https://sesame.univ-rennes1.fr/comptes/api/auth/data";
+              window.location.href = "https://services.univ-rennes2.fr/sesame/index.php/mon-compte-sesame";
             `);
           }
-
-          if (e.nativeEvent.url === "https://sesame.univ-rennes1.fr/comptes/api/auth/data") {
+          else if (e.nativeEvent.url === "https://services.univ-rennes2.fr/sesame/index.php/mon-compte-sesame") {
+            // send all HTML content to the app
             webViewRef.current?.injectJavaScript(`
-              window.ReactNativeWebView.postMessage(JSON.stringify({type: "loginData", data: document.querySelector("pre").innerText}));
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: "accountHTML",
+                data: document.documentElement.outerHTML
+              }));
             `);
           }
           else {
@@ -144,8 +189,9 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
 
         onMessage={(e) => {
           const data = JSON.parse(e.nativeEvent.data);
-          if (data.type === "loginData") {
-            loginUnivData(JSON.parse(data.data));
+          if (data.type === "accountHTML") {
+            const accountData = extractStudentDataFromHTML(data.data);
+            loginUnivData(accountData);
           }
         }}
       />
@@ -153,4 +199,4 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
   );
 };
 
-export default UnivRennes1_Login;
+export default UnivRennes2_Login;

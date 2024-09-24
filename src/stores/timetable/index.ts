@@ -22,6 +22,34 @@ export const useTimetableStore = create<TimetableStore>()(
         });
 
         log(`[timetable:updateClasses]: updated classes for week ${weekNumber}`, "timetable:updateClasses");
+      },
+      removeClasses: (weekNumber) => {
+        log(`removing classes for week ${weekNumber}`, "timetable:removeClasses");
+
+        set((state) => {
+          const timetables = { ...state.timetables };
+          delete timetables[weekNumber];
+          return {
+            timetables
+          };
+        });
+
+        log(`[timetable:removeClasses]: removed classes for week ${weekNumber}`, "timetable:removeClasses");
+      },
+      removeClassesFromSource: (source) => {
+        log(`removing classes from source ${source}`, "timetable:removeClassesFromSource");
+
+        set((state) => {
+          const timetables = { ...state.timetables };
+          for (const weekNumber in timetables) {
+            timetables[weekNumber] = timetables[weekNumber].filter((c) => c.source !== source);
+          }
+          return {
+            timetables
+          };
+        });
+
+        log(`[timetable:removeClassesFromSource]: removed classes from source ${source}`, "timetable:removeClassesFromSource");
       }
     }),
     {
