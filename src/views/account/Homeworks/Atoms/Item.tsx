@@ -64,19 +64,32 @@ const HomeworkItem = ({ homework, navigation, onDonePressHandler, index, total }
         style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
       >
         <Reanimated.View style={{ flex: 1, gap: 4 }} layout={animPapillon(LinearTransition)}>
-          <View style={{ flexDirection: "row", gap: 10 }}>
+          <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
             <NativeText variant="overtitle" style={{ color: subjectData.color, flex: 1 }} numberOfLines={1}>
               {subjectData.pretty}
             </NativeText>
             {
               homework.returnType && (
-                <NativeText variant="subtitle" style={{ marginLeft: "auto", opacity: 0.8 }} numberOfLines={1}>
-                  {homework.returnType === HomeworkReturnType.FileUpload
-                    ? "À rendre sur l'ENT"
-                    : homework.returnType === HomeworkReturnType.Paper
-                      ? "À rendre en classe"
-                      : null}
-                </NativeText>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 4,
+                    backgroundColor: theme.colors.text + "11",
+                    paddingVertical: 3,
+                    marginVertical: -1,
+                    paddingHorizontal: 8,
+                    borderRadius: 8,
+                  }}
+                >
+                  <NativeText variant="subtitle" style={{ marginLeft: "auto", opacity: 0.8 }} numberOfLines={1}>
+                    {homework.returnType === HomeworkReturnType.FileUpload
+                      ? "À rendre sur l'ENT"
+                      : homework.returnType === HomeworkReturnType.Paper
+                        ? "À rendre en classe"
+                        : null}
+                  </NativeText>
+                </View>
               )
             }
           </View>
