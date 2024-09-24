@@ -41,6 +41,13 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   let currentlyLoadingWeeks = useRef<Set<number>>(new Set());
   let lastAccountID = useRef<string | null>(null);
 
+  useEffect(() => {
+    // add all week numbers in timetables to loadedWeeks
+    for (const week in timetables) {
+      loadedWeeks.current.add(parseInt(week));
+    }
+  }, [timetables]);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -60,6 +67,10 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
       await loadTimetableWeek(weekNumber, false);
     })();
   }, [pickerDate, account.instance]);
+
+  useEffect(() => {
+    loadTimetableWeek(getWeekFromDate(new Date()), true);
+  }, [account.personalization.icalURLs]);
 
   const [loadingWeeks, setLoadingWeeks] = useState([]);
   const [loading, setLoading] = useState(false);
