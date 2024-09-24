@@ -56,6 +56,8 @@ import {animPapillon} from "@/utils/ui/animations";
 import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
 import { useFlagsStore } from "@/stores/flags";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
+import { th } from "date-fns/locale";
+import MissingItem from "@/components/Global/MissingItem";
 
 let headerHeight = Dimensions.get("window").height / 2.75;
 if (headerHeight < 275) {
@@ -486,10 +488,10 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                     }
                     onPress={() => navigation.navigate("ChangelogScreen")}
                     style={{
-                      backgroundColor: "#ffa200" + "20",
+                      backgroundColor: theme.colors.primary + "30",
                     }}
                     androidStyle={{
-                      backgroundColor: "#ffa200" + "20",
+                      backgroundColor: theme.colors.primary + "20",
                     }}
                   >
                     <NativeText variant="title">

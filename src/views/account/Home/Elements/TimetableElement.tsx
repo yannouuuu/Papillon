@@ -1,4 +1,4 @@
-import { NativeListHeader } from "@/components/Global/NativeComponents";
+import { NativeItem, NativeList, NativeListHeader } from "@/components/Global/NativeComponents";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { animPapillon } from "@/utils/ui/animations";
@@ -17,6 +17,7 @@ import { useTheme } from "@react-navigation/native";
 import { Image, Platform, Text, View } from "react-native";
 import { Sofa, Utensils } from "lucide-react-native";
 import { updateTimetableForWeekInCache } from "@/services/timetable";
+import MissingItem from "@/components/Global/MissingItem";
 
 const TimetableElement = () => {
   const account = useCurrentAccount((store) => store.account!);
@@ -142,7 +143,27 @@ const TimetableElement = () => {
   }, [account.instance, timetables]);
 
   if (hidden || nextCourses.length === 0) {
-    return null;
+    return (
+      <NativeList
+        animated
+        key="emptyCourses"
+        entering={FadeInDown.springify().mass(1).damping(20).stiffness(300)}
+        exiting={FadeOut.duration(300)}
+      >
+        <NativeItem
+          animated
+          style={{
+            paddingVertical: 10,
+          }}
+        >
+          <MissingItem
+            emoji="📚"
+            title="Aucun cours à venir"
+            description="Il n'y a pas de cours à venir pour aujourd'hui."
+          />
+        </NativeItem>
+      </NativeList>
+    );
   }
 
   const label = isToday(nextCourses[0].startTimestamp)
