@@ -129,6 +129,11 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
                   setSubjects([]);
                   setLocalSubjects([]);
                   setCurrentTitle("");
+
+                  mutateProperty("personalization", {
+                    ...account.personalization,
+                    subjects: {},
+                  });
                 }},
               ]
             );
