@@ -1,11 +1,12 @@
-import { NativeItem, NativeList, NativeText } from "@/components/Global/NativeComponents";
-import { useCurrentAccount } from "@/stores/account";
-import React, { useEffect, useState, useCallback, useLayoutEffect } from "react";
+import React, { useEffect, useState, useCallback, useLayoutEffect, useMemo } from "react";
 import { Alert, FlatList, KeyboardAvoidingView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@react-navigation/native";
 import Reanimated, { ZoomIn, ZoomOut } from "react-native-reanimated";
+import debounce from "lodash/debounce";
+import { NativeItem, NativeList, NativeText } from "@/components/Global/NativeComponents";
+import { useCurrentAccount } from "@/stores/account";
 import MissingItem from "@/components/Global/MissingItem";
 import BottomSheet from "@/components/Modals/PapillonBottomSheet";
 import { Trash2 } from "lucide-react-native";
@@ -17,6 +18,7 @@ import SubjectContainerCard from "@/components/Settings/SubjectContainerCard";
 const MemoizedNativeItem = React.memo(NativeItem);
 const MemoizedNativeList = React.memo(NativeList);
 const MemoizedNativeText = React.memo(NativeText);
+const MemoizedSubjectContainerCard = React.memo(SubjectContainerCard);
 
 type Item = [key: string, value: { color: string; pretty: string; emoji: string; }];
 
@@ -27,36 +29,83 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
   const colors = useTheme().colors;
 
   const [subjects, setSubjects] = useState<Array<Item>>([]);
-  const [currentCourseTitle, setCurrentCourseTitle] = useState("");
+  const [localSubjects, setLocalSubjects] = useState<Array<Item>>([]);
   const [selectedSubject, setSelectedSubject] = useState<Item | null>(null);
   const [opened, setOpened] = useState(false);
+  const [currentTitle, setCurrentTitle] = useState(""); // New state for unsynced text input
 
   const emojiInput = React.useRef<TextInput>(null);
 
   useEffect(() => {
-    void async function () {
-      if (subjects.length === 0 && account.personalization.subjects) {
-        setSubjects(Object.entries(account.personalization.subjects));
-      }
-    }();
+    if (subjects.length === 0 && account.personalization.subjects) {
+      const initialSubjects = Object.entries(account.personalization.subjects);
+      setSubjects(initialSubjects);
+      setLocalSubjects(initialSubjects);
+    }
   }, []);
 
   useEffect(() => {
-    if (selectedSubject && currentCourseTitle !== selectedSubject[1].pretty && currentCourseTitle.trim() !== "") {
-      setOnSubjects(
-        subjects.map((subject) => {
-          if (subject[0] === selectedSubject[0]) {
-            return [selectedSubject[0], {
-              ...subject[1],
-              pretty: currentCourseTitle,
-            }];
-          }
-
-          return subject;
-        })
-      );
+    if (selectedSubject) {
+      setCurrentTitle(selectedSubject[1].pretty);
     }
-  }, [currentCourseTitle]);
+  }, [selectedSubject]);
+
+  const updateSubject = useCallback((subjectKey: string, updates: Partial<Item[1]>) => {
+    setSubjects(prevSubjects =>
+      prevSubjects.map(subject =>
+        subject[0] === subjectKey ? [subject[0], { ...subject[1], ...updates }] : subject
+      )
+    );
+  }, []);
+
+  const debouncedUpdateSubject = useMemo(
+    () => debounce((subjectKey: string, updates: Partial<Item[1]>) => {
+      updateSubject(subjectKey, updates);
+      setOnSubjects(localSubjects);
+    }, 1000),
+    [updateSubject, localSubjects]
+  );
+
+  const handleSubjectTitleChange = useCallback((newTitle: string) => {
+    setCurrentTitle(newTitle);
+  }, []);
+
+  const handleSubjectTitleBlur = useCallback(() => {
+    if (selectedSubject && currentTitle.trim() !== "") {
+      setLocalSubjects(prevSubjects =>
+        prevSubjects.map(subject =>
+          subject[0] === selectedSubject[0] ? [subject[0], { ...subject[1], pretty: currentTitle }] : subject
+        )
+      );
+      debouncedUpdateSubject(selectedSubject[0], { pretty: currentTitle });
+    }
+  }, [selectedSubject, currentTitle, debouncedUpdateSubject]);
+
+  const handleSubjectEmojiChange = useCallback((subjectKey: string, newEmoji: string) => {
+    let emoji = "";
+    if(newEmoji.length >= 1) {
+      var regexp = /((\ud83c[\udde6-\uddff]){2}|([#*0-9]\u20e3)|(\u00a9|\u00ae|[\u2000-\u3300]|[\ud83c-\ud83e][\ud000-\udfff])((\ud83c[\udffb-\udfff])?(\ud83e[\uddb0-\uddb3])?(\ufe0f?\u200d([\u2000-\u3300]|[\ud83c-\ud83e][\ud000-\udfff])\ufe0f?)?)*)/g;
+      const emojiMatch = newEmoji.match(regexp);
+      if(emojiMatch) {
+        emoji = emojiMatch[emojiMatch.length - 1];
+      }
+    }
+    setLocalSubjects(prevSubjects =>
+      prevSubjects.map(subject =>
+        subject[0] === subjectKey ? [subject[0], { ...subject[1], emoji }] : subject
+      )
+    );
+    debouncedUpdateSubject(subjectKey, { emoji });
+  }, [debouncedUpdateSubject]);
+
+  const handleSubjectColorChange = useCallback((subjectKey: string, newColor: string) => {
+    setLocalSubjects(prevSubjects =>
+      prevSubjects.map(subject =>
+        subject[0] === subjectKey ? [subject[0], { ...subject[1], color: newColor }] : subject
+      )
+    );
+    debouncedUpdateSubject(subjectKey, { color: newColor });
+  }, [debouncedUpdateSubject]);
 
   const setOnSubjects = useCallback((newSubjects: Item[]) => {
     setSubjects(newSubjects);
@@ -64,9 +113,8 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
       ...account.personalization,
       subjects: Object.fromEntries(newSubjects),
     });
-  }, [subjects]);
+  }, [account.personalization, mutateProperty]);
 
-  // Add reset button in header.
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -76,32 +124,58 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
               "Réinitialiser les matières",
               "Voulez-vous vraiment réinitialiser les matières ?",
               [
-                {
-                  text: "Annuler",
-                  style: "cancel",
-                },
-                {
-                  text: "Réinitialiser",
-                  style: "destructive",
-                  onPress: () => {
-                    setSubjects([]);
-                  },
-                },
+                { text: "Annuler", style: "cancel" },
+                { text: "Réinitialiser", style: "destructive", onPress: () => {
+                  setSubjects([]);
+                  setLocalSubjects([]);
+                  setCurrentTitle("");
+                }},
               ]
             );
           }}
-          style={{
-            marginRight: 2,
-          }}
+          style={{ marginRight: 2 }}
         >
-          <Trash2
-            size={22}
-            color={colors.primary}
-          />
+          <Trash2 size={22} color={colors.primary} />
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, colors.primary]);
+
+  const renderSubjectItem = useCallback(({ item: subject, index }: { item: Item, index: number }) => {
+    if (!subject[0] || !subject[1] || !subject[1].emoji || !subject[1].pretty || !subject[1].color)
+      return null;
+
+    return (
+      <MemoizedNativeItem
+        onPress={() => {
+          setSelectedSubject(subject);
+          setCurrentTitle(subject[1].pretty);
+          setOpened(true);
+        }}
+        separator={index !== localSubjects.length - 1}
+        leading={
+          <View style={{ flexDirection: "row", gap: 14, alignItems: "center" }}>
+            <View
+              style={{
+                width: 4,
+                height: 40,
+                borderRadius: 8,
+                backgroundColor: subject[1].color || "#000000",
+              }}
+            />
+            <Text style={{ fontSize: 26 }}>{subject[1].emoji || "🎨"}</Text>
+          </View>
+        }
+      >
+        <MemoizedNativeText variant="title" numberOfLines={2}>
+          {subject[1].pretty || "Matière"}
+        </MemoizedNativeText>
+        <MemoizedNativeText variant="subtitle" numberOfLines={2}>
+          {subject[1].color || "Sans couleur"}
+        </MemoizedNativeText>
+      </MemoizedNativeItem>
+    );
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -115,287 +189,192 @@ const SettingsSubjects: Screen<"SettingsSubjects"> = ({ navigation }) => {
           paddingBottom: 16 + insets.bottom,
         }}
       >
-        {subjects.length > 0 && selectedSubject && (
+        {localSubjects.length > 0 && selectedSubject && (
           <BottomSheet
             opened={opened}
             setOpened={(bool: boolean) => {
-              if (subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].emoji != "") {
+              if (localSubjects.find((subject) => subject[0] === selectedSubject[0])?.[1].emoji != "") {
                 setOpened(bool);
+                if (!bool) {
+                  handleSubjectTitleBlur(); // Update subject title when closing the bottom sheet
+                }
               } else {
                 Alert.alert("Aucun émoji défini", "Vous devez définir un émoji pour cette matière avant de pouvoir quitter cette page.");
                 emojiInput.current?.focus();
               }
             }}
-            contentContainerStyle={{
-              paddingHorizontal: 16,
-            }}
+            contentContainerStyle={{ paddingHorizontal: 16 }}
           >
-            {selectedSubject &&
-              <MemoizedNativeList>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "flex-start",
-                    justifyContent: "flex-start",
-                    paddingVertical: 12,
-                    paddingHorizontal: 12,
-                    gap: 14,
-                  }}
-                >
-                  <ColorIndicator style={{ flex: 0 }} color={subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color ?? "#ffffff"} />
+            {selectedSubject && (
+              <>
+                <MemoizedNativeList>
                   <View
                     style={{
-                      flex: 1,
-                      gap: 4,
+                      flexDirection: "row",
+                      alignItems: "flex-start",
+                      justifyContent: "flex-start",
+                      paddingVertical: 12,
+                      paddingHorizontal: 12,
+                      gap: 14,
                     }}
                   >
-                    <MemoizedNativeText variant="title" numberOfLines={2}>
-                      {currentCourseTitle}
-                    </MemoizedNativeText>
-                    <MemoizedNativeText
-                      variant="subtitle"
-                      style={{
-                        backgroundColor: subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color + "22",
-                        color: subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color,
-                        alignSelf: "flex-start",
-                        paddingHorizontal: 8,
-                        paddingVertical: 2,
-                        borderRadius: 8,
-                        overflow: "hidden",
-                        borderCurve: "continuous",
-                        opacity: 1,
-                      }}
-                    >
-                      Papillon Park
-                    </MemoizedNativeText>
-                    <MemoizedNativeText variant="subtitle">
-                      HLR T.
-                    </MemoizedNativeText>
-                  </View>
-                </View>
-              </MemoizedNativeList>
-            }
-
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 16,
-              }}
-            >
-              <MemoizedNativeList
-                style={{ marginTop: 16, width: 72 }}
-              >
-                <MemoizedNativeItem
-                  style={{
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: 64,
-                    width: 42,
-                  }}
-                >
-                  <TextInput
-                    ref={emojiInput}
-                    style={{
-                      fontFamily: "medium",
-                      fontSize: 26,
-                      color: colors.text,
-                      textAlign: "center",
-                      textAlignVertical: "center",
-                      padding: 0,
-                      height: 46,
-                      width: 42,
-                    }}
-                    value={subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].emoji}
-                    onChangeText={(text) => {
-                      let emoji = "";
-                      if(text.length >= 1) {
-                        var regexp = /((\ud83c[\udde6-\uddff]){2}|([#*0-9]\u20e3)|(\u00a9|\u00ae|[\u2000-\u3300]|[\ud83c-\ud83e][\ud000-\udfff])((\ud83c[\udffb-\udfff])?(\ud83e[\uddb0-\uddb3])?(\ufe0f?\u200d([\u2000-\u3300]|[\ud83c-\ud83e][\ud000-\udfff])\ufe0f?)?)*)/g;
-
-                        const emojiMatch = text.match(regexp);
-
-                        if(emojiMatch) {
-                          emoji = emojiMatch[emojiMatch.length - 1];
-                        }
-                      }
-
-                      setOnSubjects(
-                        subjects.map((subject) => {
-                          if (subject[0] === selectedSubject[0]) {
-                            return [selectedSubject[0], {
-                              ...subject[1],
-                              emoji: emoji,
-                            }];
-                          }
-                          return subject;
-                        })
-                      );
-                    }}
-                  />
-                </MemoizedNativeItem>
-              </MemoizedNativeList>
-
-              <MemoizedNativeList
-                style={{ marginTop: 16, flex: 1 }}
-              >
-                <MemoizedNativeItem>
-                  <MemoizedNativeText variant="subtitle" numberOfLines={1}>
-                    Nom de la matière
-                  </MemoizedNativeText>
-                  <TextInput
-                    style={{
-                      fontFamily: "medium",
-                      fontSize: 16,
-                      color: colors.text,
-                    }}
-                    value={currentCourseTitle}
-                    onChangeText={setCurrentCourseTitle}
-                  />
-                </MemoizedNativeItem>
-              </MemoizedNativeList>
-            </View>
-
-            <MemoizedNativeList
-              style={{ marginTop: 16 }}
-            >
-              <MemoizedNativeItem
-              >
-                <MemoizedNativeText variant="subtitle">
-                  Couleur
-                </MemoizedNativeText>
-
-                <FlatList
-                  style={{
-                    marginHorizontal: -18,
-                    paddingHorizontal: 12,
-                    marginTop: 4,
-                  }}
-                  data={COLORS_LIST}
-                  horizontal
-                  keyExtractor={(item) => item}
-                  ListFooterComponent={<View style={{ width: 16 }} />}
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setOnSubjects(
-                          subjects.map((subject) => {
-                            if (subject[0] === selectedSubject[0]) {
-                              return [selectedSubject[0], {
-                                ...subject[1],
-                                color: item,
-                              }];
-                            }
-                            return subject;
-                          })
-                        );
-                      }}
-                    >
-                      <View
+                    <ColorIndicator style={{ flex: 0 }} color={selectedSubject[1].color} />
+                    <View style={{ flex: 1, gap: 4 }}>
+                      <MemoizedNativeText variant="title" numberOfLines={2}>
+                        {currentTitle}
+                      </MemoizedNativeText>
+                      <MemoizedNativeText
+                        variant="subtitle"
                         style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 80,
-                          backgroundColor: item,
-                          marginHorizontal: 5,
-                          alignItems: "center",
-                          justifyContent: "center",
+                          backgroundColor: selectedSubject[1].color + "22",
+                          color: selectedSubject[1].color,
+                          alignSelf: "flex-start",
+                          paddingHorizontal: 8,
+                          paddingVertical: 2,
+                          borderRadius: 8,
+                          overflow: "hidden",
+                          borderCurve: "continuous",
+                          opacity: 1,
                         }}
                       >
-                        {subjects.find((subject) => subject[0] === selectedSubject[0])?.[1].color === item && (
-                          <Reanimated.View
+                        Papillon Park
+                      </MemoizedNativeText>
+                      <MemoizedNativeText variant="subtitle">
+                        HLR T.
+                      </MemoizedNativeText>
+                    </View>
+                  </View>
+                </MemoizedNativeList>
+
+                <View style={{ flexDirection: "row", gap: 16 }}>
+                  <MemoizedNativeList style={{ marginTop: 16, width: 72 }}>
+                    <MemoizedNativeItem
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: 64,
+                        width: 42,
+                      }}
+                    >
+                      <TextInput
+                        ref={emojiInput}
+                        style={{
+                          fontFamily: "medium",
+                          fontSize: 26,
+                          color: colors.text,
+                          textAlign: "center",
+                          textAlignVertical: "center",
+                          padding: 0,
+                          height: 46,
+                          width: 42,
+                        }}
+                        value={selectedSubject[1].emoji}
+                        onChangeText={(newEmoji) => handleSubjectEmojiChange(selectedSubject[0], newEmoji)}
+                      />
+                    </MemoizedNativeItem>
+                  </MemoizedNativeList>
+
+                  <MemoizedNativeList style={{ marginTop: 16, flex: 1 }}>
+                    <MemoizedNativeItem>
+                      <MemoizedNativeText variant="subtitle" numberOfLines={1}>
+                        Nom de la matière
+                      </MemoizedNativeText>
+                      <TextInput
+                        style={{
+                          fontFamily: "medium",
+                          fontSize: 16,
+                          color: colors.text,
+                        }}
+                        value={currentTitle}
+                        onChangeText={handleSubjectTitleChange}
+                        onBlur={handleSubjectTitleBlur}
+                      />
+                    </MemoizedNativeItem>
+                  </MemoizedNativeList>
+                </View>
+
+                <MemoizedNativeList style={{ marginTop: 16 }}>
+                  <MemoizedNativeItem>
+                    <MemoizedNativeText variant="subtitle">
+                      Couleur
+                    </MemoizedNativeText>
+
+                    <FlatList
+                      style={{
+                        marginHorizontal: -18,
+                        paddingHorizontal: 12,
+                        marginTop: 4,
+                      }}
+                      data={COLORS_LIST}
+                      horizontal
+                      keyExtractor={(item) => item}
+                      ListFooterComponent={<View style={{ width: 16 }} />}
+                      showsHorizontalScrollIndicator={false}
+                      renderItem={({ item }) => (
+                        <TouchableOpacity
+                          onPress={() => handleSubjectColorChange(selectedSubject[0], item)}
+                        >
+                          <View
                             style={{
-                              width: 26,
-                              height: 26,
+                              width: 32,
+                              height: 32,
                               borderRadius: 80,
                               backgroundColor: item,
-                              borderColor: colors.background,
-                              borderWidth: 3,
+                              marginHorizontal: 5,
+                              alignItems: "center",
+                              justifyContent: "center",
                             }}
-                            entering={ZoomIn.springify().mass(1).damping(20).stiffness(300)}
-                            exiting={ZoomOut.springify().mass(1).damping(20).stiffness(300)}
-                          />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  )}
-                />
-              </MemoizedNativeItem>
-            </MemoizedNativeList>
+                          >
+                            {selectedSubject[1].color === item && (
+                              <Reanimated.View
+                                style={{
+                                  width: 26,
+                                  height: 26,
+                                  borderRadius: 80,
+                                  backgroundColor: item,
+                                  borderColor: colors.background,
+                                  borderWidth: 3,
+                                }}
+                                entering={ZoomIn.springify().mass(1).damping(20).stiffness(300)}
+                                exiting={ZoomOut.springify().mass(1).damping(20).stiffness(300)}
+                              />
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    />
+                  </MemoizedNativeItem>
+                </MemoizedNativeList>
+              </>
+            )}
           </BottomSheet>
         )}
 
-        <SubjectContainerCard theme={{ colors }} />
+        <MemoizedSubjectContainerCard theme={{ colors }} />
 
-        {subjects.length > 0 && (
-          <MemoizedNativeList
-            style={{
-              marginTop: 16,
-            }}
-          >
-            {subjects.map((subject, index) => {
-              if (!subject[0] || !subject[1] || !subject[1].emoji || !subject[1].pretty || !subject[1].color)
-                return <View key={index} />;
-
-              return (
-                <MemoizedNativeItem
-                  key={index + subject[0] + subject[1].emoji + subject[1].pretty + subject[1].color}
-                  onPress={() => {
-                    setSelectedSubject(subject);
-                    setCurrentCourseTitle(subject[1].pretty);
-                    setOpened(true);
-                  }}
-                  leading={
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        gap: 14,
-                        alignItems: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 4,
-                          height: 40,
-                          borderRadius: 8,
-                          backgroundColor: subject[1].color || "#000000",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      />
-
-                      <Text
-                        style={{
-                          fontSize: 26,
-                        }}
-                      >
-                        {subject[1].emoji || "🎨"}
-                      </Text>
-                    </View>
-                  }
-                >
-                  <MemoizedNativeText variant="body" numberOfLines={2}>
-                    {subject[1].pretty || "Matière"}
-                  </MemoizedNativeText>
-                </MemoizedNativeItem>
-              );
-            })}
-          </MemoizedNativeList>
-        )}
-
-        {subjects.length === 0 && (
+        {localSubjects.length > 0 ? (
+          <NativeList>
+            <FlatList
+              data={localSubjects}
+              renderItem={renderSubjectItem}
+              keyExtractor={(item) => item[0]}
+              initialNumToRender={10}
+              maxToRenderPerBatch={10}
+              windowSize={5}
+              removeClippedSubviews={true}
+            />
+          </NativeList>
+        ) : (
           <MissingItem
-            style={{
-              marginTop: 16,
-            }}
+            style={{ marginTop: 16 }}
             emoji={"🎨"}
             title={"Une matière manque ?"}
             description={"Essayez d'ouvrir quelques journées dans votre emploi du temps"}
           />
         )}
-
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-export default SettingsSubjects;
+export default React.memo(SettingsSubjects);
