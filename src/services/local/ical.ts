@@ -32,6 +32,11 @@ export const fetchIcalData = async (account: Account, force = false): Promise<Ti
     return acc;
   }, []);
 
+  // for each week, sort by startTimestamp
+  for (const { courses } of coursesByEpochWeekNumber) {
+    courses.sort((a, b) => a.startTimestamp - b.startTimestamp);
+  }
+
   for (const { epochWeekNumber, courses } of coursesByEpochWeekNumber) {
     useTimetableStore.getState().updateClasses(epochWeekNumber, courses);
   }
