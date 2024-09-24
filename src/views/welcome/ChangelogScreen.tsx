@@ -157,7 +157,9 @@ const ChangelogScreen = ({ route, navigation }) => {
           layout={animPapillon(LinearTransition)}
         >
           <PressableScale>
-            <NativeList animated inline>
+            <NativeList
+              animated inline
+            >
               <Image
                 source={{uri: changelog.illustration}}
                 style={{
@@ -269,7 +271,7 @@ const ChangelogFeature: React.FC<{ feature: Feature, navigation: any, theme: any
       <NativeList
         inline
         style={{
-          width: 200
+          width: 200,
         }}
       >
         <Image
@@ -279,14 +281,30 @@ const ChangelogFeature: React.FC<{ feature: Feature, navigation: any, theme: any
             aspectRatio: 3 / 2
           }}
         />
-        <NativeItem pointerEvents="none">
+        <View pointerEvents="none"
+          style={{
+            height: 160,
+            padding: 12,
+            gap: 6,
+            paddingLeft: 0,
+            marginLeft: 12,
+            borderBottomColor: theme.colors.text + "18",
+            borderBottomWidth: 0.5,
+          }}
+        >
           <NativeText variant="title">
             {feature.title}
           </NativeText>
-          <NativeText variant="subtitle">
+          <NativeText variant="subtitle"
+            style={{
+              height: "100%"
+            }}
+            ellipsizeMode="tail"
+            numberOfLines={4}
+          >
             {feature.subtitle}
           </NativeText>
-        </NativeItem>
+        </View>
         {(feature.href || feature.navigation) && (
           <NativeItem
             onPress={() => {
