@@ -48,7 +48,7 @@ export const categorizeMessages = (messages: Message[]): CategorizedMessages => 
     });
 
     if (matchCount > 0 && !read) {
-      importantMessages.push({ ...message, matchCount, matchingWords });
+      importantMessages.push({ ...message, matchCount, matchingWords, important: true });
 
       // Log the matching words or phrases for this message
       console.log(`Message Title: "${title}" matched the following words:`, matchingWords);

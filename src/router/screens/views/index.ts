@@ -36,6 +36,7 @@ export default [
   createScreen("NewsItem", NewsItem, {
     headerTitle: "Item",
     presentation: "modal",
+    headerShown: false,
   }),
   createScreen("AddonLogs", AddonLogs, {
     headerTitle: "Logs",

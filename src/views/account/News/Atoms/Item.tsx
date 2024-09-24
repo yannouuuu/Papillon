@@ -1,34 +1,16 @@
 import { useTheme } from "@react-navigation/native";
-import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import React from "react";
 import {
   View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Image,
 } from "react-native";
-import LottieView from "lottie-react-native";
-import { X } from "lucide-react-native";
-import { Screen } from "@/router/helpers/types";
-import { updateNewsInCache } from "@/services/news";
-import { useNewsStore } from "@/stores/news";
-import { useCurrentAccount } from "@/stores/account";
 import {
   NativeItem,
-  NativeList,
-  NativeListHeader,
   NativeText,
 } from "@/components/Global/NativeComponents";
 import parse_news_resume from "@/utils/format/format_pronote_news";
 import parse_initials from "@/utils/format/format_pronote_initials";
-import important_json from "@/utils/magic/regex/important.json";
 import formatDate from "@/utils/format/format_date_complets";
 import InitialIndicator from "@/components/News/InitialIndicator";
-import { defaultTabs } from "@/consts/DefaultTabs";
-import { RefreshControl } from "react-native-gesture-handler";
-import { LinearGradient } from "expo-linear-gradient";
-import BetaIndicator from "@/components/News/Beta";
 
 const NewsListItem = ({ index, message, navigation, parentMessages }) => {
   const theme = useTheme();
@@ -38,7 +20,7 @@ const NewsListItem = ({ index, message, navigation, parentMessages }) => {
       onPress={() => {
         navigation.navigate("NewsItem", {
           message: JSON.stringify(message),
-          important: true,
+          important: message.important !== undefined,
         });
       }}
       chevron={false}
