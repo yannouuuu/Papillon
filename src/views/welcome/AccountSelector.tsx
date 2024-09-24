@@ -1,11 +1,20 @@
-import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
-import { useAccounts, useCurrentAccount } from "@/stores/account";
-import { defaultProfilePicture } from "@/utils/ui/default-profile-picture";
-import { useIsFocused, useTheme } from "@react-navigation/native";
-import { PlusIcon } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import {ActivityIndicator, Alert, Image, RefreshControl, StatusBar, Text, TouchableHighlight, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {NativeItem, NativeList, NativeListHeader, NativeText} from "@/components/Global/NativeComponents";
+import {useAccounts, useCurrentAccount} from "@/stores/account";
+import {defaultProfilePicture} from "@/utils/ui/default-profile-picture";
+import {useIsFocused, useTheme} from "@react-navigation/native";
+import {PlusIcon} from "lucide-react-native";
+import {useEffect, useState} from "react";
+import {
+  Alert,
+  Dimensions,
+  Image,
+  RefreshControl,
+  StatusBar,
+  Text,
+  TouchableHighlight,
+  View
+} from "react-native";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 
 import PapillonAvatar from "@/components/Global/PapillonAvatar";
@@ -13,19 +22,20 @@ import PapillonAvatar from "@/components/Global/PapillonAvatar";
 import PackageJSON from "@/../package.json";
 
 import Reanimated, {
+  Extrapolation,
   FadeInDown,
-  FadeInUp,
   FadeOut,
-  FadeOutUp,
+  interpolate,
   LinearTransition,
+  useAnimatedRef, useAnimatedStyle,
+  useScrollViewOffset,
   ZoomIn,
 } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
-import { animPapillon } from "@/utils/ui/animations";
-import { Screen } from "@/router/helpers/types";
-import { AccountService } from "@/stores/account/types";
+import {LinearGradient} from "expo-linear-gradient";
+import {animPapillon} from "@/utils/ui/animations";
+import {Screen} from "@/router/helpers/types";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
-import { PressableScale } from "react-native-pressable-scale";
+import {PressableScale} from "react-native-pressable-scale";
 
 import datasets from "@/consts/datasets.json";
 
@@ -46,6 +56,21 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
   const [downloadedIllustrations, setDownloadedIllustrations] = useState(false);
   const [illustration, setIllustration] = useState(null);
   const [illustrationLoaded, setIllustrationLoaded] = useState(false);
+
+  const scrollRef = useAnimatedRef();
+  const scrollOffset = useScrollViewOffset(scrollRef);
+  const headerRatioHeight = Dimensions.get("window").width * 3/5;
+  let headerAnimatedStyle = useAnimatedStyle(() => ({
+    height: interpolate(
+      scrollOffset.value,
+      [0, 100],
+      [headerRatioHeight, 60 + insets.top],
+      Extrapolation.CLAMP
+    ),
+  }));
+  let headerOpacity = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollOffset.value, [0, 100], [0, 0.75], Extrapolation.CLAMP),
+  }));
 
   useEffect(() => {
     if(!downloadedIllustrations) {
@@ -105,24 +130,138 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
         flex: 1,
       }}
     >
-      {isFocused && (
-        <StatusBar
-          barStyle="light-content"
-          backgroundColor="transparent"
-          translucent
-        />
-      )}
-
-      <Reanimated.View
+      <View
         style={{
-          width: "100%",
-          aspectRatio: 5 / 3,
-
-          borderBottomColor: theme.colors.border,
-          borderBottomWidth: 1,
+          position: "absolute",
+          zIndex: 99999999,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 70 + insets.bottom,
         }}
       >
-        {!illustrationLoaded &&
+        <LinearGradient
+          colors={[theme.colors.background + "00", theme.colors.background]}
+          locations={[0, (insets.bottom) / 70]}
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            height: 70 + insets.bottom,
+            zIndex: 5,
+          }}
+        />
+        <PressableScale
+          style={{
+            zIndex: 99999999,
+            position: "absolute",
+            right: 20,
+            bottom: 16 + insets.bottom,
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            gap: 10,
+            borderRadius: 100,
+            backgroundColor: theme.colors.primary,
+            shadowColor: "#000000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+          }}
+          onPress={() => navigation.navigate("ServiceSelector")}
+        >
+          <PlusIcon
+            size={24}
+            strokeWidth={2.5}
+            color={"#fff"}
+          />
+
+          <Text
+            style={{
+              color: "#ffffff",
+              fontFamily: "semibold",
+              fontSize: 16,
+            }}
+          >
+            Ajouter un compte
+          </Text>
+        </PressableScale>
+
+        <TouchableHighlight
+          style={{
+            position: "absolute",
+            bottom: 16 + insets.bottom,
+            left: 16,
+            alignSelf: "flex-start",
+            opacity: 0.4,
+            zIndex: 99999999,
+            paddingHorizontal: 8,
+            marginHorizontal: -8,
+            paddingVertical: 4,
+            borderRadius: 5,
+          }}
+          underlayColor={theme.colors.text + "44"}
+          onLongPress={() => navigation.navigate("DevMenu")}
+          delayLongPress={2000}
+        >
+          <NativeText
+            style={{
+              fontSize: 12,
+            }}
+          >
+            ver. {PackageJSON.version}
+          </NativeText>
+        </TouchableHighlight>
+      </View>
+      <Reanimated.ScrollView
+        style={{
+          paddingBottom: insets.bottom + 16,
+          paddingTop: 0,
+          flex: 1
+        }}
+        ref={scrollRef}
+        scrollEventThrottle={8}
+        refreshControl={
+          <RefreshControl
+            refreshing={false}
+            onRefresh={() => {
+              updateIllustration();
+            }}
+            progressViewOffset={headerRatioHeight}
+          />
+        }
+        contentContainerStyle={{
+          minHeight: Dimensions.get("window").height,
+        }}
+      >
+        {isFocused && (
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
+        )}
+
+        <Reanimated.View
+          style={[{
+            width: "100%",
+            zIndex: 2,
+            transform: [
+              {
+                translateY: scrollOffset,
+              },
+            ],
+
+            borderBottomColor: theme.colors.border,
+            borderBottomWidth: 1,
+          }, headerAnimatedStyle]}
+        >
+          {!illustrationLoaded &&
           <Reanimated.View
             style={{
               width: "100%",
@@ -135,149 +274,77 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
             }}
             exiting={FadeOut}
           />
-        }
+          }
 
-        <Reanimated.Image
-          source={illustration && { uri: illustration.image }}
-          style={{
-            width: "100%",
-            height: "100%",
-          }}
-          onLoad={() => setIllustrationLoaded(true)}
-        />
-
-        <LinearGradient
-          colors={["#00000000", "#000000"]}
-          locations={[0.5, 0.8]}
-          style={{
+          <Reanimated.Image
+            source={illustration && { uri: illustration.image }}
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+            onLoad={() => setIllustrationLoaded(true)}
+          />
+          <Reanimated.View style={[{
+            backgroundColor: "#000",
             position: "absolute",
+            top: 0,
             left: 0,
             right: 0,
-            top: "0%",
-            height: "100%",
-            opacity: 0.85,
-            zIndex: 5
-          }}
-        />
+            bottom: 0,
+          }, headerOpacity]}
+          />
 
-        <View
-          style={{
-            position: "absolute",
-            left: 16,
-            right: 16,
-            bottom: 16,
-            gap: 4,
-            zIndex: 9
-          }}
-        >
-          <Text
+          <LinearGradient
+            colors={["#00000000", "#000000"]}
+            locations={[0.5, 0.8]}
             style={{
-              color: "#ffffff",
-              fontSize: 18,
-              fontFamily: "bold",
-            }}
-          >
-            Bienvenue sur Papillon !
-          </Text>
-
-          <Text
-            style={{
-              color: "#ffffff",
-              fontSize: 15,
-              fontFamily: "medium",
-              opacity: 0.8,
-            }}
-          >
-            Sélectionnez un compte pour commencer.
-          </Text>
-        </View>
-      </Reanimated.View>
-
-      <PressableScale
-        style={{
-          zIndex: 99999999,
-          position: "absolute",
-          right: 20,
-          bottom: 16 + insets.bottom,
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: 16,
-          paddingVertical: 10,
-          gap: 10,
-          borderRadius: 100,
-          backgroundColor: theme.colors.primary,
-          shadowColor: "#000000",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.2,
-          shadowRadius: 4,
-        }}
-        onPress={() => navigation.navigate("ServiceSelector")}
-      >
-        <PlusIcon
-          size={24}
-          strokeWidth={2.5}
-          color={"#fff"}
-        />
-
-        <Text
-          style={{
-            color: "#ffffff",
-            fontFamily: "semibold",
-            fontSize: 16,
-          }}
-        >
-          Ajouter un compte
-        </Text>
-      </PressableScale>
-
-      <TouchableHighlight
-        style={{
-          position: "absolute",
-          bottom: 16 + insets.bottom,
-          left: 16,
-          alignSelf: "flex-start",
-          opacity: 0.4,
-          zIndex: 99999999,
-          paddingHorizontal: 8,
-          marginHorizontal: -8,
-          paddingVertical: 4,
-          borderRadius: 5,
-        }}
-        underlayColor={theme.colors.text + "44"}
-        onLongPress={() => navigation.navigate("DevMenu")}
-        delayLongPress={2000}
-      >
-        <NativeText
-          style={{
-            fontSize: 12,
-          }}
-        >
-          ver. {PackageJSON.version}
-        </NativeText>
-      </TouchableHighlight>
-
-      <Reanimated.ScrollView
-        style={{
-          padding: 16,
-          paddingBottom: insets.bottom + 16,
-          paddingTop: 0
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={() => {
-              updateIllustration();
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: "0%",
+              height: "100%",
+              opacity: 0.85,
+              zIndex: 5
             }}
           />
-        }
-      >
+
+          <View
+            style={{
+              position: "absolute",
+              left: 16,
+              right: 16,
+              bottom: 16,
+              gap: 4,
+              zIndex: 9
+            }}
+          >
+            <Text
+              style={{
+                color: "#ffffff",
+                fontSize: 18,
+                fontFamily: "bold",
+              }}
+            >
+              Bienvenue sur Papillon !
+            </Text>
+
+            <Text
+              style={{
+                color: "#ffffff",
+                fontSize: 15,
+                fontFamily: "medium",
+                opacity: 0.8,
+              }}
+            >
+              Sélectionnez un compte pour commencer.
+            </Text>
+          </View>
+        </Reanimated.View>
         {accounts.filter((account) => !account.isExternal).length > 0 && (
           <Reanimated.View
             entering={animPapillon(FadeInDown)}
             layout={animPapillon(LinearTransition)}
+            style={{paddingHorizontal: 16}}
           >
             <NativeListHeader label="Comptes connectés" />
             <NativeList>
