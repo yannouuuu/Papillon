@@ -18,8 +18,6 @@ export async function updateTimetableForWeekInCache <T extends Account> (account
       break;
     }
     case AccountService.Local: {
-      const timetable = [];
-      useTimetableStore.getState().updateClasses(epochWeekNumber, []);
       break;
     }
     case AccountService.Skolengo: {

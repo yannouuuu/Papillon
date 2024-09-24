@@ -5,7 +5,7 @@ import { useTimetableStore } from "@/stores/timetable";
 import { useTheme } from "@react-navigation/native";
 import { Calendar, Info, QrCode, X } from "lucide-react-native";
 import React, { useEffect } from "react";
-import { Alert, Modal, Platform, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Linking, Modal, Platform, TextInput, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import * as Clipboard from "expo-clipboard";
@@ -13,17 +13,25 @@ import * as Clipboard from "expo-clipboard";
 import { CameraView } from "expo-camera";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PapillonSpinner from "@/components/Global/PapillonSpinner";
+import { fetchIcalData } from "@/services/local/ical";
+import { updateTimetableForWeekInCache } from "@/services/timetable";
 
 const ical = require("cal-parser");
 
-const LessonsImportIcal = () => {
+const LessonsImportIcal = ({ route, navigation }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
+  const defaultIcal = route.params?.ical || "";
+  const defaultTitle = route.params?.title || "";
+  const autoAdd = route.params?.autoAdd || false;
+
   const account = useCurrentAccount(store => store.account!);
+  const timetables = useTimetableStore(store => store.timetables);
   const mutateProperty = useCurrentAccount(store => store.mutateProperty);
 
-  const [url, setUrl] = React.useState("");
+  const [url, setUrl] = React.useState(defaultIcal);
+  const [title, setTitle] = React.useState(defaultTitle);
 
   const [cameraVisible, setCameraVisible] = React.useState(false);
 
@@ -33,11 +41,28 @@ const LessonsImportIcal = () => {
 
   const [loading, setLoading] = React.useState(false);
 
+  useEffect(() => {
+    if (!account.instance) return;
+    if (defaultIcal && autoAdd) {
+      if(account.personalization.icalURLs.filter(u => u.url === defaultIcal).length === 0) {
+        saveIcal().then(() => {
+          if (autoAdd) {
+            navigation.goBack();
+            navigation.navigate("Lessons");
+          }
+        });
+      }
+      else {
+        navigation.goBack();
+      }
+    }
+  }, [defaultIcal]);
+
   const saveIcal = async () => {
     setLoading(true);
     const oldUrls = account.personalization.icalURLs || [];
 
-    fetch(url)
+    await fetch(url)
       .then(response => response.text())
       .then(text => {
         const parsed = ical.parseString(text);
@@ -45,15 +70,17 @@ const LessonsImportIcal = () => {
         newParsed.events = [];
         console.log(newParsed);
 
-        const title = "Mon calendrier" + (oldUrls.length > 0 ? ` ${oldUrls.length + 1}` : "");
+        const defaultTitle = "Mon calendrier" + (oldUrls.length > 0 ? ` ${oldUrls.length + 1}` : "");
 
         mutateProperty("personalization", {
           ...account.personalization,
           icalURLs: [...oldUrls, {
-            name: title,
+            name: title.trim().length > 0 ? title : defaultTitle,
             url,
           }]
         });
+
+        fetchIcalData(account);
       })
       .catch(() => {
         Alert.alert("Erreur", "Impossible de récupérer les données du calendrier. Vérifiez l'URL et réessayez.");
@@ -61,6 +88,8 @@ const LessonsImportIcal = () => {
       .finally(() => {
         setLoading(false);
       });
+
+    return;
   };
 
   return (
