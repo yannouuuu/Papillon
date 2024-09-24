@@ -60,7 +60,11 @@ export type RouteParameters = {
   NoteReaction: undefined;
 
   Lessons?: { outsideNav?: boolean };
-  LessonsImportIcal: undefined;
+  LessonsImportIcal: {
+    ical?: string;
+    title?: string;
+    autoAdd?: boolean;
+  };
 
   Homeworks?: { outsideNav?: boolean };
   HomeworksDocument: { homework: Homework };
