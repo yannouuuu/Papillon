@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { Dimensions, View } from "react-native";
 import screens from ".";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
@@ -69,7 +69,7 @@ const AccountStackScreen: Screen<"AccountStack"> = () => {
     finalScreens = newAccountScreens.splice(0, 5);
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     SplashScreen.hideAsync();
   }, []);
 
