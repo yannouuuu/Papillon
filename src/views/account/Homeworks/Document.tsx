@@ -41,7 +41,7 @@ const HomeworksDocument = ({ route }) => {
 
   return (
     <View style={{flex: 1}}>
-      <PapillonModernHeader outsideNav={true}>
+      <PapillonModernHeader outsideNav={true} startLocation={0.6} height={110}>
         <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
           <View style={{backgroundColor: theme.colors.background, borderRadius: 100}}>
             <View
