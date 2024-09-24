@@ -70,6 +70,12 @@ export const TimetableItem: React.FC<{
             <View style={{ flexDirection: "column", flexShrink: 1, gap: 6, flex: 1 }}>
               <Text numberOfLines={2} style={[styles.titleText, { color: colors.text }]}>{subjectData.pretty || "Cours inconnu"}</Text>
 
+              {item.itemType && (
+                <Text numberOfLines={2} style={[styles.subtitleText, { color: colors.text }]}>
+                  {item.itemType}
+                </Text>
+              )}
+
               <View style={[styles.roomTextContainer, { backgroundColor: subjectData.color + "33" }]}>
                 <Text numberOfLines={1} style={[styles.roomText, { color: subjectData.color }]}>{item.room || "Salle inconnue"}</Text>
               </View>
@@ -138,6 +144,13 @@ const styles = StyleSheet.create({
   titleText: {
     fontFamily: "semibold",
     fontSize: 17,
+  },
+  subtitleText: {
+    fontFamily: "medium",
+    fontSize: 15,
+    opacity: 0.5,
+    marginTop: -1,
+    marginBottom: 2,
   },
   roomTextContainer: {
     borderRadius: 8,
