@@ -144,6 +144,7 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
                         size={20}
                         strokeWidth={2.5}
                         color={theme.colors.primary}
+                        style={{ marginRight: 10}}
                       />
                     )}
                   </TouchableOpacity>
