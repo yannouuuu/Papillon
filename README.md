@@ -22,13 +22,17 @@ Voici un aperçu de ce que nous avons accompli jusqu'à présent et de ce qui re
   - 🏫 Interface de choix du service scolaire
     - [x] 🟢 Pronote
     - [ ] 🔵 EcoleDirecte
-    - [ ] 🟡 Skolengo
+    - [x] 🟡 Skolengo
   - 🏠 Interface de sélection de l'établissement
     - **Pour PRONOTE**
       - URL de l'établissement
       - Localisation de l'utilisateur
       - Renseignement de la localité (code postal / ville)
       - QR-code PRONOTE mobile
+    - **Pour Skolengo**
+      - URL de l'établissement
+      - Localisation de l'utilisateur
+
   - 🔑 Interface de connexion au service
     - **Pour PRONOTE**
       - Connexion par identifiants et mots de passe
