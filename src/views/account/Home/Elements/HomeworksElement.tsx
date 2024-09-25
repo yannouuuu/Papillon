@@ -35,7 +35,14 @@ const HomeworksElement = ({ navigation }) => {
     [account, updateHomeworks]
   );
 
-  if (!homeworks[dateToEpochWeekNumber(actualDay)] || homeworks[dateToEpochWeekNumber(actualDay)]?.filter(hw => new Date(hw.due).getDate() === actualDay.getDate()).length === 0) {
+  if (
+    !homeworks[dateToEpochWeekNumber(actualDay)]?.filter(
+      (hw) => hw.due / 1000 >= startTime && hw.due / 1000 <= endTime
+    ) &&
+    !homeworks[dateToEpochWeekNumber(actualDay) + 1]?.filter(
+      (hw) => hw.due / 1000 >= startTime && hw.due / 1000 <= endTime
+    )
+  ) {
     return null;
   }
   const startTime = Date.now() / 1000; // Convertir en millisecondes
