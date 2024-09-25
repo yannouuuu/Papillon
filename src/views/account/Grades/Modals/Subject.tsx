@@ -180,7 +180,7 @@ const GradeSubjectScreen = ({ route, navigation }) => {
                 marginRight: 6,
               }}
             >
-              {averageDiff.difference > 0 ? "-" : "+"}{averageDiff.difference.toFixed(2).replace("-", "")} pts
+              {averageDiff.difference > 0 ? "- " : "+ "}{averageDiff.difference.toFixed(2).replace("-", "")} pts
             </NativeText>
           }
         >
