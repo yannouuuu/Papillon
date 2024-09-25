@@ -4,6 +4,7 @@ import IdentityProviderSelector from "@/views/login/IdentityProvider/IdentityPro
 import UnivRennes1_Login from "@/views/login/IdentityProvider/providers/UnivRennes1";
 import UnivLimoges_Login from "@/views/login/IdentityProvider/providers/UnivLimoges";
 import UnivRennes2_Login from "@/views/login/IdentityProvider/providers/UnivRennes2";
+import UnivSorbonneParisNord_login from "@/views/login/IdentityProvider/providers/UnivSorbonneParisNord";
 
 export default [
   createScreen("IdentityProviderSelector", IdentityProviderSelector, {
@@ -25,4 +26,11 @@ export default [
     headerBackVisible: true,
     headerTitle: "Université de Limoges",
   }),
+
+  createScreen("UnivSorbonneParisNord_login", UnivSorbonneParisNord_login, {
+    headerBackVisible: true,
+    headerTitle: "Université Sorbonne Paris Nord",
+  }),
+
+
 ] as const;

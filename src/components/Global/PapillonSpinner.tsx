@@ -1,15 +1,32 @@
-import { View, Animated, Easing, type ViewStyle, type StyleProp } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { View, Animated, Easing, ViewStyle, StyleProp } from "react-native";
 import { useTheme } from "@react-navigation/native";
-
-import Reanimated, { LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
-import { PressableScale } from "react-native-pressable-scale";
+import Reanimated, {
+  LinearTransition,
+  EntryExitAnimationFunction,
+} from "react-native-reanimated";
 import { Svg, Circle, G } from "react-native-svg";
-import { Check } from "lucide-react-native";
-import * as Haptics from "expo-haptics";
 import { animPapillon } from "@/utils/ui/animations";
 
-const PapillonSpinner = ({ size = 50, color = "#000000", strokeWidth = 4, style, entering, exiting, animated = true }) => {
+interface PapillonSpinnerProps {
+  size?: number;
+  color?: string;
+  strokeWidth?: number;
+  style?: StyleProp<ViewStyle>;
+  entering?: EntryExitAnimationFunction;
+  exiting?: EntryExitAnimationFunction;
+  animated?: boolean;
+}
+
+const PapillonSpinner: React.FC<PapillonSpinnerProps> = ({
+  size = 50,
+  color = "#000000",
+  strokeWidth = 4,
+  style,
+  entering,
+  exiting,
+  animated = true,
+}) => {
   const animatedValue = useRef(new Animated.Value(0));
 
   useEffect(() => {
@@ -34,7 +51,7 @@ const PapillonSpinner = ({ size = 50, color = "#000000", strokeWidth = 4, style,
   return (
     <Reanimated.View
       style={style}
-      layout={animated && animPapillon(LinearTransition)}
+      layout={animated ? animPapillon(LinearTransition) : undefined}
       entering={entering}
       exiting={exiting}
     >
