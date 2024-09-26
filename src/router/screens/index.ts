@@ -15,8 +15,8 @@ export default [
   createScreen("SettingStack", SettingsScreen, {
     headerShown: false,
     presentation: "modal",
-    animation: Platform.OS == "android" ? "fade_from_bottom" : "default",
-    animationDuration: 120
+    animation: Platform.OS == "android" ? "slide_from_right" : "default",
+    animationDuration: 100
   }),
 
   createScreen("AccountStack", AccountScreen, {

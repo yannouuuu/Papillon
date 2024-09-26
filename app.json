@@ -44,12 +44,12 @@
         "backgroundColor": "#32AB8E"
       },
       "splash": {
-        "backgroundColor": "#FFFFFF",
-        "image": "./assets/launch/splash-transparent.png",
+        "backgroundColor": "#32AB8E",
+        "image": "./assets/launch/splash.png",
         "resizeMode": "cover",
         "dark": {
           "backgroundColor": "#001C0F",
-          "image": "./assets/launch/splash-transparent.png",
+          "image": "./assets/launch/splash-dark.png",
           "resizeMode": "cover"
         }
       },

@@ -99,7 +99,6 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           index: 0,
           routes: [{ name: "FirstInstallation" }],
         });
-        SplashScreen.hideAsync();
       }
 
       if (accounts.filter((account) => !account.isExternal).length === 1) {
