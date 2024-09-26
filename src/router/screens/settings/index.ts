@@ -22,6 +22,7 @@ import QrcodeAnswer from "@/views/settings/ExternalAccount/QrcodeAnswer";
 import QrcodeScanner from "@/views/settings/ExternalAccount/QrcodeScanner";
 import PriceDetectionOnboarding from "@/views/settings/ExternalAccount/PriceDetectionOnboarding";
 import PriceBeforeScan from "@/views/settings/ExternalAccount/PriceBeforeScan";
+import SettingsFlagsInfos from "@/views/settings/SettingsFlagsInfos";
 
 const settingsScreens = [
   createScreen("Settings", Settings, {
@@ -47,6 +48,8 @@ const settingsScreens = [
   createScreen("SettingsFlags", SettingsFlags, {
     headerTitle: "Flags (développeur)",
   }),
+  createScreen("SettingsFlagsInfos", SettingsFlagsInfos),
+
   createScreen("SettingsSubjects", SettingsSubjects, {
     headerTitle: "Matières",
   }),
