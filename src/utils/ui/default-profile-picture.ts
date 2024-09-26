@@ -8,6 +8,8 @@ export const defaultProfilePicture = (service: AccountService, accountProvider: 
       return require("../../../assets/images/service_rennes2.png");
     case "Université de Limoges":
       return require("../../../assets/images/service_unilim.png");
+    case "Université Sorbonne Paris Nord":
+      return require("../../../assets/images/service_uspn.png");
   }
 
   switch (service) {

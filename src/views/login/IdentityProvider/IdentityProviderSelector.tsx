@@ -29,6 +29,13 @@ const IdentityProviderSelector: Screen<"IdentityProviderSelector"> = ({ navigati
       image: require("@/../assets/images/service_unilim.png"),
       navigate: () => navigation.navigate("UnivLimoges_Login"),
     },
+    {
+      name: "univ_sorbonne_paris_nord",
+      title: "Université Sorbonne Paris Nord",
+      description: "Utilisez votre compte Sorbonne pour vous connecter",
+      image: require("@/../assets/images/service_uspn.png"),
+      navigate: () => navigation.navigate("UnivSorbonneParisNord_login"),
+    },
   ];
 
   return (

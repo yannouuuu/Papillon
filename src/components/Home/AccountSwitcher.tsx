@@ -6,14 +6,22 @@ import { ChevronDown } from "lucide-react-native";
 import Reanimated, {
   FadeIn,
   FadeOut,
+  LinearTransition,
+  ZoomIn,
+  ZoomOut,
 } from "react-native-reanimated";
 
 import { useCurrentAccount } from "@/stores/account";
 import { defaultProfilePicture } from "@/utils/ui/default-profile-picture";
+import PapillonSpinner from "../Global/PapillonSpinner";
+import { animPapillon } from "@/utils/ui/animations";
 
 const AccountSwitcher: React.FC<{
-  small?: boolean
-}> = ({ small }) => {
+  small?: boolean,
+  scrolled?: boolean,
+  translationY?: Reanimated.SharedValue<number>,
+  loading?: boolean,
+}> = ({ small, scrolled, translationY, loading }) => {
   const theme = useTheme();
   const { colors } = theme;
 
@@ -24,10 +32,14 @@ const AccountSwitcher: React.FC<{
 
   return (
     <Reanimated.View
+      layout={animPapillon(LinearTransition)}
       style={[
         styles.accountSwitcher,
         {
           backgroundColor: colors.background,
+        },
+        loading && {
+          shadowOpacity: 0,
         },
         small && {
           paddingHorizontal: 0,
@@ -64,6 +76,7 @@ const AccountSwitcher: React.FC<{
             gap: 12,
           },
         ]}
+        layout={animPapillon(LinearTransition)}
       >
         {!shouldHidePicture ? (
           <Image
@@ -99,12 +112,27 @@ const AccountSwitcher: React.FC<{
           ) : "Mon compte"}
         </Text>
 
-        <ChevronDown
-          size={24}
-          strokeWidth={2.3}
-          color={colors.text + "55"}
-          style={{ marginLeft: -6 }}
-        />
+        {loading && (
+          <PapillonSpinner
+            size={20}
+            strokeWidth={3}
+            color={colors.text}
+            animated
+            entering={animPapillon(ZoomIn)}
+            exiting={animPapillon(ZoomOut)}
+          />
+        )}
+
+        <Reanimated.View
+          layout={animPapillon(LinearTransition)}
+        >
+          <ChevronDown
+            size={24}
+            strokeWidth={2.3}
+            color={colors.text + "55"}
+            style={{ marginLeft: -6 }}
+          />
+        </Reanimated.View>
       </Reanimated.View>
 
     </Reanimated.View>

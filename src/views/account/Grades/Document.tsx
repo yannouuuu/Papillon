@@ -105,9 +105,9 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
           title: "Moyenne générale",
           description: "Impact de la note sur la moyenne générale",
           value: gradeDiff.difference === undefined ? "???" :
-            (gradeDiff.difference > 0 ? "+ " : "- ") +
+            (gradeDiff.difference > 0 ? "- " : "+ ") +
             gradeDiff.difference.toFixed(2).replace("-", "") + " pts",
-          color: gradeDiff.difference === undefined ? void 0 : (gradeDiff.difference > 0 ? "#00C853" : "#FF1744"),
+          color: gradeDiff.difference === undefined ? void 0 : (gradeDiff.difference < 0 ? "#4CAF50" : "#F44336"),
         },
         !grade.average.disabled && {
           icon: <School />,

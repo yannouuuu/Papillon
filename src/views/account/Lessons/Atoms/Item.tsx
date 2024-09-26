@@ -5,6 +5,8 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 import ColorIndicator from "@/components/Lessons/ColorIndicator";
 import { TimetableClass, TimetableClassStatus } from "@/services/shared/Timetable";
 
+import { PapillonNavigation } from "@/router/refs";
+
 import Reanimated, {
   FadeInDown,
   FadeOut,
@@ -54,6 +56,10 @@ export const TimetableItem: React.FC<{
       <NativeTouchable
         style={[styles.detailsContainer, { backgroundColor: colors.card, borderColor: colors.text + "33" }]}
         underlayColor={colors.text + "11"}
+        onPress={() => {
+          PapillonNavigation.current.navigate("LessonDocument", { lesson: item });
+
+        }}
       >
         <View style={[{ flex: 1, flexDirection: "column", overflow: "hidden", borderRadius: 10 }]}>
           {item.status && (

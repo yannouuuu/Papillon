@@ -254,6 +254,7 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
             <AccountSwitcher
               translationY={translationY}
               scrolled={scrolled}
+              loading={!account.instance}
             />
           </ContextMenu>
         </Reanimated.View>
@@ -503,28 +504,6 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
                   </NativeItem>
                 </NativeList>
               )}
-
-              {!account.instance &&
-                  <Reanimated.View
-                    entering={FlipInXDown.springify().mass(1).damping(20).stiffness(300)}
-                    exiting={FadeOutUp.springify().mass(1).damping(20).stiffness(300)}
-                    layout={animPapillon(LinearTransition)}
-                  >
-                    <NativeList inline>
-                      <NativeItem
-                        leading={
-                          <ActivityIndicator
-                            style={{ marginLeft: 9, marginVertical: 4 }}
-                          />
-                        }
-                      >
-                        <NativeText variant="body">
-                          Obtention de la session
-                        </NativeText>
-                      </NativeItem>
-                    </NativeList>
-                  </Reanimated.View>
-              }
 
               {!isOnline &&
                 <Reanimated.View

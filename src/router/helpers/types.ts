@@ -48,6 +48,7 @@ export type RouteParameters = {
   UnivRennes1_Login: undefined;
   UnivRennes2_Login: undefined;
   UnivLimoges_Login: undefined;
+  UnivSorbonneParisNord_login: undefined;
 
   // login.skolengo
   SkolengoAuthenticationSelector: undefined;
@@ -65,6 +66,7 @@ export type RouteParameters = {
     title?: string;
     autoAdd?: boolean;
   };
+  LessonDocument: { lesson: Homework };
 
   Homeworks?: { outsideNav?: boolean };
   HomeworksDocument: { homework: Homework };
@@ -99,6 +101,7 @@ export type RouteParameters = {
   SettingsExternalServices: undefined;
   SettingsMagic: undefined;
   SettingsFlags: undefined;
+  SettingsFlagsInfos: undefined;
   SettingsAddons: undefined;
   SettingsDevLogs: undefined;
   SettingsDonorsList: undefined;

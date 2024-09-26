@@ -59,12 +59,12 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
 
   const scrollRef = useAnimatedRef();
   const scrollOffset = useScrollViewOffset(scrollRef);
-  const headerRatioHeight = Dimensions.get("window").width * 3/5;
+  const headerRatioHeight = 250;
   let headerAnimatedStyle = useAnimatedStyle(() => ({
-    height: interpolate(
+    top: interpolate(
       scrollOffset.value,
-      [0, 100],
-      [headerRatioHeight, 60 + insets.top],
+      [headerRatioHeight - 1000, 0, headerRatioHeight - (insets.top + 64), headerRatioHeight + 1000],
+      [headerRatioHeight - 1000, 0, 0, headerRatioHeight + 1000 - (insets.top + 64)],
       Extrapolation.CLAMP
     ),
   }));
@@ -99,7 +99,6 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           index: 0,
           routes: [{ name: "FirstInstallation" }],
         });
-        SplashScreen.hideAsync();
       }
 
       if (accounts.filter((account) => !account.isExternal).length === 1) {
@@ -138,6 +137,13 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           left: 0,
           right: 0,
           height: 70 + insets.bottom,
+          shadowColor: "#000000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
         }}
       >
         <LinearGradient
@@ -165,13 +171,6 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
             gap: 10,
             borderRadius: 100,
             backgroundColor: theme.colors.primary,
-            shadowColor: "#000000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
           }}
           onPress={() => navigation.navigate("ServiceSelector")}
         >
@@ -218,6 +217,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           </NativeText>
         </TouchableHighlight>
       </View>
+
       <Reanimated.ScrollView
         style={{
           paddingBottom: insets.bottom + 16,
@@ -251,14 +251,9 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           style={[{
             width: "100%",
             zIndex: 2,
-            transform: [
-              {
-                translateY: scrollOffset,
-              },
-            ],
-
             borderBottomColor: theme.colors.border,
             borderBottomWidth: 1,
+            height: headerRatioHeight,
           }, headerAnimatedStyle]}
         >
           {!illustrationLoaded &&
@@ -340,6 +335,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
             </Text>
           </View>
         </Reanimated.View>
+
         {accounts.filter((account) => !account.isExternal).length > 0 && (
           <Reanimated.View
             entering={animPapillon(FadeInDown)}
