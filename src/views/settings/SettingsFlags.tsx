@@ -1,87 +1,136 @@
-import React from "react";
-import { Text, ScrollView, View, TouchableOpacity, StyleSheet, Image, Switch, TextInput, Alert, KeyboardAvoidingView } from "react-native";
+import React, { useRef } from "react";
+import { ScrollView, TextInput, Alert, KeyboardAvoidingView, StyleSheet } from "react-native";
 import type { Screen } from "@/router/helpers/types";
 import { useTheme } from "@react-navigation/native";
-import { ChevronLeft, Code, MegaphoneOff } from "lucide-react-native";
+import { Code, ChevronRight } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
 import { useFlagsStore } from "@/stores/flags";
+import { useCurrentAccount } from "@/stores/account";
 
-const SettingsFlags: Screen<"SettingsFlags"> = () => {
-  const flags = useFlagsStore(state => state.flags);
-  const remove = useFlagsStore(state => state.remove);
-  const set = useFlagsStore(state => state.set);
-
-  const theme = useTheme();
-  const { colors } = theme;
+const SettingsFlags: Screen<"SettingsFlags"> = ({ navigation }) => {
+  const { flags, remove, set } = useFlagsStore();
+  const account = useCurrentAccount(store => store.account!);
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const textInputRef = React.useRef<TextInput>(null);
+  const textInputRef = useRef<TextInput>(null);
+
+  const isBase64Image = (str: string) => {
+    return typeof str === "string" && str.startsWith("data:image/jpeg");
+  };
+
+  const renderAccountSection = (sectionName: string, sectionData: any) => {
+    const renderItem = (key: string, value: any) => {
+      let displayValue = value;
+      if (isBase64Image(value)) {
+        displayValue = "[Image Base64]";
+      } else if (typeof value === "object" && value !== null) {
+        displayValue = JSON.stringify(value).substring(0, 50) + "...";
+      } else {
+        displayValue = String(value);
+      }
+
+      return (
+        <NativeItem
+          key={key}
+          onPress={() => navigation.navigate("SettingsFlagsInfos", { title: key, value: value })}
+        >
+          <NativeText>{key}</NativeText>
+          <NativeText>{displayValue}</NativeText>
+        </NativeItem>
+      );
+    };
+
+    return (
+      <>
+        <NativeListHeader label={sectionName} />
+        <NativeList>
+          {Object.entries(sectionData).map(([key, value]) => renderItem(key, value))}
+        </NativeList>
+      </>
+    );
+  };
+
+  const addFlag = (flag: string) => {
+    set(flag);
+    textInputRef.current?.clear();
+  };
+
+  const confirmRemoveFlag = (flag: string) => {
+    Alert.alert(
+      "Supprimer le flag",
+      `Voulez-vous vraiment supprimer le flag "${flag}" ?`,
+      [
+        { text: "Annuler" },
+        { text: "Supprimer", onPress: () => remove(flag), style: "destructive" }
+      ]
+    );
+  };
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-    >
-      <ScrollView
-        contentContainerStyle={{
-          padding: 16,
-          paddingTop: 0,
-          paddingBottom: insets.bottom + 16,
-        }}
-      >
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <NativeListHeader label="Ajouter un flag" />
-
         <NativeList>
           <NativeItem>
             <TextInput
-              style={{ flex: 1, fontSize: 16, fontFamily: "medium", color: colors.text }}
-              placeholder="Ajouter un flag"
+              style={[styles.input, { color: colors.text }]}
+              placeholder="Nouveau flag"
+              placeholderTextColor={colors.text + "80"}
               ref={textInputRef}
-              onSubmitEditing={(e) => {
-                set(e.nativeEvent.text);
-                textInputRef.current?.clear();
-              }}
+              onSubmitEditing={(e) => addFlag(e.nativeEvent.text)}
             />
           </NativeItem>
         </NativeList>
 
         {flags.length > 0 && (
-          <View>
+          <>
             <NativeListHeader label="Flags activés" />
-
             <NativeList>
               {flags.map((flag) => (
                 <NativeItem
                   key={flag}
-                  icon={<Code />}
-                  onPress={() => {
-                    Alert.alert(
-                      "Flag",
-                      flag,
-                      [
-                        {
-                          text: "OK"
-                        },
-                        {
-                          text: "Supprimer",
-                          onPress: () => remove(flag),
-                          style: "destructive"
-                        }
-                      ]
-                    );
-                  }}
+                  icon={<Code color={colors.text} />}
+                  onPress={() => confirmRemoveFlag(flag)}
                 >
-                  <NativeText>
-                    {flag}
-                  </NativeText>
+                  <NativeText>{flag}</NativeText>
                 </NativeItem>
               ))}
             </NativeList>
-          </View>
+          </>
         )}
 
+        {renderAccountSection("Informations générales", {
+          name: account.name,
+          schoolName: account.schoolName,
+          className: account.className
+        })}
+
+        {renderAccountSection("Détails de l'authentification", account.authentication)}
+
+        {renderAccountSection("Personnalisation", account.personalization)}
+
+        {renderAccountSection("Informations de l'instance", account?.instance?.information)}
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 16,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: "medium",
+  },
+  itemKey: {
+    fontWeight: "bold",
+  },
+});
 
 export default SettingsFlags;
