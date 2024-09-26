@@ -69,7 +69,7 @@ const SettingsFlags: Screen<"SettingsFlags"> = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
-      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <NativeListHeader label="Ajouter un flag" />
         <NativeList>
           <NativeItem>
