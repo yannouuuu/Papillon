@@ -38,6 +38,9 @@ const AccountSwitcher: React.FC<{
         {
           backgroundColor: colors.background,
         },
+        loading && {
+          shadowOpacity: 0,
+        },
         small && {
           paddingHorizontal: 0,
           shadowOpacity: 0,

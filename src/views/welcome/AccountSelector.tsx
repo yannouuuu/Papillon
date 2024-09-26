@@ -137,6 +137,13 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           left: 0,
           right: 0,
           height: 70 + insets.bottom,
+          shadowColor: "#000000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
         }}
       >
         <LinearGradient
@@ -164,13 +171,6 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
             gap: 10,
             borderRadius: 100,
             backgroundColor: theme.colors.primary,
-            shadowColor: "#000000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
           }}
           onPress={() => navigation.navigate("ServiceSelector")}
         >
