@@ -61,10 +61,10 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
   const scrollOffset = useScrollViewOffset(scrollRef);
   const headerRatioHeight = 250;
   let headerAnimatedStyle = useAnimatedStyle(() => ({
-    height: interpolate(
+    top: interpolate(
       scrollOffset.value,
-      [0, 60 + insets.top],
-      [headerRatioHeight, 60 + insets.top],
+      [headerRatioHeight - 1000, 0, headerRatioHeight - (insets.top + 64), headerRatioHeight + 1000],
+      [headerRatioHeight - 1000, 0, 0, headerRatioHeight + 1000 - (insets.top + 64)],
       Extrapolation.CLAMP
     ),
   }));
@@ -217,6 +217,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           </NativeText>
         </TouchableHighlight>
       </View>
+
       <Reanimated.ScrollView
         style={{
           paddingBottom: insets.bottom + 16,
@@ -250,13 +251,9 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           style={[{
             width: "100%",
             zIndex: 2,
-            transform: [
-              {
-                translateY: scrollOffset,
-              },
-            ],
             borderBottomColor: theme.colors.border,
             borderBottomWidth: 1,
+            height: headerRatioHeight,
           }, headerAnimatedStyle]}
         >
           {!illustrationLoaded &&
