@@ -17,7 +17,8 @@ const TimetableElement = () => {
 
   const [nextCourses, setNextCourses] = useState<TimetableClass[]>([]);
   const [hidden, setHidden] = useState(true);
-  const epochWeekNumber = useMemo(() => dateToEpochWeekNumber(new Date()), []);
+  const [loading, setLoading] = useState(false);
+  const currentWeekNumber = useMemo(() => dateToEpochWeekNumber(new Date()), []);
 
   const isToday = (timestamp: number) => {
     const today = new Date();
@@ -29,74 +30,73 @@ const TimetableElement = () => {
     );
   };
 
-  // Fetch timetable if not already fetched
-  const fetchTimetable = () => {
-    if (!timetables[epochWeekNumber] && account.instance) {
-      console.log("Fetching timetable for epoch week:", epochWeekNumber);
-      updateTimetableForWeekInCache(account, epochWeekNumber);
+  const fetchTimetable = async () => {
+    if (!timetables[currentWeekNumber] && account.instance) {
+      setLoading(true);
+      try {
+        await updateTimetableForWeekInCache(account, currentWeekNumber);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  // Filter and sort the courses to get today's or the next 3 courses
-  const filterAndSortCourses = (allCourses: TimetableClass[]): TimetableClass[] => {
+  const filterAndSortCourses = (weekCourses: TimetableClass[]): TimetableClass[] => {
     const now = Date.now();
-
-    // Log all courses available
-    console.log("All courses:", allCourses);
-
-    // Filter for today's remaining courses
-    const todayCourses = allCourses
+    const todayCourses = weekCourses
       .filter(c => isToday(c.startTimestamp) && c.endTimestamp > now)
       .sort((a, b) => a.startTimestamp - b.startTimestamp);
-
-    console.log("Today's courses:", todayCourses);
 
     if (todayCourses.length > 0) {
       return todayCourses;
     }
 
-    // If no more courses today, log and return the next 3 upcoming courses
-    const upcomingCourses = allCourses
+    return weekCourses
       .filter(c => c.startTimestamp > now)
       .sort((a, b) => a.startTimestamp - b.startTimestamp)
       .slice(0, 3);
-
-    console.log("Upcoming courses:", upcomingCourses);
-    return upcomingCourses;
   };
 
-  // Update the next courses based on the current timetable
   const updateNextCourses = () => {
-    if (!account.instance || !timetables) {
+    if (!account.instance || !timetables[currentWeekNumber]) {
       return;
     }
 
-    const allCourses = Object.values(timetables).flat();
-    console.log("Flattened timetable data:", allCourses);
+    const weekCourses = timetables[currentWeekNumber];
+    const upcomingCourses = filterAndSortCourses(weekCourses);
 
-    const upcomingCourses = filterAndSortCourses(allCourses);
-
-    if (upcomingCourses.length > 0) {
-      setNextCourses(upcomingCourses);
-      setHidden(false);
-    } else {
-      setHidden(true);
-    }
-
-    console.log("Next courses to display:", upcomingCourses);
+    setNextCourses(upcomingCourses);
+    setHidden(upcomingCourses.length === 0);
   };
 
-  // Fetch timetable on mount and when week changes
   useEffect(() => {
     fetchTimetable();
-  }, [epochWeekNumber, timetables, account?.instance]);
+  }, [currentWeekNumber, account.instance]);
 
-  // Update courses every minute
   useEffect(() => {
     updateNextCourses();
-    const intervalId = setInterval(updateNextCourses, 60000); // Update every minute
+    const intervalId = setInterval(updateNextCourses, 60000);
     return () => clearInterval(intervalId);
-  }, [account.instance, timetables]);
+  }, [account.instance, timetables, currentWeekNumber]);
+
+  if (loading) {
+    return (
+      <NativeList
+        animated
+        key="loadingCourses"
+        entering={FadeInDown.springify().mass(1).damping(20).stiffness(300)}
+        exiting={FadeOut.duration(300)}
+      >
+        <NativeItem animated style={{ paddingVertical: 10 }}>
+          <MissingItem
+            emoji="⏳"
+            title="Chargement de l'emploi du temps"
+            description="Veuillez patienter..."
+          />
+        </NativeItem>
+      </NativeList>
+    );
+  }
 
   if (hidden || nextCourses.length === 0) {
     return (
@@ -106,10 +106,7 @@ const TimetableElement = () => {
         entering={FadeInDown.springify().mass(1).damping(20).stiffness(300)}
         exiting={FadeOut.duration(300)}
       >
-        <NativeItem
-          animated
-          style={{ paddingVertical: 10 }}
-        >
+        <NativeItem animated style={{ paddingVertical: 10 }}>
           <MissingItem
             emoji="📚"
             title="Aucun cours à venir"
