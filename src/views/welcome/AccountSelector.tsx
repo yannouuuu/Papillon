@@ -59,11 +59,11 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
 
   const scrollRef = useAnimatedRef();
   const scrollOffset = useScrollViewOffset(scrollRef);
-  const headerRatioHeight = Dimensions.get("window").width * 3/5;
+  const headerRatioHeight = 250;
   let headerAnimatedStyle = useAnimatedStyle(() => ({
     height: interpolate(
       scrollOffset.value,
-      [0, 100],
+      [0, 60 + insets.top],
       [headerRatioHeight, 60 + insets.top],
       Extrapolation.CLAMP
     ),
@@ -256,7 +256,6 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                 translateY: scrollOffset,
               },
             ],
-
             borderBottomColor: theme.colors.border,
             borderBottomWidth: 1,
           }, headerAnimatedStyle]}
@@ -340,6 +339,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
             </Text>
           </View>
         </Reanimated.View>
+
         {accounts.filter((account) => !account.isExternal).length > 0 && (
           <Reanimated.View
             entering={animPapillon(FadeInDown)}
