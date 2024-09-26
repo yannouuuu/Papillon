@@ -18,6 +18,8 @@ import {
 import { useTheme } from "@react-navigation/native";
 import MaskStars from "@/components/FirstInstallation/MaskStars";
 
+import Reanimated, { FadeIn, FadeInUp, FadeOut, FadeOutDown, LinearTransition } from "react-native-reanimated";
+
 import pronote from "pawnote";
 
 import { Audio } from "expo-av";
@@ -28,6 +30,8 @@ import uuid from "@/utils/uuid-v4";
 import downloadAsBase64 from "@/utils/external/download-as-base64";
 import defaultPersonalization from "@/services/pronote/default-personalization";
 import extract_pronote_name from "@/utils/format/extract_pronote_name";
+import PapillonSpinner from "@/components/Global/PapillonSpinner";
+import { animPapillon } from "@/utils/ui/animations";
 
 const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -44,7 +48,7 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [sound2, setSound2] = useState<Audio.Sound | null>(null);
 
-  const [loginStep, setLoginStep] = useState("Enregistrement de votre appareil auprès de votre établissement...");
+  const [loginStep, setLoginStep] = useState("Préparation de la connexion");
 
   const instanceURL = route.params.instanceURL.toLowerCase();
 
@@ -182,7 +186,7 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
           ]}
         >
           {!showWebView && (
-            <View
+            <Reanimated.View
               style={{
                 position: "absolute",
                 top: 0,
@@ -193,14 +197,21 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 paddingHorizontal: 20,
+                backgroundColor: theme.colors.card,
               }}
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(200)}
             >
-              <ActivityIndicator
-                size="large"
-                color={theme.colors.text}
+              <PapillonSpinner
+                animated={true}
+                size={48}
+                color={theme.colors.primary}
+                strokeWidth={6}
+                entering={!showWebView && FadeInUp.duration(200)}
+                exiting={FadeOutDown.duration(100)}
               />
 
-              <Text
+              <Reanimated.Text
                 style={{
                   color: theme.colors.text,
                   marginTop: 10,
@@ -208,24 +219,34 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                   fontFamily: "semibold",
                   textAlign: "center",
                 }}
+                entering={!showWebView && FadeInUp.duration(200)}
+                exiting={FadeOutDown.duration(100)}
+                layout={animPapillon(LinearTransition)}
               >
                 Connexion à Pronote
-              </Text>
+              </Reanimated.Text>
 
-              <Text
-                style={{
-                  color: theme.colors.text,
-                  marginTop: 6,
-                  fontSize: 16,
-                  lineHeight: 20,
-                  fontFamily: "medium",
-                  opacity: 0.5,
-                  textAlign: "center",
-                }}
+              <Reanimated.View
+                layout={animPapillon(LinearTransition)}
+                entering={!showWebView && FadeInUp.duration(200)}
+                exiting={FadeOutDown.duration(100)}
+                key={loginStep + "stp"}
               >
-                {loginStep}
-              </Text>
-            </View>
+                <Reanimated.Text
+                  style={{
+                    color: theme.colors.text,
+                    marginTop: 6,
+                    fontSize: 16,
+                    lineHeight: 20,
+                    fontFamily: "medium",
+                    opacity: 0.5,
+                    textAlign: "center",
+                  }}
+                >
+                  {loginStep}
+                </Reanimated.Text>
+              </Reanimated.View>
+            </Reanimated.View>
           )}
 
           <WebView
@@ -255,6 +276,11 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
               setCurrentURL(url);
 
               setLoading(true);
+
+              if (url.includes("mobile.eleve.html")) {
+                setLoginStep("En attente de votre établissement");
+                setShowWebView(false);
+              }
             }}
             onMessage={async ({ nativeEvent }) => {
               const message = JSON.parse(nativeEvent.data);
@@ -264,7 +290,7 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                 if (!message.data) return;
                 if (message.data.status !== 0) return;
                 setShowWebView(false);
-                setLoginStep("Obtention des informations de connexion...");
+                setLoginStep("Obtention des informations");
                 setLoggingIn(true);
 
                 if (currentLoginStateIntervalRef.current)
@@ -340,7 +366,6 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                 );
               } else {
                 setLoading(false);
-                setShowWebView(true);
                 if (url.includes("mobile.eleve.html")) {
 
 
@@ -355,6 +380,10 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                   /*currentLoginStateIntervalRef.current = setInterval(() => {
                     webViewRef.current?.injectJavaScript(INJECT_PRONOTE_CURRENT_LOGIN_STATE);
                   }, 250);*/
+                }
+
+                if (url.split("?")[0].includes("mobile.eleve.html") == false) {
+                  setShowWebView(true);
                 }
               }
             }}

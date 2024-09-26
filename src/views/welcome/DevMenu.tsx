@@ -1,8 +1,10 @@
 import { useTheme } from "@react-navigation/native";
 import { ChevronRight } from "lucide-react-native";
 import React, { useLayoutEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Button } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Button, Alert } from "react-native";
 import type { Screen } from "@/router/helpers/types";
+import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DevMenu: Screen<"DevMenu"> = ({ navigation }) => {
   const theme = useTheme();
@@ -46,11 +48,13 @@ const DevMenu: Screen<"DevMenu"> = ({ navigation }) => {
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={{
+        padding: 16,
+      }}
     >
       <View
         style={{
           backgroundColor: colors.text + "16",
-          margin: 16,
           borderRadius: 10,
           borderCurve: "continuous",
           padding: 16,
@@ -81,25 +85,87 @@ const DevMenu: Screen<"DevMenu"> = ({ navigation }) => {
         </Text>
       </View>
 
-      <Button
-        title="Go to Account Selector"
-        onPress={() => navigation.navigate("AccountSelector")}
-      />
+      {__DEV__ && (
+        <View>
+          <NativeListHeader label="Options de développement" />
 
-      <Button
-        title="NoteReaction"
-        onPress={() => navigation.navigate("NoteReaction")}
-      />
+          <NativeList>
 
-      <Button
-        title="ColorSelector"
-        onPress={() => navigation.navigate("ColorSelector")}
-      />
+            <NativeItem
+              onPress={() => navigation.navigate("AccountSelector")}
+            >
+              <NativeText>
+                Go to Account Selector
+              </NativeText>
+            </NativeItem>
 
-      <Button
-        title="AccountCreated"
-        onPress={() => navigation.navigate("AccountCreated")}
-      />
+            <NativeItem
+              onPress={() => navigation.navigate("NoteReaction")}
+            >
+              <NativeText>
+                NoteReaction
+              </NativeText>
+            </NativeItem>
+
+            <NativeItem
+              onPress={() => navigation.navigate("ColorSelector")}
+            >
+              <NativeText>
+                ColorSelector
+              </NativeText>
+            </NativeItem>
+
+            <NativeItem
+              onPress={() => navigation.navigate("AccountCreated")}
+            >
+              <NativeText>
+                AccountCreated
+              </NativeText>
+            </NativeItem>
+
+          </NativeList>
+        </View>
+      )}
+
+      <View>
+        <NativeListHeader label="Options de développement" />
+
+        <NativeList>
+
+          <NativeItem
+            onPress={() => {
+              Alert.alert(
+                "Reset all data",
+                "Are you sure you want to reset all data?",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                  },
+                  {
+                    text: "Reset",
+                    style: "destructive",
+                    onPress: () => {
+                      AsyncStorage.clear();
+                      navigation.popToTop();
+                    },
+                  },
+                ],
+              );
+            }}
+          >
+            <NativeText
+              style={{
+                color: "#E91E63",
+                fontFamily: "semibold",
+              }}
+            >
+              Erase all Papillon data and settings
+            </NativeText>
+          </NativeItem>
+        </NativeList>
+      </View>
+
     </ScrollView>
   );
 };

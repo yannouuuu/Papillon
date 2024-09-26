@@ -133,7 +133,6 @@ const AccountCreated: Screen<"AccountCreated"> = ({ navigation }) => {
             playSound();
           }}
         />
-
         <ButtonCta
           value="Ignorer cette étape"
           onPress={() => {

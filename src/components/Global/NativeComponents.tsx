@@ -192,6 +192,7 @@ interface NativeItemProps {
   subtitle?: string;
   endPadding?: number;
   disabled?: boolean;
+  pointerEvents?: any;
 }
 
 export const NativeItem: React.FC<NativeItemProps> = ({
@@ -216,6 +217,7 @@ export const NativeItem: React.FC<NativeItemProps> = ({
   subtitle,
   endPadding,
   disabled,
+  pointerEvents
 }) => {
   const theme = useTheme();
   const { colors } = theme;
@@ -225,6 +227,7 @@ export const NativeItem: React.FC<NativeItemProps> = ({
       layout={animated && animPapillon(LinearTransition)}
       entering={entering && entering}
       exiting={exiting && exiting}
+      pointerEvents={pointerEvents}
     >
       <NativePressable
         onPress={!disabled ? onPress : () => {}}
@@ -346,11 +349,14 @@ export const NativeIcon: React.FC<NativeIconProps> = ({ icon, color, style }) =>
 
 interface NativeTextProps {
   children: ReactNode;
-  variant?: "title" | "titleLarge" | "subtitle" | "overtitle" | "body"| "default";
+  variant?: "title" | "titleLarge" | "subtitle" | "overtitle" | "body"| "default" | "titleLarge2";
   color?: string;
   style?: StyleProp<TextStyle>;
   numberOfLines?: number;
   ellipsizeMode?: "head" | "middle" | "tail" | "clip";
+  animated?: boolean;
+  entering?: EntryOrExitLayoutType;
+  exiting?: EntryOrExitLayoutType;
 }
 
 export const NativeText: React.FC<NativeTextProps> = (props) => {
@@ -372,6 +378,13 @@ export const NativeText: React.FC<NativeTextProps> = (props) => {
         fontFamily: "semibold",
         fontSize: 19,
         lineHeight: 24,
+      };
+      break;
+    case "titleLarge2":
+      fontStyle = {
+        fontFamily: "bold",
+        fontSize: 24,
+        lineHeight: 28,
       };
       break;
     case "subtitle":
@@ -398,16 +411,19 @@ export const NativeText: React.FC<NativeTextProps> = (props) => {
   }
 
   return (
-    <Text
+    <Reanimated.Text
       {...props}
       style={[{
         fontFamily: "medium",
         fontSize: 16,
         color: props.color || colors.text,
       }, fontStyle, props.style]}
+      layout={props.animated && animPapillon(LinearTransition)}
+      entering={props.entering}
+      exiting={props.exiting}
     >
       {props.children}
-    </Text>
+    </Reanimated.Text>
   );
 };
 

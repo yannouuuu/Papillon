@@ -12,6 +12,7 @@ import { useTheme } from "@react-navigation/native";
 
 import * as WebBrowser from "expo-web-browser";
 import { Audio } from "expo-av";
+import * as SplashScreen from "expo-splash-screen";
 
 const PRIVACY_POLICY_URL = "https://safety.getpapillon.xyz/documents/privacy-policy";
 const TERMS_OF_SERVICE_URL = "https://safety.getpapillon.xyz/documents/terms-of-service";
@@ -37,6 +38,7 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
     };
 
     loadSound();
+    SplashScreen.hideAsync();
 
     return () => {
       if (sound) {

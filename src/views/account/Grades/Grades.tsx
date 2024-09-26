@@ -1,6 +1,8 @@
+import AnimatedNumber from "@/components/Global/AnimatedNumber";
 import MissingItem from "@/components/Global/MissingItem";
 import { NativeText } from "@/components/Global/NativeComponents";
 import PapillonHeader from "@/components/Global/PapillonHeader";
+import { PapillonHeaderSelector, PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
 import PapillonPicker from "@/components/Global/PapillonPicker";
 import { Screen } from "@/router/helpers/types";
 import { updateGradesAndAveragesInCache, updateGradesPeriodsInCache } from "@/services/grades";
@@ -12,7 +14,7 @@ import { useTheme } from "@react-navigation/native";
 import { ChevronDown } from "lucide-react-native";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Platform, RefreshControl, ScrollView, View } from "react-native";
-import Reanimated, { FadeIn, FadeInUp, FadeOut, LinearTransition } from "react-native-reanimated";
+import Reanimated, { FadeIn, FadeInUp, FadeOut, FadeOutDown, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const GradesAverageGraph = lazy(() => import("./Graph/GradesAverage"));
@@ -22,6 +24,8 @@ const Subject = lazy(() => import("./Subject/Subject"));
 const Grades: Screen<"Grades"> = ({ route, navigation }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+
+  const outsideNav = route.params?.outsideNav;
 
   const account = useCurrentAccount(store => store.account!);
   const defaultPeriod = useGradesStore(store => store.defaultPeriod);
@@ -55,17 +59,17 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
   }
 
   useEffect(() => {
-    setTimeout(() => {
-      if (selectedPeriod === "") return;
-      if (!account.instance) return;
+    if (selectedPeriod === "") return;
+    if (!account.instance) return;
 
-      void async function () {
-        setIsLoading(true);
+    void (async function () {
+      setIsLoading(true);
+      setTimeout(async () => {
         await updateData();
         setIsRefreshing(false);
         setIsLoading(false);
-      }();
-    }, 1);
+      }, 100);
+    })();
   }, [selectedPeriod, account.instance, isRefreshing]);
 
   useEffect(() => {
@@ -100,46 +104,35 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
 
   return (
     <>
-      <PapillonHeader route={route} navigation={navigation}>
-        <Reanimated.View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 16,
-          }}
-          layout={LinearTransition}
-        >
-          <Reanimated.View
-            layout={LinearTransition}
-          >
-            <PapillonPicker
-              delay={0}
-              data={periods.map(period => period.name)}
-              selected={userSelectedPeriod ?? selectedPeriod}
-              onSelectionChange={setUserSelectedPeriod}
-            >
-              <View style={{ flexDirection: "row", gap: 4, alignItems: "center" }}>
-                <NativeText style={{ color: theme.colors.primary, maxWidth: 100 }} numberOfLines={1}>
-                  {userSelectedPeriod ?? selectedPeriod}
-                </NativeText>
-                <ChevronDown color={theme.colors.primary} size={24} />
-              </View>
-            </PapillonPicker>
-          </Reanimated.View>
+      <PapillonModernHeader outsideNav={outsideNav}>
 
-          {isLoading && !isRefreshing &&
-            <Reanimated.View
-              entering={FadeIn}
-              exiting={FadeOut.duration(1000)}
-              layout={LinearTransition}
-              style={{ marginRight: 6 }}
-            >
-              <ActivityIndicator color={Platform.OS === "android" ? theme.colors.primary : void 0} />
-            </Reanimated.View>
-          }
-        </Reanimated.View>
-      </PapillonHeader>
+        <PapillonPicker
+          delay={0}
+          data={periods.map(period => period.name)}
+          selected={userSelectedPeriod ?? selectedPeriod}
+          onSelectionChange={setUserSelectedPeriod}
+        >
+          <PapillonHeaderSelector
+            loading={isLoading}
+          >
+            <View style={{ flexDirection: "row", gap: 4, alignItems: "center" }}>
+              <Reanimated.Text
+                style={{ color: theme.colors.text, maxWidth: 100, fontFamily: "medium", fontSize: 16 }}
+                numberOfLines={1}
+                key={selectedPeriod + "sel"}
+                entering={animPapillon(FadeInUp)}
+                exiting={animPapillon(FadeOutDown)}
+              >
+                {userSelectedPeriod ?? selectedPeriod}
+              </Reanimated.Text>
+
+              <ChevronDown color={theme.colors.text} size={22} strokeWidth={2.5} style={{marginRight: -4}} />
+            </View>
+          </PapillonHeaderSelector>
+        </PapillonPicker>
+
+      </PapillonModernHeader>
+
       <ScrollView
         style={{ flex: 1, backgroundColor: theme.colors.background }}
         refreshControl={
@@ -147,8 +140,13 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
             refreshing={isRefreshing}
             onRefresh={() => setIsRefreshing(true)}
             colors={Platform.OS === "android" ? [theme.colors.primary] : void 0}
+            progressViewOffset={outsideNav ? 72 : insets.top + 56}
           />
         }
+        contentContainerStyle={{
+          paddingTop: outsideNav ? 64 : insets.top + 42,
+        }}
+        scrollIndicatorInsets={{ top: outsideNav ? 64 : insets.top + 16 }}
       >
         <Suspense fallback={<ActivityIndicator />}>
           <View style={{ padding: 16, overflow: "visible", paddingTop: 0, paddingBottom: 16 + insets.bottom }}>

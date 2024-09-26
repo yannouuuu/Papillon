@@ -1,25 +1,43 @@
-import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
-import { useAccounts, useCurrentAccount } from "@/stores/account";
-import { defaultProfilePicture } from "@/utils/ui/default-profile-picture";
-import { useIsFocused, useTheme } from "@react-navigation/native";
-import { PlusIcon } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import {ActivityIndicator, Image, StatusBar, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {NativeItem, NativeList, NativeListHeader, NativeText} from "@/components/Global/NativeComponents";
+import {useAccounts, useCurrentAccount} from "@/stores/account";
+import {defaultProfilePicture} from "@/utils/ui/default-profile-picture";
+import {useIsFocused, useTheme} from "@react-navigation/native";
+import {PlusIcon} from "lucide-react-native";
+import {useEffect, useState} from "react";
+import {
+  Alert,
+  Dimensions,
+  Image,
+  RefreshControl,
+  StatusBar,
+  Text,
+  TouchableHighlight,
+  View
+} from "react-native";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 
 import PapillonAvatar from "@/components/Global/PapillonAvatar";
 
+import PackageJSON from "@/../package.json";
+
 import Reanimated, {
+  Extrapolation,
   FadeInDown,
-  FadeInUp,
-  FadeOutUp,
+  FadeOut,
+  interpolate,
   LinearTransition,
+  useAnimatedRef, useAnimatedStyle,
+  useScrollViewOffset,
+  ZoomIn,
 } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
-import { animPapillon } from "@/utils/ui/animations";
-import { Screen } from "@/router/helpers/types";
-import { AccountService } from "@/stores/account/types";
+import {LinearGradient} from "expo-linear-gradient";
+import {animPapillon} from "@/utils/ui/animations";
+import {Screen} from "@/router/helpers/types";
+import PapillonSpinner from "@/components/Global/PapillonSpinner";
+import {PressableScale} from "react-native-pressable-scale";
+
+import datasets from "@/consts/datasets.json";
 
 const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
   const theme = useTheme();
@@ -29,10 +47,46 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
 
   const currentAccount = useCurrentAccount((store) => store.account);
   const switchTo = useCurrentAccount((store) => store.switchTo);
+  const removeAccount = useAccounts((store) => store.remove);
 
   const accounts = useAccounts((store) => store.accounts);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(null);
+
+  const [downloadedIllustrations, setDownloadedIllustrations] = useState(false);
+  const [illustration, setIllustration] = useState(null);
+  const [illustrationLoaded, setIllustrationLoaded] = useState(false);
+
+  const scrollRef = useAnimatedRef();
+  const scrollOffset = useScrollViewOffset(scrollRef);
+  const headerRatioHeight = 250;
+  let headerAnimatedStyle = useAnimatedStyle(() => ({
+    top: interpolate(
+      scrollOffset.value,
+      [headerRatioHeight - 1000, 0, headerRatioHeight - (insets.top + 64), headerRatioHeight + 1000],
+      [headerRatioHeight - 1000, 0, 0, headerRatioHeight + 1000 - (insets.top + 64)],
+      Extrapolation.CLAMP
+    ),
+  }));
+  let headerOpacity = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollOffset.value, [0, 100], [0, 0.75], Extrapolation.CLAMP),
+  }));
+
+  useEffect(() => {
+    if(!downloadedIllustrations) {
+      updateIllustration();
+    }
+  }, []);
+
+  const updateIllustration = async () => {
+    fetch(datasets["illustrations"])
+      .then((response) => response.json())
+      .then((data) => {
+        setDownloadedIllustrations(true);
+        // select a random illustration
+        setIllustration(data[Math.floor(Math.random() * data.length)]);
+      });
+  };
 
   useEffect(() => {
     void async function () {
@@ -57,9 +111,13 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
             routes: [{ name: "AccountStack" }],
           });
         }
+        else {
+          SplashScreen.hideAsync();
+        }
       }
-
-      SplashScreen.hideAsync();
+      else {
+        SplashScreen.hideAsync();
+      }
     }();
   }, [accounts]);
 
@@ -69,87 +127,220 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
     <View
       style={{
         flex: 1,
-        padding: 16,
-        paddingTop: insets.top + 16,
-        paddingBottom: insets.bottom + 16,
       }}
     >
-      {isFocused && (
-        <StatusBar
-          barStyle={theme.dark ? "light-content" : "dark-content"}
-          backgroundColor={"transparent"}
-          translucent
-        />
-      )}
-
-      <LinearGradient
-        colors={["#29947a", theme.colors.background]}
+      <View
         style={{
           position: "absolute",
+          zIndex: 99999999,
+          bottom: 0,
           left: 0,
           right: 0,
-          top: 0,
-          height: "35%",
-          opacity: 0.2,
-          zIndex: -1,
-        }}
-        pointerEvents="none"
-      />
-
-      <Reanimated.View
-        entering={animPapillon(FadeInUp)}
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginBottom: 16,
-          gap: 16,
+          height: 70 + insets.bottom,
+          shadowColor: "#000000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
         }}
       >
-        <Image
-          source={require("@/../assets/images/icon_papillon.png")}
+        <LinearGradient
+          colors={[theme.colors.background + "00", theme.colors.background]}
+          locations={[0, (insets.bottom) / 70]}
           style={{
-            width: 26,
-            aspectRatio: 1,
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            height: 70 + insets.bottom,
+            zIndex: 5,
           }}
-          tintColor={theme.colors.text}
         />
+        <PressableScale
+          style={{
+            zIndex: 99999999,
+            position: "absolute",
+            right: 20,
+            bottom: 16 + insets.bottom,
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            gap: 10,
+            borderRadius: 100,
+            backgroundColor: theme.colors.primary,
+          }}
+          onPress={() => navigation.navigate("ServiceSelector")}
+        >
+          <PlusIcon
+            size={24}
+            strokeWidth={2.5}
+            color={"#fff"}
+          />
 
-        <View>
-          <NativeText variant="titleLarge">
-            Ravis de vous revoir !
-          </NativeText>
-          <NativeText variant="subtitle">
-            Sélectionnez un compte pour commencer
-          </NativeText>
-        </View>
-      </Reanimated.View>
-
-      <Reanimated.ScrollView>
-        {loading && (
-          <NativeList
-            animated
-            entering={animPapillon(FadeInUp)}
-            exiting={animPapillon(FadeOutUp)}
+          <Text
+            style={{
+              color: "#ffffff",
+              fontFamily: "semibold",
+              fontSize: 16,
+            }}
           >
-            <NativeItem
-              trailing={<ActivityIndicator />}
-              animated
+            Ajouter un compte
+          </Text>
+        </PressableScale>
+
+        <TouchableHighlight
+          style={{
+            position: "absolute",
+            bottom: 16 + insets.bottom,
+            left: 16,
+            alignSelf: "flex-start",
+            opacity: 0.4,
+            zIndex: 99999999,
+            paddingHorizontal: 8,
+            marginHorizontal: -8,
+            paddingVertical: 4,
+            borderRadius: 5,
+          }}
+          underlayColor={theme.colors.text + "44"}
+          onLongPress={() => navigation.navigate("DevMenu")}
+          delayLongPress={2000}
+        >
+          <NativeText
+            style={{
+              fontSize: 12,
+            }}
+          >
+            ver. {PackageJSON.version}
+          </NativeText>
+        </TouchableHighlight>
+      </View>
+
+      <Reanimated.ScrollView
+        style={{
+          paddingBottom: insets.bottom + 16,
+          paddingTop: 0,
+          flex: 1
+        }}
+        ref={scrollRef}
+        scrollEventThrottle={8}
+        refreshControl={
+          <RefreshControl
+            refreshing={false}
+            onRefresh={() => {
+              updateIllustration();
+            }}
+            progressViewOffset={headerRatioHeight}
+          />
+        }
+        contentContainerStyle={{
+          minHeight: Dimensions.get("window").height,
+        }}
+      >
+        {isFocused && (
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor="transparent"
+            translucent
+          />
+        )}
+
+        <Reanimated.View
+          style={[{
+            width: "100%",
+            zIndex: 2,
+            borderBottomColor: theme.colors.border,
+            borderBottomWidth: 1,
+            height: headerRatioHeight,
+          }, headerAnimatedStyle]}
+        >
+          {!illustrationLoaded &&
+          <Reanimated.View
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              backgroundColor: "#1E212D",
+              zIndex: 3,
+            }}
+            exiting={FadeOut}
+          />
+          }
+
+          <Reanimated.Image
+            source={illustration && { uri: illustration.image }}
+            style={{
+              width: "100%",
+              height: "100%",
+            }}
+            onLoad={() => setIllustrationLoaded(true)}
+          />
+          <Reanimated.View style={[{
+            backgroundColor: "#000",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }, headerOpacity]}
+          />
+
+          <LinearGradient
+            colors={["#00000000", "#000000"]}
+            locations={[0.5, 0.8]}
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: "0%",
+              height: "100%",
+              opacity: 0.85,
+              zIndex: 5
+            }}
+          />
+
+          <View
+            style={{
+              position: "absolute",
+              left: 16,
+              right: 16,
+              bottom: 16,
+              gap: 4,
+              zIndex: 9
+            }}
+          >
+            <Text
               style={{
-                paddingVertical: 2,
-                paddingHorizontal: 4,
+                color: "#ffffff",
+                fontSize: 18,
+                fontFamily: "bold",
               }}
             >
-              <NativeText variant="subtitle">
-                Chargement de vos données...
-              </NativeText>
-            </NativeItem>
-          </NativeList>
-        )}
+              Bienvenue sur Papillon !
+            </Text>
+
+            <Text
+              style={{
+                color: "#ffffff",
+                fontSize: 15,
+                fontFamily: "medium",
+                opacity: 0.8,
+              }}
+            >
+              Sélectionnez un compte pour commencer.
+            </Text>
+          </View>
+        </Reanimated.View>
 
         {accounts.filter((account) => !account.isExternal).length > 0 && (
           <Reanimated.View
             entering={animPapillon(FadeInDown)}
             layout={animPapillon(LinearTransition)}
+            style={{paddingHorizontal: 16}}
           >
             <NativeListHeader label="Comptes connectés" />
             <NativeList>
@@ -161,25 +352,72 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                       <PapillonAvatar
                         source={account.personalization.profilePictureB64 ? { uri: account.personalization.profilePictureB64 } : defaultProfilePicture(account.service)}
                         badgeOffset={4}
-                        badge={account.service !== AccountService.Local &&
-                        <Image
-                          source={defaultProfilePicture(account.service)}
-                          style={{
-                            width: 22,
-                            height: 22,
-                            borderRadius: 12,
-                            borderColor: theme.colors.card,
-                            borderWidth: 2,
-                          }}
-                        />
+                        badge={
+                          <Image
+                            source={defaultProfilePicture(account.service, account.identityProvider && account.identityProvider.name)}
+                            style={{
+                              width: 22,
+                              height: 22,
+                              borderRadius: 12,
+                              borderColor: theme.colors.card,
+                              borderWidth: 2,
+                            }}
+                          />
                         }
                       />
                     }
+                    trailing={
+                      loading === account.localID && (
+                        <PapillonSpinner
+                          size={24}
+                          strokeWidth={3.5}
+                          color={theme.colors.primary}
+                          animated
+                          entering={animPapillon(ZoomIn)}
+                        />
+                      )
+                    }
+                    onLongPress={async () => {
+                      // delete account
+                      Alert.alert(
+                        "Supprimer le compte",
+                        "Êtes-vous sûr de vouloir supprimer ce compte ?",
+                        [
+                          {
+                            text: "Annuler",
+                            style: "cancel",
+                          },
+                          {
+                            text: "Supprimer",
+                            style: "destructive",
+                            onPress: () => {
+                              Alert.alert(
+                                "Êtes-vous sûr ?",
+                                "Voulez-vous supprimer définitivement " + account.studentName.first + " " + account.studentName.last + " ?",
+                                [
+                                  {
+                                    text: "Annuler",
+                                    style: "cancel",
+                                  },
+                                  {
+                                    text: "Supprimer",
+                                    style: "destructive",
+                                    onPress: () => {
+                                      removeAccount(account.localID);
+                                    },
+                                  },
+                                ]
+                              );
+                            },
+                          },
+                        ]
+                      );
+                    }}
                     onPress={async () => {
                       if (currentAccount?.localID !== account.localID) {
-                        setLoading(true);
+                        setLoading(account.localID);
                         await switchTo(account);
-                        setLoading(false);
+                        setLoading(null);
                       }
 
                       navigation.reset({
@@ -188,17 +426,27 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
                       });
                     }}
                   >
-                    <NativeText variant="title" numberOfLines={1}>
-                      {account.name}
-                    </NativeText>
-                    <NativeText variant="subtitle" numberOfLines={1}>
-                      {account.schoolName ?
-                        account.schoolName :
-                        account.identityProvider ?
-                          account.identityProvider.name :
-                          "Compte local"
-                      }
-                    </NativeText>
+                    <Reanimated.View
+                      style={{
+                        flex: 1,
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        gap: 3,
+                      }}
+                      layout={animPapillon(LinearTransition)}
+                    >
+                      <NativeText animated variant="title" numberOfLines={1}>
+                        {account.studentName.first} {account.studentName.last}
+                      </NativeText>
+                      <NativeText animated variant="subtitle" numberOfLines={1}>
+                        {account.schoolName ?
+                          account.schoolName :
+                          account.identityProvider ?
+                            account.identityProvider.name :
+                            "Compte local"
+                        }
+                      </NativeText>
+                    </Reanimated.View>
                   </NativeItem>
                 );
               })}
@@ -206,19 +454,11 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
           </Reanimated.View>
         )}
 
-        <Reanimated.View
-          entering={animPapillon(FadeInDown).delay(100)}
-          layout={animPapillon(LinearTransition)}
-        >
-          <NativeListHeader label="Gestion des comptes" />
-          <NativeList>
-            <NativeItem
-              icon={<PlusIcon />}
-              subtitle="Ajouter un compte"
-              onPress={() => navigation.navigate("ServiceSelector")}
-            />
-          </NativeList>
-        </Reanimated.View>
+        <View
+          style={{
+            height: 100,
+          }}
+        />
       </Reanimated.ScrollView>
     </View>
   );

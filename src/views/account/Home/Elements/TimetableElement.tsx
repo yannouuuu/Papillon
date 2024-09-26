@@ -1,9 +1,13 @@
-import { NativeListHeader } from "@/components/Global/NativeComponents";
+import { NativeItem, NativeList, NativeListHeader } from "@/components/Global/NativeComponents";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { animPapillon } from "@/utils/ui/animations";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Reanimated, { FadeInDown, FadeOut, LinearTransition } from "react-native-reanimated";
+import Reanimated, {
+  FadeInDown,
+  FadeOut,
+  LinearTransition,
+} from "react-native-reanimated";
 import { TimetableItem } from "../../Lessons/Atoms/Item";
 import { PapillonNavigation } from "@/router/refs";
 import RedirectButton from "@/components/Home/RedirectButton";
@@ -13,6 +17,7 @@ import { useTheme } from "@react-navigation/native";
 import { Image, Platform, Text, View } from "react-native";
 import { Sofa, Utensils } from "lucide-react-native";
 import { updateTimetableForWeekInCache } from "@/services/timetable";
+import MissingItem from "@/components/Global/MissingItem";
 
 const TimetableElement = () => {
   const account = useCurrentAccount((store) => store.account!);
@@ -41,18 +46,15 @@ const TimetableElement = () => {
     );
   };
 
-  const epochWeekNumber = useMemo(
-    () => dateToEpochWeekNumber(new Date()),
-    []
-  );
+  const epochWeekNumber = useMemo(() => dateToEpochWeekNumber(new Date()), []);
 
   const [currentlyUpdating, setCurrentlyUpdating] = useState(false);
 
   useEffect(() => {
     if (
       !timetables[epochWeekNumber] &&
-          !currentlyUpdating &&
-          account.instance
+      !currentlyUpdating &&
+      account.instance
     ) {
       setCurrentlyUpdating(true);
       updateTimetableForWeekInCache(account, epochWeekNumber);
@@ -92,19 +94,32 @@ const TimetableElement = () => {
 
       const allCourses = Object.values(timetables).flat();
       const now = new Date();
-      const today = now.getTime();
-
-      const sortedCourses = allCourses
-        .filter((c) => c.endTimestamp > today)
-        .sort((a, b) => a.startTimestamp - b.startTimestamp);
+      const today = parseInt(((new Date(`${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, "0")}-${(new Date().getDate()).toString().padStart(2, "0")}T00:00:00Z`)).getTime() / 1000).toString());
+      const tomorrow = today + 1 * 24 * 60 * 60; // Ajouter 1 jour en millisecondes
+      const Bistomorrow = today + 2 * 24 * 60 * 60; // Ajouter 1 jour en millisecondes
+      const sortedCourses =
+        allCourses.filter((c) => c.startTimestamp / 1000 > Date.now() / 1000 && c.startTimestamp / 1000 < tomorrow).length !== 0
+          ? allCourses.filter((c) => c.startTimestamp / 1000 > Date.now() / 1000 && c.startTimestamp / 1000 < tomorrow)
+            .sort((a, b) => a.startTimestamp - b.startTimestamp)
+          : allCourses
+            .filter((c) => c.endTimestamp / 1000 > tomorrow && c.endTimestamp / 1000 < Bistomorrow)
+            .sort((a, b) => a.startTimestamp - b.startTimestamp);
 
       let nextThreeCourses: TimetableClass[] = [];
+      let verif: string[] = [];
       let currentDay = now;
 
       for (const course of sortedCourses) {
         if (isSameDay(course.startTimestamp, currentDay.getTime())) {
-          nextThreeCourses.push(course);
-          if (nextThreeCourses.length === 3) break;
+          if (
+            ((nextThreeCourses.length === 1 &&
+              nextThreeCourses[0].endTimestamp !== course.endTimestamp) ||
+              nextThreeCourses.length !== 1) &&
+            !verif.includes(`${course.endTimestamp}|${course.startTimestamp}`)
+          ) {
+            nextThreeCourses.push(course);
+            verif.push(`${course.endTimestamp}|${course.startTimestamp}`);
+          }
         } else if (nextThreeCourses.length > 0) {
           break;
         } else {
@@ -128,7 +143,27 @@ const TimetableElement = () => {
   }, [account.instance, timetables]);
 
   if (hidden || nextCourses.length === 0) {
-    return null;
+    return (
+      <NativeList
+        animated
+        key="emptyCourses"
+        entering={FadeInDown.springify().mass(1).damping(20).stiffness(300)}
+        exiting={FadeOut.duration(300)}
+      >
+        <NativeItem
+          animated
+          style={{
+            paddingVertical: 10,
+          }}
+        >
+          <MissingItem
+            emoji="📚"
+            title="Aucun cours à venir"
+            description="Il n'y a pas de cours à venir pour aujourd'hui."
+          />
+        </NativeItem>
+      </NativeList>
+    );
   }
 
   const label = isToday(nextCourses[0].startTimestamp)
@@ -158,18 +193,15 @@ const TimetableElement = () => {
           <React.Fragment key={course.id || index}>
             <TimetableItem item={course} index={index} small />
             {nextCourses[index + 1] &&
-                          isSameDay(
-                            course.endTimestamp,
-                            nextCourses[index + 1].startTimestamp
-                          ) &&
-                          nextCourses[index + 1].startTimestamp -
-                              course.endTimestamp >
-                              1740000 && (
+              isSameDay(
+                course.endTimestamp,
+                nextCourses[index + 1].startTimestamp
+              ) &&
+              nextCourses[index + 1].startTimestamp - course.endTimestamp >
+                1740000 && (
               <SeparatorCourse
                 i={index}
-                start={
-                  nextCourses[index + 1].startTimestamp
-                }
+                start={nextCourses[index + 1].startTimestamp}
                 end={course.endTimestamp}
               />
             )}

@@ -13,9 +13,10 @@ import { useAlert } from "@/providers/AlertProvider";
 import { Audio } from "expo-av";
 import { useTheme } from "@react-navigation/native";
 import GetV6Data from "@/utils/login/GetV6Data";
-import { Check, Undo2 } from "lucide-react-native";
+import { Check, School, Undo2 } from "lucide-react-native";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
+import { sr } from "date-fns/locale";
 
 const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
   const theme = useTheme();
@@ -84,29 +85,18 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
       title: "Skolengo",
       image: require("../../../assets/images/service_skolengo.png"),
       login: () => {
-        if (__DEV__) {
-          showAlert({
-            title: "[DEBUG] Service en développement",
-            message: "Ce service est actuellement en développement. Certaines fonctionnalités peuvent ne pas fonctionner correctement ou ne pas être disponibles.",
-            actions: [
-              {
-                title: "Annuler",
-                onPress: () => { },
-                icon: <Undo2 />,
-                primary: false,
-              },
-              {
-                title: "Continuer",
-                onPress: () => {
-                  navigation.navigate("SkolengoAuthenticationSelector");
-                  playSound();
-                },
-                icon: <Check />,
-                primary: true,
-              }
-            ]
-          });
-        } else UnsupportedAlert();
+        navigation.navigate("SkolengoAuthenticationSelector");
+        playSound();
+      }
+    },
+    {
+      name: "university",
+      title: "Universités et autres",
+      image: require("../../../assets/images/service_skolengo.png"),
+      icon: <School />,
+      login: () => {
+        navigation.navigate("IdentityProviderSelector");
+        playSound();
       }
     },
   ];
@@ -201,11 +191,21 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
               <DuoListPressable
                 key={srv.name}
                 leading={
-                  <Image
-                    source={srv.image}
-                    style={styles.image}
-                    resizeMode="contain"
-                  />
+                  srv.icon ?
+                    <View
+                      style={{
+                        opacity: srv.name === service ? 1 : 0.5,
+                        padding: 3,
+                      }}
+                    >
+                      {React.cloneElement(srv.icon, { size: 26, strokeWidth: 2.5, color: srv.name === service ? colors.primary : colors.text })}
+                    </View>
+                    :
+                    <Image
+                      source={srv.image}
+                      style={styles.image}
+                      resizeMode="contain"
+                    />
                 }
                 text={srv.title}
                 enabled={srv.name === service}
@@ -228,13 +228,6 @@ const ServiceSelector: Screen<"ServiceSelector"> = ({ navigation }) => {
           <ButtonCta
             value="Importer mon compte"
             onPress={() => navigation.navigate("PronoteV6Import", { data: v6Data.data })}
-          />
-        )}
-
-        {__DEV__ && (
-          <ButtonCta
-            value="Fournisseur d'identité"
-            onPress={() => navigation.navigate("IdentityProviderSelector")}
           />
         )}
       </View>

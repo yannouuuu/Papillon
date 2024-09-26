@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { Dimensions, View } from "react-native";
 import screens from ".";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import { useCurrentAccount } from "@/stores/account";
 import PapillonTabNavigator from "@/router/helpers/PapillonTabNavigator";
 import { Screen } from "@/router/helpers/types";
+
+import * as SplashScreen from "expo-splash-screen";
+import * as Linking from "expo-linking";
+import { PapillonNavigation } from "@/router/refs";
 
 export const AccountStack = PapillonTabNavigator();
 const screenOptions: NativeStackNavigationOptions = {
@@ -29,6 +33,27 @@ function TabBarContainer () {
 
 const AccountStackScreen: Screen<"AccountStack"> = () => {
   const account = useCurrentAccount(store => store.account);
+
+  const navigatorRef = React.useRef();
+
+  const url = Linking.useURL();
+  const params = url && Linking.parse(url);
+
+  useEffect(() => {
+    if (params) {
+      if (params.queryParams.method == "importIcal") {
+        const ical = params.queryParams.ical;
+        const title = params.queryParams.title;
+        const autoAdd = params.queryParams.autoAdd;
+
+        PapillonNavigation.current?.navigate("LessonsImportIcal", {
+          ical,
+          title,
+          autoAdd,
+        });
+      }
+    }
+  }, [params]);
 
   const dims = Dimensions.get("window");
   const tablet = dims.width > 600;
@@ -66,6 +91,10 @@ const AccountStackScreen: Screen<"AccountStack"> = () => {
   if (!tablet) {
     finalScreens = newAccountScreens.splice(0, 5);
   }
+
+  useLayoutEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
   return (
     <AccountStack.Navigator screenOptions={screenOptions} tabBar={TabBarContainer}>

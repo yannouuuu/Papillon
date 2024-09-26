@@ -1,6 +1,7 @@
 import { AddonPlacementManifest } from "@/addons/types";
 import type { Chat } from "@/services/shared/Chat";
 import type { Grade } from "@/services/shared/Grade";
+import { Homework } from "@/services/shared/Homework";
 import type { AccountService } from "@/stores/account/types";
 import { Log } from "@/utils/logger/logger";
 import type { CurrentPosition } from "@/utils/native/location";
@@ -16,6 +17,7 @@ export type RouteParameters = {
   ColorSelector?: { settings: boolean };
   DevMenu: undefined;
   AccountCreated: undefined;
+  ChangelogScreen: undefined;
 
   // login.index
   ServiceSelector: undefined;
@@ -44,7 +46,9 @@ export type RouteParameters = {
   // login.identityProvider
   IdentityProviderSelector: undefined;
   UnivRennes1_Login: undefined;
+  UnivRennes2_Login: undefined;
   UnivLimoges_Login: undefined;
+  UnivSorbonneParisNord_login: undefined;
 
   // login.skolengo
   SkolengoAuthenticationSelector: undefined;
@@ -55,8 +59,17 @@ export type RouteParameters = {
   Home: undefined
   HomeScreen?: { onboard: boolean };
   NoteReaction: undefined;
+
   Lessons?: { outsideNav?: boolean };
+  LessonsImportIcal: {
+    ical?: string;
+    title?: string;
+    autoAdd?: boolean;
+  };
+  LessonDocument: { lesson: Homework };
+
   Homeworks?: { outsideNav?: boolean };
+  HomeworksDocument: { homework: Homework };
 
   News?: { outsideNav?: boolean };
   NewsItem: undefined;
@@ -88,6 +101,7 @@ export type RouteParameters = {
   SettingsExternalServices: undefined;
   SettingsMagic: undefined;
   SettingsFlags: undefined;
+  SettingsFlagsInfos: undefined;
   SettingsAddons: undefined;
   SettingsDevLogs: undefined;
   SettingsDonorsList: undefined;

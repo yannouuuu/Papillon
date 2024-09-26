@@ -266,5 +266,115 @@
         "vie de classe"
       ]
     }
+  },
+  {
+    "label": "integration",
+    "pretty": "Intégration",
+    "formats": {
+      "default": [
+        "integration"
+      ]
+    }
+  },
+  {
+    "label": "marketing",
+    "pretty": "Marketing",
+    "formats": {
+      "default": [
+        "sdc marketing"
+      ]
+    }
+  },
+  {
+    "label": "gestiondeprojet",
+    "pretty": "Gestion de projet",
+    "formats": {
+      "default": [
+        "gestion de projet"
+      ]
+    }
+  },
+  {
+    "label": "culturenum",
+    "pretty": "Culture numérique",
+    "formats": {
+      "default": [
+        "culture num"
+      ]
+    }
+  },
+  {
+    "label": "developpementweb",
+    "pretty": "Développement web",
+    "formats": {
+      "default": [
+        "developpement web"
+      ]
+    }
+  },
+  {
+    "label": "traitementdelinformation",
+    "pretty": "Traitement de l'information",
+    "formats": {
+      "default": [
+        "traitement de l information",
+        "traitement de linformation"
+      ]
+    }
+  },
+  {
+    "label": "prodgraphique",
+    "pretty": "Production graphique",
+    "formats": {
+      "default": [
+        "prod graphique"
+      ]
+    }
+  },
+  {
+    "label": "expressioncom",
+    "pretty": "Expression & communication",
+    "formats": {
+      "default": [
+        "expression com"
+      ]
+    }
+  },
+  {
+    "label": "prodaudiovisuelle",
+    "pretty": "Production audiovisuelle",
+    "formats": {
+      "default": [
+        "prod audiovisuelle",
+        "prod audio visuelle"
+      ]
+    }
+  },
+  {
+    "label": "ecrituremedianum",
+    "pretty": "Écriture média numérique",
+    "formats": {
+      "default": [
+        "ecriture media num"
+      ]
+    }
+  },
+  {
+    "label": "methodologie",
+    "pretty": "Méthodologie",
+    "formats": {
+      "default": [
+        "methodologie"
+      ]
+    }
+  },
+  {
+    "label": "ecoetdroitdunumerique",
+    "pretty": "Éco. & droit du numérique",
+    "formats": {
+      "default": [
+        "eco et droit du numerique"
+      ]
+    }
   }
 ]

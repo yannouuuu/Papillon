@@ -4,7 +4,7 @@ import { Screen } from "@/router/helpers/types";
 import { updateNewsInCache } from "@/services/news";
 import { useNewsStore } from "@/stores/news";
 import { useCurrentAccount } from "@/stores/account";
-import { NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
+import { NativeList, NativeListHeader } from "@/components/Global/NativeComponents";
 import { RefreshControl } from "react-native-gesture-handler";
 import { LinearGradient } from "expo-linear-gradient";
 import BetaIndicator from "@/components/News/Beta";
@@ -36,13 +36,14 @@ const NewsScreen: Screen<"News"> = ({ route, navigation }) => {
     });
   }, [navigation, route.params, theme.colors.text]);
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
+  const fetchData = useCallback(async (hidden: boolean = false) => {
+    if (!hidden) setIsLoading(true);
     await updateNewsInCache(account);
     setIsLoading(false);
   }, [account]);
 
   useEffect(() => {
+    navigation.addListener("focus", () => fetchData(true));
     fetchData();
   }, [account.instance]);
 

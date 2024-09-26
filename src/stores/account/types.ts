@@ -4,6 +4,7 @@ import type { Session as TSSession, Authentication as TSAuthentication } from "t
 import type { Client as ARDClient } from "pawrd";
 import type ScolengoAPI from "scolengo-api";
 import { SkolengoAuthConfig } from "@/services/skolengo/skolengo-types";
+import { User as ScolengoAPIUser } from "scolengo-api/types/models/Common";
 
 export interface Tab {
   name: string
@@ -22,6 +23,12 @@ export interface PersonalizationColor {
   }
 }
 
+export interface PapillonIcalURL {
+  name: string
+  url: string,
+  lastRefreshed?: Date
+}
+
 export interface Personalization {
   color: PersonalizationColor
   profilePictureB64?: string,
@@ -31,7 +38,8 @@ export interface Personalization {
   showTabBackground: boolean,
   transparentTabBar: boolean,
   hideTabBar: boolean,
-  magicEnabled?: boolean
+  magicEnabled?: boolean,
+  icalURLs: PapillonIcalURL[],
   tabs: Tab[],
   subjects: {
     [subject: string]: {
@@ -114,6 +122,7 @@ export interface SkolengoAccount extends BaseAccount {
   service: AccountService.Skolengo
   instance?: ScolengoAPI.Skolengo
   authentication: SkolengoAuthConfig
+  userInfo: ScolengoAPIUser
 }
 
 export interface LocalAccount extends BaseAccount {

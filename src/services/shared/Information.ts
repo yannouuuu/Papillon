@@ -10,4 +10,5 @@ export interface Information {
   author: string
   category: string
   read: boolean
+  ref: any
 }

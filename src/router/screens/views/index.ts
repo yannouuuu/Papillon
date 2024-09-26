@@ -11,6 +11,9 @@ import GradeDocument from "@/views/account/Grades/Document";
 import RestaurantHistory from "@/views/account/Restaurant/Modals/History";
 import ChatCreate from "@/views/account/Chat/Modals/ChatCreate";
 import Chat from "@/views/account/Chat/Modals/Chat";
+import HomeworksDocument from "@/views/account/Homeworks/Document";
+import LessonsImportIcal from "@/views/account/Lessons/Options/LessonsImportIcal";
+import LessonDocument from "@/views/account/Lessons/Document";
 
 export default [
   createScreen("NoteReaction", NoteReaction, {
@@ -34,6 +37,7 @@ export default [
   createScreen("NewsItem", NewsItem, {
     headerTitle: "Item",
     presentation: "modal",
+    headerShown: false,
   }),
   createScreen("AddonLogs", AddonLogs, {
     headerTitle: "Logs",
@@ -41,6 +45,21 @@ export default [
   }),
   createScreen("AddonPage", AddonPage, {
     headerTitle: "Extension",
+  }),
+  createScreen("LessonsImportIcal", LessonsImportIcal, {
+    headerTitle: "Importer un iCal",
+    presentation: "modal",
+    headerLargeTitle: true,
+  }),
+  createScreen("LessonDocument", LessonDocument, {
+    headerTitle: "Cours",
+    presentation: "modal",
+    headerShown: false,
+  }),
+  createScreen("HomeworksDocument", HomeworksDocument, {
+    headerTitle: "Devoir",
+    presentation: "modal",
+    headerShown: false,
   }),
   createScreen("GradeSubject", GradeSubjectScreen, {
     headerTitle: "Détail de la matière",
