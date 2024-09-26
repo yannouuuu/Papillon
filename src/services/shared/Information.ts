@@ -2,7 +2,7 @@ import type { Attachment } from "./Attachment";
 
 export interface Information {
   id: string
-  title: string | undefined
+  title?: string
   date: Date
   acknowledged: boolean
   attachments: Attachment[]
