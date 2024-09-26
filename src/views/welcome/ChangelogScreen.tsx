@@ -283,7 +283,7 @@ const ChangelogFeature: React.FC<{ feature: Feature, navigation: any, theme: any
         />
         <View pointerEvents="none"
           style={{
-            height: 160,
+            height: 142,
             padding: 12,
             gap: 6,
             paddingLeft: 0,
@@ -292,7 +292,9 @@ const ChangelogFeature: React.FC<{ feature: Feature, navigation: any, theme: any
             borderBottomWidth: 0.5,
           }}
         >
-          <NativeText variant="title">
+          <NativeText variant="title"
+            numberOfLines={2}
+          >
             {feature.title}
           </NativeText>
           <NativeText variant="subtitle"
@@ -305,31 +307,30 @@ const ChangelogFeature: React.FC<{ feature: Feature, navigation: any, theme: any
             {feature.subtitle}
           </NativeText>
         </View>
-        {(feature.href || feature.navigation) && (
-          <NativeItem
-            onPress={() => {
-              if(feature.href) {
-                Linking.openURL(feature.href);
+        <NativeItem
+          onPress={(feature.href || feature.navigation) ? () => {
+            if(feature.href) {
+              Linking.openURL(feature.href);
+            }
+            else if(feature.navigation) {
+              try {
+                navigation.goBack();
+                navigation.navigate(feature.navigation);
               }
-              else if(feature.navigation) {
-                try {
-                  navigation.goBack();
-                  navigation.navigate(feature.navigation);
-                }
-                catch {}
-              }
+              catch {}
+            }
+          } : null}
+        >
+          <NativeText
+            variant="default"
+            style={{
+              color: (feature.href || feature.navigation) ? theme.colors.primary : theme.colors.text + "50"
             }}
           >
-            <NativeText
-              variant="default"
-              style={{
-                color: theme.colors.primary
-              }}
-            >
-              {feature.button || "En savoir plus"}
-            </NativeText>
-          </NativeItem>
-        )}
+            {feature.button || "En savoir plus"}
+          </NativeText>
+        </NativeItem>
+
       </NativeList>
     </PressableScale>
   );
