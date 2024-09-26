@@ -5,6 +5,7 @@ import createScreen from "../helpers/create-screen";
 
 import { SettingsScreen } from "./settings/navigator";
 import AccountScreen from "./account/stack";
+import { Platform } from "react-native";
 
 export default [
   ...welcome,
@@ -14,8 +15,8 @@ export default [
   createScreen("SettingStack", SettingsScreen, {
     headerShown: false,
     presentation: "modal",
-    animation: "slide_from_right",
-    animationDuration: 100
+    animation: Platform.OS == "android" ? "fade_from_bottom" : "default",
+    animationDuration: 120
   }),
 
   createScreen("AccountStack", AccountScreen, {
