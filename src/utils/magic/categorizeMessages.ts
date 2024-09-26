@@ -2,7 +2,7 @@ import important_json from "@/utils/magic/regex/important.json";
 
 // Define the structure of a message
 interface Message {
-  title: string | undefined;
+  title?: string;
   content: string;
   read: boolean;
   [key: string]: any; // Allow for any additional properties
@@ -48,7 +48,7 @@ export const categorizeMessages = (messages: Message[]): CategorizedMessages => 
     });
 
     if (!message.title) {
-      message.title = "(aucun titre)";
+      message.title = "Sans titre";
     }
 
     if (matchCount > 0 && !read) {
