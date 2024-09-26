@@ -13,6 +13,7 @@ import ChatCreate from "@/views/account/Chat/Modals/ChatCreate";
 import Chat from "@/views/account/Chat/Modals/Chat";
 import HomeworksDocument from "@/views/account/Homeworks/Document";
 import LessonsImportIcal from "@/views/account/Lessons/Options/LessonsImportIcal";
+import LessonDocument from "@/views/account/Lessons/Document";
 
 export default [
   createScreen("NoteReaction", NoteReaction, {
@@ -49,6 +50,11 @@ export default [
     headerTitle: "Importer un iCal",
     presentation: "modal",
     headerLargeTitle: true,
+  }),
+  createScreen("LessonDocument", LessonDocument, {
+    headerTitle: "Cours",
+    presentation: "modal",
+    headerShown: false,
   }),
   createScreen("HomeworksDocument", HomeworksDocument, {
     headerTitle: "Devoir",

@@ -65,6 +65,7 @@ export type RouteParameters = {
     title?: string;
     autoAdd?: boolean;
   };
+  LessonDocument: { lesson: Homework };
 
   Homeworks?: { outsideNav?: boolean };
   HomeworksDocument: { homework: Homework };

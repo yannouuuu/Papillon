@@ -31,10 +31,10 @@ export const reduceIcalToCourse = (course, identityProvider, url) => {
       // Get if CM, TD, TP
       const courseType = course.summary?.value.match(/(CM|TD|TP|DS)/);
       const courseTypes = {
-        CM: "Cours Magistral",
-        TD: "Travaux Dirigés",
-        TP: "Travaux Pratiques",
-        DS: "Devoir Surveillé",
+        CM: "CM (Cours magistral)",
+        TD: "TD (Travaux dirigés)",
+        TP: "TP (Travaux pratiques)",
+        DS: "DS -(Devoir surveillé)",
       };
 
       const itemType = (ressource ? ressource[0].replace("-","") + " - " : "") + (courseType ? courseTypes[courseType[0]] : "");
