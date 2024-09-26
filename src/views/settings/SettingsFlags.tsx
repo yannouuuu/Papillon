@@ -110,7 +110,7 @@ const SettingsFlags: Screen<"SettingsFlags"> = ({ navigation }) => {
 
         {renderAccountSection("Personnalisation", account.personalization)}
 
-        {renderAccountSection("Informations de l'instance", account?.instance?.information)}
+        {renderAccountSection("Informations de l'instance", account?.instance)}
       </ScrollView>
     </KeyboardAvoidingView>
   );
