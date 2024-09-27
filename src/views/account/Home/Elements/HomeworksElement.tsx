@@ -48,6 +48,12 @@ const HomeworksElement = ({ navigation }) => {
   const startTime = Date.now() / 1000; // Convertir en millisecondes
   const endTime = startTime + 7 * 24 * 60 * 60 * 1000; // Ajouter 7 jours en millisecondes
 
+  const hwFinalList = homeworks[dateToEpochWeekNumber(actualDay)]?.filter(hw => hw.due / 1000 >= startTime && hw.due / 1000 <= endTime);
+
+  if(hwFinalList.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <NativeListHeader animated label="Travail à faire"
@@ -56,7 +62,7 @@ const HomeworksElement = ({ navigation }) => {
         )}
       />
       <NativeList>
-        {homeworks[dateToEpochWeekNumber(actualDay)]?.filter(hw => hw.due / 1000 >= startTime && hw.due / 1000 <= endTime).map((hw, index) => (
+        {hwFinalList.map((hw, index) => (
           <HomeworkItem
             navigation={navigation}
             homework={hw}
