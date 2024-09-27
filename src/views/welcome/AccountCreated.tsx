@@ -115,7 +115,7 @@ const AccountCreated: Screen<"AccountCreated"> = ({ navigation }) => {
 
       <PapillonShineBubble
         message={name ? `Enchanté, ${name} ! On va personnaliser ton expérience !` : "Bienvenue sur Papillon !"}
-        numberOfLines={2}
+        numberOfLines={name ? 3 : 1}
         width={260}
         style={{
           zIndex: 10,

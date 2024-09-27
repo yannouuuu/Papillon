@@ -44,6 +44,14 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
     setLoading(false);
   }, [account.instance, timetables, setHidden, setLoading]);
 
+      if (nextCourse) {
+        setNextCourse(nextCourse);
+        setHidden(false);
+      }
+      setLoading(false);
+    }();
+  }, [account.instance, timetables]);
+
   useEffect(() => {
     setLoading(true);
     updateNextCourse();

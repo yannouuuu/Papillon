@@ -53,7 +53,7 @@ const SkolengoGeolocation: Screen<"SkolengoGeolocation"> = ({ navigation }) => {
 
       <PapillonShineBubble
         message={PapillonMessage}
-        numberOfLines={permission?.granted ? 1 : 3}
+        numberOfLines={permission?.granted ? 1 : 4}
         width={250}
       />
       {!permission?.granted && (

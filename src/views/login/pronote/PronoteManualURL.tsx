@@ -96,7 +96,7 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
             "Indique moi l'adresse URL Pronote de ton établissement"
             : "J'ai trouvé cette adresse dans ton presse-papier !"
         }
-        numberOfLines={2}
+        numberOfLines={3}
         width={250}
         noFlex
       />
