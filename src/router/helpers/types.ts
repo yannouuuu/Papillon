@@ -101,7 +101,7 @@ export type RouteParameters = {
   SettingsExternalServices: undefined;
   SettingsMagic: undefined;
   SettingsFlags: undefined;
-  SettingsFlagsInfos: undefined;
+  SettingsFlagsInfos: { title: string, value: any };
   SettingsAddons: undefined;
   SettingsDevLogs: undefined;
   SettingsDonorsList: undefined;
