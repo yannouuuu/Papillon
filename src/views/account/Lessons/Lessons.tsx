@@ -69,7 +69,7 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   }, [pickerDate, account.instance]);
 
   useEffect(() => {
-    loadTimetableWeek(getWeekFromDate(new Date()), true);
+    loadTimetableWeek(getWeekFromDate(new Date()));
   }, [account.personalization.icalURLs]);
 
   const [loadingWeeks, setLoadingWeeks] = useState([]);
