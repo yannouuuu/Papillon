@@ -113,7 +113,7 @@ const NextCourseLesson: React.FC<{
       if (distance > 0) {
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.ceil((distance % (1000 * 60 * 60)) / (1000 * 60)); // Using ceil to always show at least 1 minute
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
 
         if (days > 0) {
           setPrettyTime(`dans ${days} jour(s)`);
@@ -125,7 +125,7 @@ const NextCourseLesson: React.FC<{
         setWidgetTitle("Prochain cours");
       } else if (end > 0) {
         const hours = Math.floor((end % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.ceil((end % (1000 * 60 * 60)) / (1000 * 60)); // Using ceil to always show at least 1 minute
+        const minutes = Math.floor((end % (1000 * 60 * 60)) / (1000 * 60));
         setPrettyTime(`reste ${hours}h ${lz(minutes)}min`);
         setWidgetTitle("En classe");
       } else {
@@ -135,9 +135,9 @@ const NextCourseLesson: React.FC<{
 
       // Schedule next update at the start of the next minute
       const nextMinute = new Date(now);
-      nextMinute.setMinutes(nextMinute.getMinutes() + 1);
       nextMinute.setSeconds(0);
       nextMinute.setMilliseconds(0);
+      nextMinute.setMinutes(nextMinute.getMinutes() + 1);
       const delay = nextMinute.getTime() - now;
       setTimeout(updateRemainingTime, delay);
     };
