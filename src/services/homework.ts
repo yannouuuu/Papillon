@@ -31,6 +31,11 @@ export async function updateHomeworkForWeekInCache <T extends Account> (account:
         homeworks = await getHomeworkForWeek(account, weekNumber);
         break;
       }
+      case AccountService.EcoleDirecte: {
+        const { getHomeworkForWeek } = await import("./ecoledirecte/homework");
+        const weekNumber = dateToEpochWeekNumber(date);
+        homeworks = await getHomeworkForWeek(account, weekNumber);
+      }
       case AccountService.Local: {
         homeworks = [];
         break;
