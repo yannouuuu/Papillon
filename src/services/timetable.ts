@@ -1,6 +1,6 @@
 import { type Account, AccountService } from "@/stores/account/types";
 import { useTimetableStore } from "@/stores/timetable";
-import { epochWNToPronoteWN, epochWNToDate, weekNumberToDateRange } from "@/utils/epochWeekNumber";
+import { epochWNToPronoteWN, weekNumberToDateRange } from "@/utils/epochWeekNumber";
 import { checkIfSkoSupported } from "./skolengo/default-personalization";
 import { error } from "@/utils/logger/logger";
 import { fetchIcalData } from "./local/ical";
