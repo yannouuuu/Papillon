@@ -10,7 +10,6 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
     additionalNotes: c.notes,
     backgroundColor: c.color
   };
-  console.info(c);
 
   switch (c.kind) {
     case TimetableItemKind.COURS:
