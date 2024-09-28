@@ -14,6 +14,7 @@ const parseInformation = (i: pronote.NewsInformation): Information => ({
   author: i.author,
   category: i.category.name,
   read: i.read,
+  ref: i,
 });
 
 export const getNews = async (account: PronoteAccount): Promise<Information[]> => {

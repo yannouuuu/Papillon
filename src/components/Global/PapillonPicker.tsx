@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Platform, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 
-import { PapillonContextEnter, PapillonContextExit } from "@/utils/ui/animations";
+import { animPapillon, PapillonContextEnter, PapillonContextExit } from "@/utils/ui/animations";
 import { useTheme } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import Reanimated, { type AnimatedStyle } from "react-native-reanimated";
+import Reanimated, { LinearTransition, type AnimatedStyle } from "react-native-reanimated";
 import { NativeText } from "./NativeComponents";
 
 import { BlurView } from "expo-blur";
@@ -13,11 +13,12 @@ import { Check } from "lucide-react-native";
 
 interface PapillonPickerProps {
   children: React.ReactNode
-  data: string[]
-  selected: string
+  data: string[] | { label: string, icon?: React.ReactNode, onPress: () => unknown }[]
+  selected?: string
   contentContainerStyle?: StyleProp<AnimatedStyle<StyleProp<ViewStyle>>>
   delay?: number,
-  direction?: "left" | "right"
+  direction?: "left" | "right",
+  animated?: boolean,
   onSelectionChange?: (item: string) => unknown
 }
 
@@ -28,6 +29,7 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
   contentContainerStyle,
   delay,
   direction = "left",
+  animated,
   onSelectionChange,
 }) => {
   const theme = useTheme();
@@ -47,11 +49,12 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
   };
 
   return (
-    <Reanimated.View style={[styles.container, contentContainerStyle]}>
+    <Reanimated.View layout={animated && animPapillon(LinearTransition)} style={[styles.container, contentContainerStyle]}>
       <TouchableOpacity
         onPress={() => setOpened(!opened)}
       >
         <Reanimated.View
+          layout={animated && animPapillon(LinearTransition)}
           style={styles.children}
           onLayout={(event)=> {
             const height = event.nativeEvent.layout.height;
@@ -64,6 +67,7 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
 
       {opened && (
         <Reanimated.View
+          layout={animated && animPapillon(LinearTransition)}
           style={[
             styles.picker,
             direction === "left" ? {
@@ -90,41 +94,74 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
             }}
             tint={theme.dark ? "dark" : "light"}
           >
-            {data.map((item, index) => (
-              <View key={index}>
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => {
-                    setOpened(false);
-                    handleSelectionChange(item);
-                  }}
-                  style={[
-                    styles.item
-                  ]}
-                >
-                  <NativeText>{item}</NativeText>
+            {data.map((item, index) => {
+              // check if item is a string or a component
+              const isNotString = typeof item !== "string";
 
-                  {item === selected && (
-                    <Check
-                      size={20}
-                      strokeWidth={2.5}
-                      color={theme.colors.primary}
+              const label = isNotString ? item.label : item;
+              const icon = isNotString ? item.icon && item.icon : null;
+
+              const onPressItem = isNotString ? item.onPress : null;
+
+              const newIcon = icon ? React.cloneElement(icon, {
+                size: 20,
+                strokeWidth: 2.5,
+                color: theme.colors.text,
+              }) : null;
+
+              return (
+                <View key={index}>
+                  <TouchableOpacity
+                    key={index}
+                    onPress={onPressItem ? () => {
+                      setOpened(false);
+                      onPressItem();
+                    } : () => {
+                      setOpened(false);
+                      handleSelectionChange(item);
+                    }}
+                    style={[
+                      styles.item
+                    ]}
+                  >
+                    {newIcon && (
+                      <View
+                        style={{
+                          marginRight: 10,
+                        }}
+                      >
+                        {newIcon}
+                      </View>
+                    )}
+
+                    <NativeText
+                    >{label}</NativeText>
+
+                    <View style={{ flex: 1 }} />
+
+                    {item === selected && (
+                      <Check
+                        size={20}
+                        strokeWidth={2.5}
+                        color={theme.colors.primary}
+                        style={{ marginRight: 10}}
+                      />
+                    )}
+                  </TouchableOpacity>
+
+                  {index === data.length - 1 ? null : (
+                    <View
+                      style={{
+                        height: 1,
+                        borderBottomColor: theme.colors.text + "25",
+                        borderBottomWidth: 0.5,
+                        marginLeft: 14,
+                      }}
                     />
                   )}
-                </TouchableOpacity>
-
-                {index === data.length - 1 ? null : (
-                  <View
-                    style={{
-                      height: 1,
-                      borderBottomColor: theme.colors.text + "25",
-                      borderBottomWidth: 0.5,
-                      marginLeft: 14,
-                    }}
-                  />
-                )}
-              </View>
-            ))}
+                </View>
+              );
+            })}
           </BlurView>
         </Reanimated.View>
       )}
@@ -163,9 +200,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingRight: 14,
     marginLeft: 14,
-
+    width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
   },
 });

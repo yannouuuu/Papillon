@@ -157,7 +157,9 @@ const ChangelogScreen = ({ route, navigation }) => {
           layout={animPapillon(LinearTransition)}
         >
           <PressableScale>
-            <NativeList animated inline>
+            <NativeList
+              animated inline
+            >
               <Image
                 source={{uri: changelog.illustration}}
                 style={{
@@ -269,7 +271,7 @@ const ChangelogFeature: React.FC<{ feature: Feature, navigation: any, theme: any
       <NativeList
         inline
         style={{
-          width: 200
+          width: 200,
         }}
       >
         <Image
@@ -279,39 +281,56 @@ const ChangelogFeature: React.FC<{ feature: Feature, navigation: any, theme: any
             aspectRatio: 3 / 2
           }}
         />
-        <NativeItem pointerEvents="none">
-          <NativeText variant="title">
+        <View pointerEvents="none"
+          style={{
+            height: 142,
+            padding: 12,
+            gap: 6,
+            paddingLeft: 0,
+            marginLeft: 12,
+            borderBottomColor: theme.colors.text + "18",
+            borderBottomWidth: 0.5,
+          }}
+        >
+          <NativeText variant="title"
+            numberOfLines={2}
+          >
             {feature.title}
           </NativeText>
-          <NativeText variant="subtitle">
+          <NativeText variant="subtitle"
+            style={{
+              height: "100%"
+            }}
+            ellipsizeMode="tail"
+            numberOfLines={4}
+          >
             {feature.subtitle}
           </NativeText>
-        </NativeItem>
-        {(feature.href || feature.navigation) && (
-          <NativeItem
-            onPress={() => {
-              if(feature.href) {
-                Linking.openURL(feature.href);
+        </View>
+        <NativeItem
+          onPress={(feature.href || feature.navigation) ? () => {
+            if(feature.href) {
+              Linking.openURL(feature.href);
+            }
+            else if(feature.navigation) {
+              try {
+                navigation.goBack();
+                navigation.navigate(feature.navigation);
               }
-              else if(feature.navigation) {
-                try {
-                  navigation.goBack();
-                  navigation.navigate(feature.navigation);
-                }
-                catch {}
-              }
+              catch {}
+            }
+          } : null}
+        >
+          <NativeText
+            variant="default"
+            style={{
+              color: (feature.href || feature.navigation) ? theme.colors.primary : theme.colors.text + "50"
             }}
           >
-            <NativeText
-              variant="default"
-              style={{
-                color: theme.colors.primary
-              }}
-            >
-              {feature.button || "En savoir plus"}
-            </NativeText>
-          </NativeItem>
-        )}
+            {feature.button || "En savoir plus"}
+          </NativeText>
+        </NativeItem>
+
       </NativeList>
     </PressableScale>
   );

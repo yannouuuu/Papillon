@@ -194,7 +194,10 @@ const ContextMenu: React.FC<{
                           fontWeight: 500,
                           color: colors.text + "50",
                           fontFamily: "medium",
+                          maxWidth: "70%",
                         }}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
                       >
                         {AccountService[account.service] !== "Local" ?
                           AccountService[account.service] :

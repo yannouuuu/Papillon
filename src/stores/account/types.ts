@@ -23,6 +23,12 @@ export interface PersonalizationColor {
   }
 }
 
+export interface PapillonIcalURL {
+  name: string
+  url: string,
+  lastRefreshed?: Date
+}
+
 export interface Personalization {
   color: PersonalizationColor
   profilePictureB64?: string,
@@ -32,7 +38,8 @@ export interface Personalization {
   showTabBackground: boolean,
   transparentTabBar: boolean,
   hideTabBar: boolean,
-  magicEnabled?: boolean
+  magicEnabled?: boolean,
+  icalURLs: PapillonIcalURL[],
   tabs: Tab[],
   subjects: {
     [subject: string]: {

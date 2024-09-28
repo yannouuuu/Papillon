@@ -2,7 +2,7 @@ import important_json from "@/utils/magic/regex/important.json";
 
 // Define the structure of a message
 interface Message {
-  title: string;
+  title?: string;
   content: string;
   read: boolean;
   [key: string]: any; // Allow for any additional properties
@@ -25,7 +25,7 @@ export const categorizeMessages = (messages: Message[]): CategorizedMessages => 
     Object.values(important_json).forEach((regexArray: string[]) => {
       regexArray.forEach((regex) => {
         const pattern = new RegExp(regex, "i");
-        const titleMatches = title.match(pattern);
+        const titleMatches = title && title.match(pattern);
         const contentMatches = content.match(pattern);
 
         // Filter out empty strings and add only non-empty matches to matchingWords
@@ -47,8 +47,12 @@ export const categorizeMessages = (messages: Message[]): CategorizedMessages => 
       });
     });
 
+    if (!message.title) {
+      message.title = "Sans titre";
+    }
+
     if (matchCount > 0 && !read) {
-      importantMessages.push({ ...message, matchCount, matchingWords });
+      importantMessages.push({ ...message, matchCount, matchingWords, important: true });
 
       // Log the matching words or phrases for this message
       console.log(`Message Title: "${title}" matched the following words:`, matchingWords);

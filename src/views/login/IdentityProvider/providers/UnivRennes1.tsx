@@ -9,14 +9,21 @@ import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { AccountService, LocalAccount } from "@/stores/account/types";
 import defaultPersonalization from "@/services/local/default-personalization";
 import uuid from "@/utils/uuid-v4";
+import PapillonSpinner from "@/components/Global/PapillonSpinner";
+import { NativeText } from "@/components/Global/NativeComponents";
+import { useTheme } from "@react-navigation/native";
 
 const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
   const mainURL = "https://sesame.univ-rennes1.fr/comptes/";
+  const theme = useTheme();
 
   const webViewRef = React.useRef<WebView>(null);
 
   const createStoredAccount = useAccounts(store => store.create);
   const switchTo = useCurrentAccount(store => store.switchTo);
+
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoadingText, setIsLoadingText] = React.useState("Connexion en cours...");
 
   const loginUnivData = async (data: any) => {
     if (data?.user?.uid !== null) {
@@ -41,8 +48,8 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
           first: data?.user?.infos?.firstName,
           last: data?.user?.infos?.lastName,
         },
-        className: "", // TODO ?
-        schoolName: "Université de Rennes",
+        className: "UR1", // TODO ?
+        schoolName: data.caccount.data.attachmentDpt.name.replace("Institut Universitaire de Technologie", "IUT") + " - Université de Rennes",
 
         personalization: await defaultPersonalization()
       };
@@ -67,6 +74,41 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         flex: 1,
       }}
     >
+      {isLoading && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: theme.colors.card,
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            gap: 6,
+          }}
+        >
+          <PapillonSpinner
+            size={48}
+            strokeWidth={5}
+            color="#29947a"
+            style={{
+              marginBottom: 16,
+              marginHorizontal: 26,
+            }}
+          />
+
+          <NativeText variant="title" style={{textAlign: "center"}}>
+            Connexion au compte Sésame
+          </NativeText>
+
+          <NativeText variant="subtitle" style={{textAlign: "center"}}>
+            {isLoadingText}
+          </NativeText>
+        </View>
+      )}
+
       <WebView
         source={{ uri: mainURL }}
         style={{
@@ -76,6 +118,13 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
         ref={webViewRef}
         startInLoadingState={true}
         incognito={true}
+        onLoadStart={(e) => {
+          if (e.nativeEvent.url === "https://sesame.univ-rennes1.fr/comptes/api/auth/data") {
+            setIsLoadingText("Récupération des données...");
+            setIsLoading(true);
+          }
+        }}
+
         onLoadEnd={(e) => {
           if (e.nativeEvent.title === "Sésame" && e.nativeEvent.url === mainURL) {
             webViewRef.current?.injectJavaScript(`
@@ -87,6 +136,9 @@ const UnivRennes1_Login: Screen<"UnivRennes1_Login"> = ({ navigation }) => {
             webViewRef.current?.injectJavaScript(`
               window.ReactNativeWebView.postMessage(JSON.stringify({type: "loginData", data: document.querySelector("pre").innerText}));
             `);
+          }
+          else {
+            setIsLoading(false);
           }
         }}
 

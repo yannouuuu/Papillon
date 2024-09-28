@@ -3,11 +3,12 @@ import { useTimetableStore } from "@/stores/timetable";
 import { epochWNToPronoteWN } from "@/utils/epochWeekNumber";
 import { checkIfSkoSupported } from "./skolengo/default-personalization";
 import { error } from "@/utils/logger/logger";
+import { fetchIcalData } from "./local/ical";
 
 /**
  * Updates the state and cache for the timetable of given week number.
  */
-export async function updateTimetableForWeekInCache <T extends Account> (account: T, epochWeekNumber: number): Promise<void> {
+export async function updateTimetableForWeekInCache <T extends Account> (account: T, epochWeekNumber: number, force: boolean = false): Promise<void> {
   switch (account.service) {
     case AccountService.Pronote: {
       const { getTimetableForWeek } = await import("./pronote/timetable");
@@ -17,8 +18,6 @@ export async function updateTimetableForWeekInCache <T extends Account> (account
       break;
     }
     case AccountService.Local: {
-      const timetable = [];
-      useTimetableStore.getState().updateClasses(epochWeekNumber, []);
       break;
     }
     case AccountService.Skolengo: {
@@ -35,4 +34,7 @@ export async function updateTimetableForWeekInCache <T extends Account> (account
       throw new Error("Service not implemented.");
     }
   }
+
+  // Fetch iCal data
+  await fetchIcalData(account, force);
 }

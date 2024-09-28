@@ -123,7 +123,7 @@ const PronoteManualLocation: Screen<"PronoteManualLocation"> = ({ navigation }) 
             layout={LinearTransition}
           >
             <PapillonShineBubble
-              message={"Dans quelle ville se trouve votre établissement ?"}
+              message={"Dans quelle ville se trouve ton établissement ?"}
               numberOfLines={2}
               width={250}
               noFlex

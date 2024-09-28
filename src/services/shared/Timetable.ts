@@ -2,7 +2,8 @@ export interface TimetableClass {
   subject: string
   id: number | string
   type: "lesson" | "activity" | "detention" | "vacation"
-  title: string
+  title: string,
+  itemType?: string,
   startTimestamp: number
   endTimestamp: number
   additionalNotes?: string
@@ -10,6 +11,7 @@ export interface TimetableClass {
   teacher?: string
   backgroundColor?: string,
   status?: TimetableClassStatus,
+  source?: string
 }
 
 export type Timetable = Array<TimetableClass>;

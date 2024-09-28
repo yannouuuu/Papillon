@@ -133,18 +133,18 @@ export const icones = {
   ],
   "Icônes statiques": [
     {
-      "id": "AppIcon_Pride_2024",
-      "name": "Pride 2024",
-      "icon": require("../../../assets/icon/pride_2024.png"),
-      "author": "",
+      "id": "AppIcon_Frutiger",
+      "name": "Frutiger",
+      "icon": require("../../../assets/icon/frutiger.png"),
+      "author": "Tom Hélière (toi-et-moi)",
       "isVariable": false,
-      "isSpecial": true,
+      "isSpecial": false,
       "isPremium": false
     },
     {
-      "id": "AppIcon_Pride_ALT",
-      "name": "Été",
-      "icon": require("../../../assets/icon/pride_summer_2024.png"),
+      "id": "AppIcon_Pride",
+      "name": "Pride 2024",
+      "icon": require("../../../assets/icon/pride_2024.png"),
       "author": "",
       "isVariable": false,
       "isSpecial": true,
@@ -181,21 +181,12 @@ export const icones = {
       "isPremium": false
     },
     {
-      "id": "AppIcon_Retro",
+      "id": "AppIcon_retro",
       "name": "Rétro",
       "icon": require("../../../assets/icon/retro.png"),
       "author": "",
       "isVariable": false,
       "isSpecial": false,
-      "isPremium": false
-    },
-    {
-      "id": "AppIcon_Pride_2023",
-      "name": "Pride 2023",
-      "icon": require("../../../assets/icon/pride_2023.png"),
-      "author": "",
-      "isVariable": false,
-      "isSpecial": true,
       "isPremium": false
     },
     {
@@ -215,16 +206,7 @@ export const icones = {
       "isVariable": false,
       "isSpecial": false,
       "isPremium": false
-    },
-    {
-      "id": "AppIcon_Gradient",
-      "name": "Dégradé",
-      "icon": require("../../../assets/icon/gradient.png"),
-      "author": "",
-      "isVariable": false,
-      "isSpecial": false,
-      "isPremium": false
-    },
+    }
   ],
 };
 

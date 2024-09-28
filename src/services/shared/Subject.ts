@@ -45,6 +45,13 @@ const getClosestGradeEmoji = (subjectName: string): string => {
     stage: "👔",
     œuvre: "🖼️",
     default: "📝",
+    developpement: "👨‍💻",
+    culture: "🧠",
+    gestion: "💼",
+    traitement: "📊",
+    sae: "📚",
+    expression: "🎭",
+    ppp: "🧑‍🏫",
   };
 
   const subjectNameFormatted: string = subjectName

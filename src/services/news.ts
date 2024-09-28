@@ -3,6 +3,7 @@ import { useNewsStore } from "@/stores/news";
 import type { Information } from "./shared/Information";
 import { checkIfSkoSupported } from "./skolengo/default-personalization";
 import { error } from "@/utils/logger/logger";
+import { newsRead } from "pawnote";
 
 /**
  * Updates the state and cache for the news.
@@ -27,6 +28,24 @@ export async function updateNewsInCache <T extends Account> (account: T): Promis
       const { getNews } = await import("./skolengo/data/news");
       const informations = await getNews(account);
       useNewsStore.getState().updateInformations(informations);
+      break;
+    }
+    default: {
+      throw new Error("Service not implemented.");
+    }
+  }
+}
+
+/**
+ * Sets news read
+ */
+export async function setNewsRead <T extends Account> (account: T, message: Information, read: Boolean = false): Promise<void> {
+  switch (account.service) {
+    case AccountService.Pronote: {
+      await newsRead(account.instance, message.ref, read);
+      break;
+    }
+    case AccountService.Local: {
       break;
     }
     default: {

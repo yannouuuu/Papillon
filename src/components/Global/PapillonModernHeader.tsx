@@ -29,7 +29,9 @@ import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, C
 export const PapillonModernHeader: React.FC<{
   children: React.ReactNode,
   outsideNav?: boolean,
-}> = ({ children, outsideNav }) => {
+  height?: number,
+  startLocation?: number,
+}> = ({ children, outsideNav = false, height = 70, startLocation = 0.5 }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -37,13 +39,13 @@ export const PapillonModernHeader: React.FC<{
     <>
       <LinearGradient
         colors={[theme.colors.background + "EE", theme.colors.background + "00"]}
-        locations={[0.5, 1]}
+        locations={[startLocation, 1]}
         style={{
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
-          height: outsideNav ? 70 : insets.top + 70,
+          height: outsideNav ? height : insets.top + height,
           zIndex: 90,
         }}
       />

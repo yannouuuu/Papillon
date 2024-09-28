@@ -5,6 +5,8 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 import ColorIndicator from "@/components/Lessons/ColorIndicator";
 import { TimetableClass, TimetableClassStatus } from "@/services/shared/Timetable";
 
+import { PapillonNavigation } from "@/router/refs";
+
 import Reanimated, {
   FadeInDown,
   FadeOut,
@@ -54,6 +56,10 @@ export const TimetableItem: React.FC<{
       <NativeTouchable
         style={[styles.detailsContainer, { backgroundColor: colors.card, borderColor: colors.text + "33" }]}
         underlayColor={colors.text + "11"}
+        onPress={() => {
+          PapillonNavigation.current.navigate("LessonDocument", { lesson: item });
+
+        }}
       >
         <View style={[{ flex: 1, flexDirection: "column", overflow: "hidden", borderRadius: 10 }]}>
           {item.status && (
@@ -69,6 +75,12 @@ export const TimetableItem: React.FC<{
 
             <View style={{ flexDirection: "column", flexShrink: 1, gap: 6, flex: 1 }}>
               <Text numberOfLines={2} style={[styles.titleText, { color: colors.text }]}>{subjectData.pretty || "Cours inconnu"}</Text>
+
+              {item.itemType && (
+                <Text numberOfLines={2} style={[styles.subtitleText, { color: colors.text }]}>
+                  {item.itemType}
+                </Text>
+              )}
 
               <View style={[styles.roomTextContainer, { backgroundColor: subjectData.color + "33" }]}>
                 <Text numberOfLines={1} style={[styles.roomText, { color: subjectData.color }]}>{item.room || "Salle inconnue"}</Text>
@@ -138,6 +150,13 @@ const styles = StyleSheet.create({
   titleText: {
     fontFamily: "semibold",
     fontSize: 17,
+  },
+  subtitleText: {
+    fontFamily: "medium",
+    fontSize: 15,
+    opacity: 0.5,
+    marginTop: -1,
+    marginBottom: 2,
   },
   roomTextContainer: {
     borderRadius: 8,
