@@ -13,6 +13,7 @@ const parseInformation = (i: ecoledirecte.HomepageTimelineItem): Information => 
   author: i.authorName,
   category: "",
   read: false,
+  ref: undefined
 });
 
 export const getNews = async (account: EcoleDirecteAccount): Promise<Information[]> => {
