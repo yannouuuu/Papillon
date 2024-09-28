@@ -25,6 +25,12 @@ export async function updateGradesPeriodsInCache <T extends Account> (account: T
 
       break;
     }
+    case AccountService.EcoleDirecte: {
+      const { getGradesPeriods } = await import("./ecoledirecte/grades");
+      const periods = await getGradesPeriods(account);
+      defaultPeriod = getDefaultPeriod(periods);
+      break;
+    }
     case AccountService.Local: {
       periods = [
         {
@@ -68,6 +74,15 @@ export async function updateGradesAndAveragesInCache <T extends Account> (accoun
     switch (account.service) {
       case AccountService.Pronote: {
         const { getGradesAndAverages } = await import("./pronote/grades");
+        const output = await getGradesAndAverages(account, periodName);
+
+        grades = output.grades;
+        averages = output.averages;
+
+        break;
+      }
+      case AccountService.EcoleDirecte: {
+        const { getGradesAndAverages } = await import("./ecoledirecte/grades");
         const output = await getGradesAndAverages(account, periodName);
 
         grades = output.grades;
