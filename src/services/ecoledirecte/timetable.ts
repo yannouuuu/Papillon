@@ -6,7 +6,7 @@ import ecoledirecte, {TimetableItemKind} from "pawdirecte";
 const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => {
   const base = {
     startTimestamp: c.startDate.getTime(),
-    endTimestamp: c.startDate.getTime(),
+    endTimestamp: c.endDate.getTime(),
     additionalNotes: c.notes,
     backgroundColor: c.color
   };
@@ -33,6 +33,16 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
         room: c.room || void 0,
         ...base
       };
+    case TimetableItemKind.EVENEMENT:
+      console.log(c)
+      return {
+        type: "activity",
+        subject: c.subjectName,
+        id: c.id,
+        title: c.subjectName ?? "Sans titre",
+        room: c.room || void 0,
+        ...base
+      };
     case TimetableItemKind.CONGE:
       return {
         type: "vacation",
@@ -49,19 +59,11 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
   throw new Error("ecoledirecte: unknown class type");
 };
 
-export const getTimetableForWeek = async (account: EcoleDirecteAccount, weekNumber: number): Promise<Timetable> => {
-  if (!account.instance)
+export const getTimetableForWeek = async (account: EcoleDirecteAccount, rangeDate: { "start": Date, "end": Date}): Promise<Timetable> => {
+  if (!account.authentication.session)
     throw new ErrorServiceUnauthenticated("ecoledirecte");
-
-  // TODO: test this method, not sure
-  const date = (1 + (weekNumber - 1) * 7); // 1st of January + 7 days for each week
-  const startDate = new Date();
-  startDate.setDate(date);
-  const endDate = new Date();
-  endDate.setDate(date + 7);
-
-  const timetable = await ecoledirecte.studentTimetable(account.authentication.session, account.authentication.account, startDate, endDate);
+  
+  const timetable = await ecoledirecte.studentTimetable(account.authentication.session, account.authentication.account, rangeDate.start, rangeDate.end);
   // TODO: parse timetable
-
-  return timetable.map(decodeTimetableClass);
+  return timetable.map(decodeTimetableClass).sort((a, b) => a.startTimestamp - b.startTimestamp);
 };
