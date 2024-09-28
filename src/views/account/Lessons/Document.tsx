@@ -62,13 +62,13 @@ const LessonDocument = ({ route, navigation }) => {
               locale: fr,
             }
           ) + " (à " + new Date(lesson.startTimestamp).toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit", hour12: false}) + ")",
-          enabled: lesson.startTimestamp !== null,
+          enabled: lesson.startTimestamp,
         },
         {
           icon: <Hourglass />,
           text: "Durée du cours",
           value: getDuration(Math.round((lesson.endTimestamp - lesson.startTimestamp) / 60000)),
-          enabled: lesson.endTimestamp !== null,
+          enabled: lesson.endTimestamp,
         }
       ]
     },
@@ -79,13 +79,13 @@ const LessonDocument = ({ route, navigation }) => {
           icon: <DoorOpen />,
           text: "Salle de classe",
           value: lesson.room,
-          enabled: lesson.room !== null,
+          enabled: lesson.room,
         },
         {
           icon: <PersonStanding />,
           text: "Professeur",
           value: lesson.teacher,
-          enabled: lesson.teacher !== null,
+          enabled: lesson.teacher,
         },
       ]
     },
@@ -96,7 +96,7 @@ const LessonDocument = ({ route, navigation }) => {
           icon: <Info />,
           text: "Statut",
           value: lesson.status,
-          enabled: lesson.status !== null,
+          enabled: lesson.status,
         },
       ]
     }
