@@ -17,6 +17,7 @@ import { Timetable } from "@/services/shared/Timetable";
 import { animPapillon } from "@/utils/ui/animations";
 import LessonsLoading from "./Loading";
 import MissingItem from "@/components/Global/MissingItem";
+import { el } from "date-fns/locale";
 
 const RefreshControl = createNativeWrapper(RNRefreshControl, {
   disallowInterruption: true,
@@ -60,7 +61,7 @@ export const Page = ({ day, date, current, paddingTop, refreshAction, loading, w
             width: "100%"
           }}
         >
-          {day && day.map((item, i) => (
+          {day && day.length == 1 && day[0].type !== "vacation" && day.map((item, i) => (
             <View key={item.startTimestamp + i.toString()} style={{ gap: 10 }}>
               <TimetableItem key={item.startTimestamp} item={item} index={i} />
 
@@ -107,6 +108,15 @@ export const Page = ({ day, date, current, paddingTop, refreshAction, loading, w
             exiting={animPapillon(FadeOut)}
           />
         )
+      )}
+
+      {day.length === 1 && current && !loading && (day[0].type === "vacation" ? <MissingItem
+        emoji="🏝️"
+        title="C'est les vacances !"
+        description="Profitez de vos vacances, à bientôt."
+        entering={animPapillon(FadeInDown)}
+        exiting={animPapillon(FadeOut)}
+      />: <></>
       )}
     </ScrollView>
   );
