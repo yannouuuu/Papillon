@@ -28,3 +28,9 @@ export const getHomeworkForWeek = async (account: EcoleDirecteAccount, weekNumbe
   }
   return response;
 };
+
+export const toggleHomeworkState = async (account: EcoleDirecteAccount, homework: Homework): Promise<void> => {
+  if (!account.authentication.session)
+    throw new ErrorServiceUnauthenticated("ecoledirecte");
+  await ecoledirecte.setHomeworkState(account.authentication.session, account.authentication.account, homework.id, !homework.done);
+};

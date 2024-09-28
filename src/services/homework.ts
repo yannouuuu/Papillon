@@ -58,6 +58,11 @@ export async function toggleHomeworkState <T extends Account> (account: T, homew
       await toggleHomeworkState(account, homework);
       break;
     }
+    case AccountService.EcoleDirecte: {
+      const { toggleHomeworkState } = await import("./ecoledirecte/homework");
+      await toggleHomeworkState(account, homework);
+      break;
+    }
     case AccountService.Local: {
       break;
     }
