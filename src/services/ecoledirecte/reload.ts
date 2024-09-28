@@ -10,7 +10,7 @@ export const reload = async (account: EcoleDirecteAccount): Promise<Reconnected<
   const refreshedAccount = refresh[0];
 
   return {
-    instance: undefined,
+    instance: {},
     authentication: {
       ...authentication,
       ...refreshedAccount
