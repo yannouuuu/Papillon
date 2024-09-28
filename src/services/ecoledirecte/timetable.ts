@@ -10,18 +10,19 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
     additionalNotes: c.notes,
     backgroundColor: c.color
   };
+  console.info(c);
 
   switch (c.kind) {
     case TimetableItemKind.COURS:
       return {
         type: "lesson",
         id: c.id,
-        subject: c.subjectShortName,
+        subject: c.subjectName,
         title: c.subjectName,
         room: c.room || void 0,
         teacher: c.teacher ?? void 0,
         // TODO: add more states
-        status: c.updated ? TimetableClassStatus.MODIFIED: void 0,
+        status: c.updated ? TimetableClassStatus.MODIFIED : c.cancelled ? TimetableClassStatus.CANCELED : void 0,
         ...base
       } satisfies TimetableClass;
     case TimetableItemKind.PERMANENCE:
@@ -34,7 +35,6 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
         ...base
       };
     case TimetableItemKind.EVENEMENT:
-      console.log(c)
       return {
         type: "activity",
         subject: c.subjectName,
@@ -62,7 +62,7 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
 export const getTimetableForWeek = async (account: EcoleDirecteAccount, rangeDate: { "start": Date, "end": Date}): Promise<Timetable> => {
   if (!account.authentication.session)
     throw new ErrorServiceUnauthenticated("ecoledirecte");
-  
+
   const timetable = await ecoledirecte.studentTimetable(account.authentication.session, account.authentication.account, rangeDate.start, rangeDate.end);
   // TODO: parse timetable
   return timetable.map(decodeTimetableClass).sort((a, b) => a.startTimestamp - b.startTimestamp);

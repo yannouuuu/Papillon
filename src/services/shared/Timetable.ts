@@ -17,7 +17,7 @@ export interface TimetableClass {
 export type Timetable = Array<TimetableClass>;
 
 export enum TimetableClassStatus {
-  CANCELED = "canceled",
-  MODIFIED = "modified"
+  CANCELED = "Annulé",
+  MODIFIED = "Modifié"
 }
 
