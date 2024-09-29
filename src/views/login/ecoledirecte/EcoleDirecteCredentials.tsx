@@ -60,7 +60,7 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
       const accounts = await login(currentSession, password ? password : cachedPassword);
       const account = accounts[0]; // NOTE: We only support single accounts for now. //TODO: Support multiple accounts in ED
 
-      setAccessToken(session, account);
+      setAccessToken(currentSession, account);
       const local_account: EcoleDirecteAccount = {
         instance: {},
 
