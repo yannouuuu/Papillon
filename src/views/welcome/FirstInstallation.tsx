@@ -15,6 +15,7 @@ import { Audio } from "expo-av";
 import * as SplashScreen from "expo-splash-screen";
 
 const PRIVACY_POLICY_URL = "https://safety.getpapillon.xyz/documents/privacy-policy";
+const TERMS_OF_SERVICE_URL = "https://safety.getpapillon.xyz/documents/terms-of-service";
 
 const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
   const theme = useTheme();
@@ -99,14 +100,14 @@ const FirstInstallation: Screen<"FirstInstallation"> = ({ navigation }) => {
         En continuant, vous acceptez les&nbsp;
         <Text
           style={{ textDecorationLine: "underline" }}
-          onPress={() => openUrl("https://safety.getpapillon.xyz/documents/terms-of-service")}
+          onPress={() => openUrl(TERMS_OF_SERVICE_URL)}
         >
           conditions d'utilisation
         </Text>
         &nbsp;et la&nbsp;
         <Text
           style={{ textDecorationLine: "underline" }}
-          onPress={() => openUrl("https://safety.getpapillon.xyz/documents/privacy-policy")}
+          onPress={() => openUrl(PRIVACY_POLICY_URL)}
         >
           politique de confidentialité
         </Text>.

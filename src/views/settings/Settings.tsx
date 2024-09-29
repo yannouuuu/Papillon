@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Alert, Image, Platform, Text, View } from "react-native";
 import { useAccounts, useCurrentAccount } from "@/stores/account";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as WebBrowser from "expo-web-browser";
 import AppJSON from "../../../app.json";
 
 import Reanimated, {
@@ -28,7 +29,8 @@ import {
   Settings as SettingsLucide,
   Sparkles,
   SwatchBook,
-  WandSparkles
+  WandSparkles,
+  X
 } from "lucide-react-native";
 
 import { NativeIcon, NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
@@ -39,6 +41,7 @@ import {get_settings_widgets} from "@/addons/addons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {AddonPlacementManifest} from "@/addons/types";
 import { useFlagsStore } from "@/stores/flags";
+import { useAlert } from "@/providers/AlertProvider";
 
 const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -50,6 +53,13 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
   const defined = useFlagsStore(state => state.defined);
 
   const removeAccount = useAccounts((store) => store.remove);
+
+  const openUrl = async (url: string) => {
+    await WebBrowser.openBrowserAsync(url, {
+      controlsColor: colors.primary,
+      presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
+    });
+  };
 
   useEffect(() => {
     AsyncStorage.getItem("devmode")
@@ -79,6 +89,8 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
 
     return unsubscribe;
   }, []);
+
+  const { showAlert } = useAlert();
 
   const tabs = [
     {
@@ -164,6 +176,7 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           icon: <WandSparkles />,
           color: "#58A3C3",
           label: "Papillon Magic",
+          description: "Beta",
           onPress: () => navigation.navigate("SettingsMagic"),
         },
       ],
@@ -173,6 +186,12 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
       label: "Projet Papillon",
       tabs: [
         {
+          icon: <HandCoins />,
+          color: "#CBA024",
+          label: "Soutenir Papillon",
+          onPress: () => {
+            Platform.OS === "android" ? openUrl("https://papillon.bzh/donate") : undefined;
+          },
           icon: <Scroll />,
           color: "#c75110",
           label: "Quoi de neuf ?",
@@ -193,23 +212,51 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           color: "#CF0029",
           label: "Se déconnecter",
           onPress: () => {
-            Alert.alert("Se déconnecter", "Êtes-vous sûr de vouloir vous déconnecter ?", [
-              {
-                text: "Annuler",
-                style: "cancel",
-              },
-              {
-                text: "Se déconnecter",
-                style: "destructive",
-                onPress: () => {
-                  removeAccount(account.localID);
-                  navigation.reset({
-                    index: 0,
-                    routes: [{ name: "AccountSelector" }],
-                  });
+            if (Platform.OS === "ios") {
+              Alert.alert("Se déconnecter", "Êtes-vous sûr de vouloir vous déconnecter ?", [
+                {
+                  text: "Annuler",
+                  style: "cancel",
                 },
-              },
-            ]);
+                {
+                  text: "Se déconnecter",
+                  style: "destructive",
+                  onPress: () => {
+                    removeAccount(account.localID);
+                    navigation.reset({
+                      index: 0,
+                      routes: [{ name: "AccountSelector" }],
+                    });
+                  },
+                },
+              ]);
+            } else {
+              showAlert({
+                title: "Se déconnecter",
+                message: "Êtes-vous sûr de vouloir vous déconnecter ?",
+                actions: [
+                  {
+                    title: "Annuler",
+                    onPress: () => {},
+                    backgroundColor: colors.card,
+                    icon: <X color={colors.text} />,
+                  },
+                  {
+                    title: "Se déconnecter",
+                    onPress: () => {
+                      removeAccount(account.localID);
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: "AccountSelector" }],
+                      });
+                    },
+                    primary: true,
+                    backgroundColor: "#CF0029",
+                    icon: <LogOut color="#FFFFFF" />,
+                  },
+                ],
+              });
+            }
           },
         },
       ]
@@ -364,7 +411,8 @@ const Settings: Screen<"Settings"> = ({ route, navigation }) => {
           }}
         >
           version {AppJSON.expo.version} {"\n"}
-          fabriqué avec ❤️ par les contributeurs de Papillon
+          {Platform.OS} {Platform.Version} {"\n"}
+          fabriqué avec ❤️ par les contributeurs Papillon
         </Text>
       </Reanimated.ScrollView>
     </>

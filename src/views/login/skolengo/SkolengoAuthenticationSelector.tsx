@@ -55,8 +55,8 @@ const SkolengoAuthenticationSelector: Screen<"SkolengoAuthenticationSelector"> =
       <MaskStars />
 
       <PapillonShineBubble
-        message="Pour trouver ton établissement, préfères-tu utiliser ta position ou faire autrement ?"
-        numberOfLines={3}
+        message="Que préfères-tu pour te connecter à Skolengo ?"
+        numberOfLines={2}
         width={260}
         offsetTop={"16%"}
       />

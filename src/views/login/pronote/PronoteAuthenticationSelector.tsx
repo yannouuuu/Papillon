@@ -61,8 +61,8 @@ const PronoteAuthenticationSelector: Screen<"PronoteAuthenticationSelector"> = (
       <MaskStars />
 
       <PapillonShineBubble
-        message="Pour trouver ton établissement, préfères-tu utiliser ta position ou faire autrement ?"
-        numberOfLines={3}
+        message="Que préfères-tu utiliser pour te connecter à Pronote ?"
+        numberOfLines={2}
         width={260}
         offsetTop={"16%"}
       />
