@@ -201,8 +201,8 @@ const TimetableElement = () => {
                 1740000 && (
               <SeparatorCourse
                 i={index}
-                start={nextCourses[index + 1].startTimestamp}
-                end={course.endTimestamp}
+                start={course.endTimestamp}
+                end={nextCourses[index + 1].startTimestamp}
               />
             )}
           </React.Fragment>
@@ -215,21 +215,12 @@ const TimetableElement = () => {
 export default TimetableElement;
 
 const SeparatorCourse: React.FC<{
-  i: number;
-  start: number;
-  end: number;
+  i: number
+  start: number
+  end: number
 }> = ({ i, start, end }) => {
   const { colors } = useTheme();
   const startHours = new Date(start).getHours();
-
-  const getDuration = (minutes: number): string => {
-    const durationHours = Math.floor(minutes / 60);
-    const durationRemainingMinutes = minutes % 60;
-    return `${durationHours} h ${lz(durationRemainingMinutes)} min`;
-  };
-
-  const lz = (num: number) => (num < 10 ? `0${num}` : num);
-
   return (
     <Reanimated.View
       style={{
@@ -245,8 +236,8 @@ const SeparatorCourse: React.FC<{
         marginLeft: 70,
       }}
       entering={
-        Platform.OS === "ios"
-          ? FadeInDown.delay(50 * i)
+        Platform.OS === "ios" ?
+          FadeInDown.delay(50 * i)
             .springify()
             .mass(1)
             .damping(20)
@@ -268,23 +259,24 @@ const SeparatorCourse: React.FC<{
       >
         <Image
           source={require("../../../../../assets/images/mask_course.png")}
-          resizeMode="cover"
+          resizeMode='cover'
           tintColor={colors.text}
           style={{
             position: "absolute",
-            top: "-20%",
+            top: "-15%",
             left: "-20%",
             width: "200%",
-            height: "200%",
+            height: "300%",
             opacity: 0.05,
           }}
         />
 
-        {startHours > 11 && startHours < 14 ? (
-          <Utensils size={20} color={colors.text} />
-        ) : (
-          <Sofa size={20} color={colors.text} />
-        )}
+        {startHours > 11 &&
+          startHours < 14 ? (
+            <Utensils size={20} color={colors.text} />
+          ) : (
+            <Sofa size={20} color={colors.text} />
+          )}
         <Text
           numberOfLines={1}
           style={{
@@ -294,7 +286,8 @@ const SeparatorCourse: React.FC<{
             color: colors.text,
           }}
         >
-          {startHours > 11 && startHours < 14
+          {startHours > 11 &&
+            startHours < 14
             ? "Pause méridienne"
             : "Pas de cours"}
         </Text>
@@ -308,9 +301,19 @@ const SeparatorCourse: React.FC<{
             color: colors.text,
           }}
         >
-          {getDuration(Math.round((start - end) / 60000))}
+          {getDuration(
+            Math.round((end - start) / 60000)
+          )}
         </Text>
       </View>
     </Reanimated.View>
   );
+};
+
+const lz = (num: number) => (num < 10 ? `0${num}` : num);
+
+const getDuration = (minutes: number): string => {
+  const durationHours = Math.floor(minutes / 60);
+  const durationRemainingMinutes = minutes % 60;
+  return `${durationHours} h ${lz(durationRemainingMinutes)} min`;
 };
