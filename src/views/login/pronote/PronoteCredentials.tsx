@@ -32,7 +32,19 @@ const PronoteCredentials: Screen<"PronoteCredentials"> = ({ route, navigation })
         username,
         password,
         deviceUUID: accountID
+      }).catch((error) => {
+        if (error instanceof pronote.SecurityError && !error.handle.shouldCustomPassword && !error.handle.shouldCustomDoubleAuth) {
+          navigation.navigate("Pronote2FA_Auth", {
+            session,
+            error,
+            accountID
+          });
+        } else {
+          throw error;
+        }
       });
+
+      if (!refresh) throw pronote.AuthenticateError;
 
       const user = session.user.resources[0];
       const name = user.name;
