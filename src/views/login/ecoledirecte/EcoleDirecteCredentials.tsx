@@ -2,7 +2,15 @@ import React, { useState } from "react";
 import type { Screen } from "@/router/helpers/types";
 import { View, ActivityIndicator, ScrollView, Dimensions } from "react-native";
 
-import { type DoubleAuthChallenge, DoubleAuthRequired, initDoubleAuth, login, type Session, checkDoubleAuth } from "pawdirecte";
+import {
+  type DoubleAuthChallenge,
+  DoubleAuthRequired,
+  initDoubleAuth,
+  login,
+  type Session,
+  checkDoubleAuth,
+  setAccessToken
+} from "pawdirecte";
 import uuid from "@/utils/uuid-v4";
 
 import { useAccounts, useCurrentAccount } from "@/stores/account";
@@ -52,7 +60,7 @@ const EcoleDirecteCredentials: Screen<"EcoleDirecteCredentials"> = ({ navigation
       const accounts = await login(currentSession, password ? password : cachedPassword);
       const account = accounts[0]; // NOTE: We only support single accounts for now. //TODO: Support multiple accounts in ED
 
-      currentSession.accessToken = account.access_token;
+      setAccessToken(session, account);
       const local_account: EcoleDirecteAccount = {
         instance: {},
 
