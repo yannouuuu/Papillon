@@ -55,7 +55,7 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
     navigation: NativeStackNavigationProp<RouteParameters, ScreenName>,
     showAlert: any
   ): Promise<void> => {
-    if (!instanceURL.includes("demo.index-education.net")) return determinateAuthenticationView(instanceURL, navigation, showAlert);
+    if (!instanceURL.includes("demo.index-education.net")) return determinateAuthenticationView(instanceURL.trim(), navigation, showAlert);
     showAlert({
       title: "Instance non prise en charge",
       message: "Désolé, les instances de démonstration ne sont pas prises en charge, elles peuvent être instables ou ne pas fonctionner correctement.",
@@ -125,6 +125,11 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
 
             value={instanceURL}
             onChangeText={setInstanceURL}
+            onSubmitEditing={() => {
+              if (instanceURL.length > 0) {
+                checkForDemoInstance(instanceURL, navigation, showAlert);
+              };
+            }}
           />
 
           {instanceURL.length > 0 && (
@@ -151,7 +156,11 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
         <ButtonCta
           value="Confirmer"
           primary
-          onPress={() => checkForDemoInstance(instanceURL, navigation, showAlert)}
+          onPress={() => {
+            if (instanceURL.length > 0) {
+              checkForDemoInstance(instanceURL, navigation, showAlert);
+            };
+          }}
         />
         {(route.params?.method) && (
           <ButtonCta
