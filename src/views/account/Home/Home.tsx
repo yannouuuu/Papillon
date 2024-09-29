@@ -31,6 +31,7 @@ import Reanimated, {
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { defaultTabs } from "@/consts/DefaultTabs";
 
 import AccountSwitcher from "@/components/Home/AccountSwitcher";
 import ContextMenu from "@/components/Home/AccountSwitcherContextMenu";
@@ -102,6 +103,7 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
   const scrollRef = useRef<Reanimated.ScrollView>(null);
 
   const account = useCurrentAccount(store => store.account!);
+  const mutateProperty = useCurrentAccount(store => store.mutateProperty);
 
   const stylez = stylezAnim(translationY, headerHeight);
   const overHeaderAnim = overHeaderAnimAnim(translationY, headerHeight);
@@ -128,6 +130,43 @@ const Home: Screen<"HomeScreen"> = ({ route, navigation }) => {
         }
       });
   }, []);
+
+  const checkForNewTabs = useCallback(() => {
+    const storedTabs = account.personalization.tabs || [];
+    const newTabs = defaultTabs.filter(defaultTab =>
+      !storedTabs.some(storedTab => storedTab.name === defaultTab.tab)
+    );
+
+    if (newTabs.length > 0) {
+      const updatedTabs = [
+        ...storedTabs,
+        ...newTabs.map(tab => ({
+          name: tab.tab,
+          enabled: false,
+          installed: true
+        }))
+      ];
+
+      mutateProperty("personalization", {
+        ...account.personalization,
+        tabs: updatedTabs,
+      });
+
+      setUpdatedRecently(true);
+    }
+  }, [account.personalization.tabs, mutateProperty]);
+
+  useEffect(() => {
+    checkForNewTabs();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      checkForNewTabs();
+    });
+
+    return unsubscribe;
+  }, [navigation, checkForNewTabs]);
 
   const openAccSwitcher = useCallback(() => {
     scrollRef.current?.scrollTo({ y: headerHeight, animated: true });
