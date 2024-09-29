@@ -19,6 +19,19 @@ export async function updateAttendancePeriodsInCache <T extends Account> (accoun
 
       break;
     }
+    case AccountService.EcoleDirecte: {
+      periods = [
+        {
+          name: "Toutes",
+          startTimestamp: new Date("2024-09-28").getTime(),
+          endTimestamp: new Date("2024-09-28").getTime(),
+        },
+      ];
+
+      defaultPeriod = "Toutes";
+
+      break;
+    }
     case AccountService.Local: {
       periods = [
         {
@@ -29,15 +42,6 @@ export async function updateAttendancePeriodsInCache <T extends Account> (accoun
       ];
 
       defaultPeriod = "Toutes";
-
-      break;
-    }
-    case AccountService.Pronote: {
-      const { getAttendancePeriods } = await import("./pronote/attendance");
-      const output = getAttendancePeriods(account);
-
-      periods = output.periods;
-      defaultPeriod = output.default;
 
       break;
     }
@@ -70,6 +74,12 @@ export async function updateAttendanceInCache <T extends Account> (account: T, p
   switch (account.service) {
     case AccountService.Pronote: {
       const { getAttendance } = await import("./pronote/attendance");
+      attendance = await getAttendance(account, periodName);
+
+      break;
+    }
+    case AccountService.EcoleDirecte: {
+      const { getAttendance } = await import("./ecoledirecte/attendance");
       attendance = await getAttendance(account, periodName);
 
       break;
