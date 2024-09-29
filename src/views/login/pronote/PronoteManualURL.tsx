@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { RouteParameters, Screen } from "@/router/helpers/types";
-import { Platform, TextInput, View, StyleSheet, TouchableOpacity } from "react-native";
+import { TextInput, View, StyleSheet, TouchableOpacity } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import determinateAuthenticationView from "@/services/pronote/determinate-authentication-view";
 
@@ -33,7 +33,6 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
   }, [route.params]);
 
   const [clipboardFound, setClipboardFound] = useState(false);
-  const [clipboardHasBeenFound, setClipboardHasBeenFound] = useState(false);
 
   // get url from clipboard
   useEffect(() => {
@@ -42,7 +41,6 @@ const PronoteManualURL: Screen<"PronoteManualURL"> = ({ route, navigation }) => 
         if (clipboardContent && clipboardContent.startsWith("https://") && clipboardContent.includes("/pronote")) {
           setInstanceURL(clipboardContent);
           setClipboardFound(true);
-          setClipboardHasBeenFound(true);
         }
       });
     }

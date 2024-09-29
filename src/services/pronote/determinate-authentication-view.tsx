@@ -1,6 +1,6 @@
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RouteParameters } from "@/router/helpers/types";
-import { Check, KeyRound, LockKeyhole } from "lucide-react-native";
+import { KeyRound, LockKeyhole } from "lucide-react-native";
 import pronote from "pawnote";
 import {info, warn} from "@/utils/logger/logger";
 
