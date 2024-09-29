@@ -82,12 +82,14 @@ export async function updateGradesAndAveragesInCache <T extends Account> (accoun
         break;
       }
       case AccountService.EcoleDirecte: {
-        console.log("called");
         const { getGradesAndAverages } = await import("./ecoledirecte/grades");
         const output = await getGradesAndAverages(account, periodName);
 
         grades = output.grades;
         averages = output.averages;
+
+        console.log(JSON.stringify(grades));
+        console.log(JSON.stringify(averages));
         break;
       }
       case AccountService.Local: {

@@ -79,7 +79,6 @@ export const getGradesAndAverages = async (account: EcoleDirecteAccount, periodN
   const response = await ecoledirecte.studentGrades(account.authentication.session, account.authentication.account, "");
   const overview = response.overview[period.id as string];
 
-  console.log(JSON.stringify(overview));
 
   // TODO
   const averages: AverageOverview = {
@@ -93,7 +92,7 @@ export const getGradesAndAverages = async (account: EcoleDirecteAccount, periodN
       min: decodeGradeValue(s.minAverage),
       average: decodeGradeValue(s.studentAverage),
       outOf: decodeGradeValue(s.outOf)
-    }))
+    })).filter(a => a.average.value ?? -1 > 0)
   };
 
   const grades: Grade[] = response.grades.map((g: ecoledirecte.Grade) => ({
@@ -117,7 +116,6 @@ export const getGradesAndAverages = async (account: EcoleDirecteAccount, periodN
     max: decodeGradeValue(g.max),
     min: decodeGradeValue(g.min)
   }));
-
   return { averages, grades };
 };
 
