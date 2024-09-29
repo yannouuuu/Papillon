@@ -65,23 +65,21 @@ export const getGradesPeriods = async (account: EcoleDirecteAccount): Promise<Pe
   return response.periods.map(decodePeriod);
 };
 
-export const getGradesAndAverages = async (account: EcoleDirecteAccount, periodName: string): Promise<{
+export const getGradesAndAverages = async (account: EcoleDirecteAccount, periodName: string, ): Promise<{
   grades: Grade[],
-  averages: AverageOverview
+  averages: AverageOverview,
 }> => {
   let period: Period | undefined;
-  const cachedPeriods = useGradesStore().periods;
-  if (cachedPeriods.length > 0) {
-    period = cachedPeriods.find((p: Period) => p.name === periodName);
-  } else {
-    period = (await getGradesPeriods(account)).find((p: Period) => p.name === periodName);
-  }
+  period = (await getGradesPeriods(account)).find((p: Period) => p.name === periodName);
+
 
   if (!period)
     throw new Error("La période sélectionnée n'a pas été trouvée.");
 
   const response = await ecoledirecte.studentGrades(account.authentication.session, account.authentication.account, "");
   const overview = response.overview[period.id as string];
+
+  console.log(JSON.stringify(overview));
 
   // TODO
   const averages: AverageOverview = {
