@@ -80,8 +80,7 @@ export async function updateAttendanceInCache <T extends Account> (account: T, p
     }
     case AccountService.EcoleDirecte: {
       const { getAttendance } = await import("./ecoledirecte/attendance");
-      attendance = await getAttendance(account, periodName);
-
+      attendance = await getAttendance(account);
       break;
     }
     case AccountService.Local: {
