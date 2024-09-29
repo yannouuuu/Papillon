@@ -37,6 +37,11 @@ export type RouteParameters = {
       nextTimeToken: string
     }
   };
+  Pronote2FA_Auth: {
+    session: pronote.SessionHandle,
+    error: pronote.SecurityError,
+    accountID: string
+  };
 
   // login.ecoledirecte
   EcoleDirecteCredentials: undefined;
