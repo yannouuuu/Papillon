@@ -1,10 +1,8 @@
-import { EcoleDirecteAccount } from "@/stores/account/types";
-import { ErrorServiceUnauthenticated } from "../shared/errors";
+import {EcoleDirecteAccount} from "@/stores/account/types";
 import type {Period} from "@/services/shared/Period";
 import {type AverageOverview, type Grade, GradeInformation, GradeValue} from "@/services/shared/Grade";
-import {decodeAttachment} from "@/services/pronote/attachment";
 import ecoledirecte, {GradeKind, type Period as PawdirectePeriod} from "pawdirecte";
-import { useGradesStore } from "@/stores/grades";
+import {AttachmentType} from "@/services/shared/Attachment";
 
 const decodePeriod = (p: PawdirectePeriod): Period => {
   return {
@@ -26,12 +24,6 @@ const decodeGradeKind = (kind: GradeKind): GradeInformation | undefined => {
       return GradeInformation.Exempted;
     case GradeKind.NotGraded:
       return GradeInformation.NotGraded;
-    case GradeKind.Unfit:
-      return GradeInformation.Unfit;
-    case GradeKind.Unreturned:
-    case GradeKind.UnreturnedZero:
-      return GradeInformation.Unreturned;
-    case GradeKind.Congratulations:
     default:
       return undefined;
   }
@@ -69,9 +61,7 @@ export const getGradesAndAverages = async (account: EcoleDirecteAccount, periodN
   grades: Grade[],
   averages: AverageOverview,
 }> => {
-  let period: Period | undefined;
-  period = (await getGradesPeriods(account)).find((p: Period) => p.name === periodName);
-
+  const period: Period | undefined = (await getGradesPeriods(account)).find((p: Period) => p.name === periodName);
 
   if (!period)
     throw new Error("La période sélectionnée n'a pas été trouvée.");
@@ -80,7 +70,6 @@ export const getGradesAndAverages = async (account: EcoleDirecteAccount, periodN
   const overview = response.overview[period.id as string];
 
 
-  // TODO
   const averages: AverageOverview = {
     classOverall: decodeGradeValue(overview.classAverage),
     overall: decodeGradeValue(overview.overallAverage),
@@ -101,9 +90,16 @@ export const getGradesAndAverages = async (account: EcoleDirecteAccount, periodN
     description: g.comment,
     timestamp: g.date.getTime(),
 
-    // TODO
-    subjectFile: undefined,
-    correctionFile: undefined,
+    subjectFile: {
+      type: AttachmentType.Link,
+      name: "Sujet",
+      url: g.subjectFilePath
+    },
+    correctionFile: {
+      type: AttachmentType.Link,
+      name: "Corrigé",
+      url: g.correctionFilePath
+    },
 
     isBonus: false,
     isOptional: g.isOptional,
