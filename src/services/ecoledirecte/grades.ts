@@ -1,10 +1,10 @@
 import type { EcoleDirecteAccount } from "@/stores/account/types";
 import type { Period } from "@/services/shared/Period";
-import type {
-  AverageOverview,
-  Grade,
+import  {
+  type AverageOverview,
+  type Grade,
   GradeInformation,
-  GradeValue,
+  type GradeValue,
 } from "@/services/shared/Grade";
 import ecoledirecte, {
   GradeKind,
