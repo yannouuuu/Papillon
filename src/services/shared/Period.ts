@@ -3,4 +3,5 @@ export interface Period {
   id?: string
   startTimestamp?: number
   endTimestamp?: number
+  yearly?: boolean
 }

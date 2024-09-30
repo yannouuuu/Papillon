@@ -18,6 +18,7 @@ const decodePeriod = (p: PawdirectePeriod): Period => {
     id: p.id,
     startTimestamp: p.startDate.getTime(),
     endTimestamp: p.endDate.getTime(),
+    yearly: p.yearly
   };
 };
 
@@ -97,20 +98,22 @@ export const getGradesAndAverages = async (
     classOverall: decodeGradeValue(overview.classAverage),
     overall: decodeGradeValue(overview.overallAverage),
     subjects: overview.subjects
-      .map((s) => ({
-        classAverage: decodeGradeValue(s.classAverage),
-        color: s.color,
-        max: decodeGradeValue(s.maxAverage),
-        subjectName: s.name,
-        min: decodeGradeValue(s.minAverage),
-        average: decodeGradeValue(s.studentAverage),
-        outOf: decodeGradeValue(s.outOf),
-      }))
-      .filter((a) => a.average.value ?? -1 > 0),
+      .filter((a) => a.studentAverage.kind !== -1)
+      .map((s) => {
+        return {
+          classAverage: decodeGradeValue(s.classAverage),
+          color: s.color,
+          max: decodeGradeValue(s.maxAverage),
+          subjectName: s.name,
+          min: decodeGradeValue(s.minAverage),
+          average: decodeGradeValue(s.studentAverage),
+          outOf: decodeGradeValue(s.outOf),
+        };
+      })
   };
 
   const grades: Grade[] = response.grades
-    .filter((g) => g.period.id === period.id)
+    .filter((g) => g.period.id === period.id && !period.yearly)
     .map((g: ecoledirecte.Grade) => {
       return {
         id: buildLocalID(g),
