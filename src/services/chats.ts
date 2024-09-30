@@ -1,6 +1,6 @@
 import { type Account, AccountService } from "@/stores/account/types";
 import type { Chat, ChatMessage } from "./shared/Chat";
-import { Recipient } from "./shared/Recipient";
+import type { Recipient } from "./shared/Recipient";
 
 export const getChats = async <T extends Account> (account: T): Promise<Array<Chat>> => {
   switch (account.service) {

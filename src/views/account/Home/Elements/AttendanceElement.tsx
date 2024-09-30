@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import type React from "react";
+import { useEffect } from "react";
 import { NativeListHeader } from "@/components/Global/NativeComponents";
 import { updateGradesPeriodsInCache } from "@/services/grades";
 import { useCurrentAccount } from "@/stores/account";
@@ -9,7 +10,7 @@ import { useTheme } from "@react-navigation/native";
 import RedirectButton from "@/components/Home/RedirectButton";
 import { PapillonNavigation } from "@/router/refs";
 import { log } from "@/utils/logger/logger";
-import { Attendance } from "@/services/shared/Attendance";
+import type { Attendance } from "@/services/shared/Attendance";
 
 const AttendanceElement: React.FC = () => {
   const account = useCurrentAccount((store) => store.account);
@@ -20,12 +21,12 @@ const AttendanceElement: React.FC = () => {
   const { colors } = theme;
 
   useEffect(() => {
-    void async function () {
+    void (async () =>{
       log("update grades periods in cache", "attendance:updateGradesPeriodsInCache");
       if (account?.instance) {
         await updateGradesPeriodsInCache(account);
       }
-    }();
+    } );
   }, [account?.instance]);
 
   const totalMissed = attendances && defaultPeriod ? attendances[defaultPeriod] : null;
@@ -38,14 +39,14 @@ const AttendanceElement: React.FC = () => {
       };
     }
 
-    let totalHours = data.absences.reduce((sum, absence) => {
+    const totalHours = data.absences.reduce((sum, absence) => {
       const [hours, minutes] = absence.hours.split("h").map(Number);
       return sum + hours + (minutes || 0) / 60;
     }, 0) + data.delays.reduce((sum, delays) => {
       return sum + (delays.duration || 0) / 60;
     }, 0);
 
-    let unJustifiedHours = data.absences.reduce((sum, absence) => {
+    const unJustifiedHours = data.absences.reduce((sum, absence) => {
       if (!absence.justified) {
         const [hours, minutes] = absence.hours.split("h").map(Number);
         return sum + hours + (minutes || 0) / 60;

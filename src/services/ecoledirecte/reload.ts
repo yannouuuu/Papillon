@@ -1,6 +1,6 @@
 import type { EcoleDirecteAccount } from "@/stores/account/types";
 import ecoledirecte from "pawdirecte";
-import { Reconnected } from "../reload-account";
+import type { Reconnected } from "../reload-account";
 import { log } from "@/utils/logger/logger";
 
 export const reload = async (account: EcoleDirecteAccount): Promise<Reconnected<EcoleDirecteAccount>> => {

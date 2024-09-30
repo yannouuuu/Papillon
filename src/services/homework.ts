@@ -48,7 +48,7 @@ export async function updateHomeworkForWeekInCache <T extends Account> (account:
     useHomeworkStore.getState().updateHomeworks(dateToEpochWeekNumber(date), homeworks);
   }
   catch (err) {
-    error("not updated, see:" + err, "updateHomeworkForWeekInCache");
+    error(`not updated, see:${err}`, "updateHomeworkForWeekInCache");
   }
 }
 

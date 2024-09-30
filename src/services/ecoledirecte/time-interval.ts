@@ -45,7 +45,7 @@ export function dateAsISO860 (str: string): string {
       break;
   }
   return (
-    parts[3] + "-" + month + "-" + parts[1] + "T" + parts[5] + ":00.000+02:00"
+    `${parts[3]}-${month}-${parts[1]}T${parts[5]}:00.000+02:00`
   );
 }
 
@@ -70,18 +70,17 @@ export function dateStringAsTimeInterval (
          */
     const parts = str.split("à");
 
-    let startDate, endDate;
+    let startDate: string;
+    let endDate: string;
 
     // C'est une journée complète ("le mercredi 21 février 2024")
     if (!str.includes(":")) {
-      startDate = parts[0].replace("le", "").trim() + " de 00:00";
-      endDate = parts[0].split("de")[0].replace("le", "").trim() + " de 23:59";
+      startDate = `${parts[0].replace("le", "").trim()} de 00:00`;
+      endDate = `${parts[0].split("de")[0].replace("le", "").trim()} de 23:59`;
     } else {
       startDate = parts[0].replace("le", "").trim();
       endDate =
-                parts[0].split("de")[0].replace("le", "").trim() +
-                " de " +
-                parts[1].trim();
+                `${parts[0].split("de")[0].replace("le", "").trim()} de ${parts[1].trim()}`;
     }
     const start = dateAsISO860(startDate);
     const end = dateAsISO860(endDate);

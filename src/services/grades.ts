@@ -117,6 +117,6 @@ export async function updateGradesAndAveragesInCache <T extends Account> (accoun
     useGradesStore.getState().updateGradesAndAverages(periodName, grades, averages);
   }
   catch (err) {
-    error("not updated, see:" + err, "updateGradesAndAveragesInCache");
+    error(`not updated, see:${err}`, "updateGradesAndAveragesInCache");
   }
 }

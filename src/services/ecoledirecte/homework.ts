@@ -1,6 +1,6 @@
 import ecoledirecte from "pawdirecte";
-import { type Homework } from "@/services/shared/Homework";
-import { EcoleDirecteAccount } from "@/stores/account/types";
+import type { Homework } from "@/services/shared/Homework";
+import type { EcoleDirecteAccount } from "@/stores/account/types";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import { weekNumberToDaysList } from "@/utils/epochWeekNumber";
 import { log } from "@/utils/logger/logger";

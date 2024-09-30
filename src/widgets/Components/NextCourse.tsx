@@ -1,13 +1,14 @@
-import { WidgetProps } from "@/components/Home/Widget";
+import type { WidgetProps } from "@/components/Home/Widget";
 import WidgetHeader from "@/components/Home/WidgetHeader";
 import ColorIndicator from "@/components/Lessons/ColorIndicator";
 import { getSubjectData } from "@/services/shared/Subject";
-import { TimetableClass, TimetableClassStatus } from "@/services/shared/Timetable";
+import { type TimetableClass, TimetableClassStatus } from "@/services/shared/Timetable";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
 import { useTheme } from "@react-navigation/native";
 import { Calendar, Clock } from "lucide-react-native";
-import React, { forwardRef, useEffect, useImperativeHandle, useState, useCallback } from "react";
+import type React from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState, useCallback } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 const lz = (num: number) => (num < 10 ? `0${num}` : num);
@@ -35,7 +36,7 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
 
     const allCourses = Object.values(timetables).flat();
 
-    let updatedNextCourse = allCourses
+    const updatedNextCourse = allCourses
       .filter(c => c.endTimestamp > today && c.status !== TimetableClassStatus.CANCELED)
       .sort((a, b) => a.startTimestamp - b.startTimestamp)[0];
 
@@ -44,13 +45,6 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
     setLoading(false);
   }, [account.instance, timetables, setHidden, setLoading]);
 
-      if (nextCourse) {
-        setNextCourse(nextCourse);
-        setHidden(false);
-      }
-      setLoading(false);
-    }();
-  }, [account.instance, timetables]);
 
   useEffect(() => {
     setLoading(true);
@@ -142,7 +136,7 @@ const NextCourseLesson: React.FC<{
         <View style={{
           paddingHorizontal: 7,
           paddingVertical: 3,
-          backgroundColor: subjectData.color + "33",
+          backgroundColor: `${subjectData.color}33`,
           borderRadius: 8,
           borderCurve: "continuous",
           alignSelf: "flex-start",

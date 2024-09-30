@@ -1,11 +1,11 @@
-import ecoledirecte, {AttendanceItemKind, AttendanceItem} from "pawdirecte";
-import { EcoleDirecteAccount } from "@/stores/account/types";
+import ecoledirecte, { AttendanceItemKind, type AttendanceItem} from "pawdirecte";
+import type { EcoleDirecteAccount } from "@/stores/account/types";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
-import { Attendance } from "../shared/Attendance";
-import {Delay} from "@/services/shared/Delay";
+import type { Attendance } from "../shared/Attendance";
+import type {Delay} from "@/services/shared/Delay";
 import {dateStringAsTimeInterval, getDuration} from "@/services/ecoledirecte/time-interval";
-import {Absence} from "@/services/shared/Absence";
-import {Punishment} from "@/services/shared/Punishment";
+import type {Absence} from "@/services/shared/Absence";
+import type {Punishment} from "@/services/shared/Punishment";
 
 const decodeDelay = (item: AttendanceItem): Delay => {
   const timeInterval = dateStringAsTimeInterval(item.displayDate);
@@ -30,7 +30,7 @@ const decodeAbsence = (item: AttendanceItem): Absence => {
     fromTimestamp,
     toTimestamp,
     justified: item.justified,
-    hours: duration.getHours() + "h" + duration.getMinutes(),
+    hours: `${duration.getHours()}h${duration.getMinutes()}`,
     administrativelyFixed: item.justified,
     reasons: item.reason,
   };

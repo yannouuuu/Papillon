@@ -1,5 +1,5 @@
-import { EcoleDirecteAccount } from "@/stores/account/types";
-import { Information } from "../shared/Information";
+import type { EcoleDirecteAccount } from "@/stores/account/types";
+import type { Information } from "../shared/Information";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import ecoledirecte from "pawdirecte";
 
