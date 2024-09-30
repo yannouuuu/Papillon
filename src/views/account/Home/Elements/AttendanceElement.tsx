@@ -31,7 +31,6 @@ const AttendanceElement: React.FC = () => {
   const totalMissed = attendances && defaultPeriod ? attendances[defaultPeriod] : null;
 
   const formatTotalMissed = (data: Attendance | null) => {
-    console.info(data);
     if (!data) {
       return {
         total: { hours: 0, minutes: 0 },
