@@ -9,13 +9,7 @@ import { useTheme } from "@react-navigation/native";
 import RedirectButton from "@/components/Home/RedirectButton";
 import { PapillonNavigation } from "@/router/refs";
 import { log } from "@/utils/logger/logger";
-
-interface Attendance {
-  absences: {
-    hours: string;
-    justified: boolean;
-  }[];
-}
+import { Attendance } from "@/services/shared/Attendance";
 
 const AttendanceElement: React.FC = () => {
   const account = useCurrentAccount((store) => store.account);
@@ -37,6 +31,7 @@ const AttendanceElement: React.FC = () => {
   const totalMissed = attendances && defaultPeriod ? attendances[defaultPeriod] : null;
 
   const formatTotalMissed = (data: Attendance | null) => {
+    console.info(data);
     if (!data) {
       return {
         total: { hours: 0, minutes: 0 },
@@ -44,15 +39,22 @@ const AttendanceElement: React.FC = () => {
       };
     }
 
-    const totalHours = data.absences.reduce((sum, absence) => {
+    let totalHours = data.absences.reduce((sum, absence) => {
       const [hours, minutes] = absence.hours.split("h").map(Number);
       return sum + hours + (minutes || 0) / 60;
+    }, 0) + data.delays.reduce((sum, delays) => {
+      return sum + (delays.duration || 0) / 60;
     }, 0);
 
-    const unJustifiedHours = data.absences.reduce((sum, absence) => {
+    let unJustifiedHours = data.absences.reduce((sum, absence) => {
       if (!absence.justified) {
         const [hours, minutes] = absence.hours.split("h").map(Number);
         return sum + hours + (minutes || 0) / 60;
+      }
+      return sum;
+    }, 0) + data.delays.reduce((sum, delays) => {
+      if (!delays.justified) {
+        return sum + (delays.duration || 0) / 60;
       }
       return sum;
     }, 0);
