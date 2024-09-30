@@ -36,7 +36,7 @@ export async function updateAttendancePeriodsInCache <T extends Account> (accoun
       periods = [
         {
           name: "Toutes",
-          startTimestamp: new Date("2021-09-01").getTime(),
+          startTimestamp: new Date("2021-09-01").getTime(), //not relevant to ED
           endTimestamp: new Date("2022-06-30").getTime(),
         },
       ];
