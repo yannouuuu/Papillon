@@ -54,6 +54,7 @@ export async function setNewsRead <T extends Account> (account: T, message: Info
     case AccountService.Local: {
       break;
     }
+    case AccountService.EcoleDirecte: { break; }
     default: {
       throw new Error("Service not implemented.");
     }
