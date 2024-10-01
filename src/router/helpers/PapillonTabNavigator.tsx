@@ -161,10 +161,6 @@ const BasePapillonBar: React.FC<Omit<ReturnType<typeof useNavigationBuilder>, "N
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 4.5,
-                opacity: theme.dark ?
-                  isFocused ? 1 : 0.25
-                  :
-                  isFocused ? 1 : 0.5,
               }}
               activeScale={0.85}
               weight="light"
