@@ -60,6 +60,16 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
 
 
   useEffect(() => {
+    void async function () {
+      if (nextCourse) {
+        setNextCourse(nextCourse);
+        setHidden(false);
+      }
+      setLoading(false);
+    }();
+  }, [account.instance, timetables]);
+
+  useEffect(() => {
     setLoading(true);
     updateNextCourse();
     const intervalId = setInterval(updateNextCourse, 60000); // Update every minute
