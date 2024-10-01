@@ -1,9 +1,16 @@
-import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/components/Global/NativeComponents";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { View, Switch } from "react-native";
+import {
+  NativeItem,
+  NativeList,
+  NativeListHeader,
+  NativeText,
+} from "@/components/Global/NativeComponents";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
 import { useCurrentAccount } from "@/stores/account";
 import { useTheme } from "@react-navigation/native";
 import LottieView from "lottie-react-native";
-import { AlertTriangle, Captions, Equal, SendToBack } from "lucide-react-native";
+import { AlertTriangle, Captions, Equal, SendToBack, Gift } from "lucide-react-native";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Alert, Platform, Switch, View } from "react-native";
 import { NestableDraggableFlatList, NestableScrollContainer, ShadowDecorator } from "react-native-draggable-flatlist";
@@ -12,48 +19,147 @@ import Reanimated, { FadeIn, FadeOut, LinearTransition, ZoomIn, ZoomOut } from "
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { defaultTabs } from "@/consts/DefaultTabs";
 import { useAlert } from "@/providers/AlertProvider";
+import { log } from "@/utils/logger/logger";
+import { animPapillon } from "@/utils/ui/animations";
 
+// Types for Tab and Account
+interface Tab {
+  tab: string;
+  label: string;
+  enabled: boolean;
+  installed: boolean;
+  icon: any; // Should be updated if Lottie icon types are more specific
+}
+
+interface Personalization {
+  tabs: Array<{ name: string; enabled: boolean; installed: boolean }>;
+  hideTabTitles?: boolean;
+  showTabBackground?: boolean;
+}
+
+interface Account {
+  personalization: Personalization;
+}
 
 const SettingsTabs = () => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const account = useCurrentAccount(store => store.account!);
-  const mutateProperty = useCurrentAccount(store => store.mutateProperty);
+  const account = useCurrentAccount((store) => store.account!);
+  const mutateProperty = useCurrentAccount((store) => store.mutateProperty);
 
   const safeTabs = ["Home"];
 
   const [tabs, setTabs] = useState(defaultTabs);
   const [loading, setLoading] = useState<true | false>(true);
+  const [tabs, setTabs] = useState<Tab[]>([]);
+  const [newTabs, setNewTabs] = useState<Tab[]>([]);
+  const [hideTabTitles, setHideTabTitles] = useState(false);
+  const [showTabBackground, setShowTabBackground] = useState(false);
+  const [failAnimation, setFailAnimation] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState(0);
+  const [showNewTabsNotification, setShowNewTabsNotification] = useState(false);
+
+  // Refs for Lottie animations
+  const lottieRefs = useRef<(React.RefObject<LottieView> | null)[]>([]);
+
+  // Update Lottie refs when tabs change
+  useEffect(() => {
+    lottieRefs.current = tabs.map((_, i) => lottieRefs.current[i] || React.createRef<LottieView>());
+  }, [tabs]);
 
   const toggleTab = (tab: string) => {
     void (async () => {
-      if (tabs.filter(t => t.enabled).length === 5 && !tabs.find(t => t.tab === tab)?.enabled) {
+      if (tabs.filter((t) => t.enabled).length === 5 && !tabs.find((t) => t.tab === tab)?.enabled) {
         playFailAnimation();
         return;
       }
 
       const newTabs = [...tabs];
-      const index = newTabs.findIndex(t => t.tab === tab);
+      const index = newTabs.findIndex((t) => t.tab === tab);
 
       if (index !== -1 && !safeTabs.includes(tab)) {
         newTabs[index].enabled = !newTabs[index].enabled;
         setTabs(newTabs);
+        updatePersonalizationTabs(newTabs);
       }
     })();
   };
 
+  const playFailAnimation = () => {
+    setFailAnimation(true);
+    setTimeout(() => setFailAnimation(false), 900);
+  };
+
+  const updatePersonalizationTabs = (updatedTabs: Tab[]) => {
+    mutateProperty("personalization", {
+      ...account.personalization,
+      tabs: updatedTabs.map(({ tab, enabled, installed }) => ({
+        name: tab,
+        enabled,
+        installed,
+      })),
+    });
+  };
+
+  useLayoutEffect(() => {
+    const loadTabs = async () => {
+      if (account.personalization.tabs) {
+        const storedTabs = account.personalization.tabs;
+        const updatedTabs = defaultTabs
+          .filter((defaultTab) =>
+            storedTabs.some((storedTab) => storedTab.name === defaultTab.tab)
+          )
+          .map((defaultTab) => {
+            const storedTab = storedTabs.find((t) => t.name === defaultTab.tab);
+            return {
+              ...defaultTab,
+              enabled: storedTab ? storedTab.enabled : false,
+              installed: true,
+            };
+          });
+
+        const newTabsFound = defaultTabs.filter(
+          (defaultTab) =>
+            !storedTabs.some((storedTab) => storedTab.name === defaultTab.tab)
+        );
+
+        setTabs(updatedTabs);
+        setNewTabs(newTabsFound);
+        setShowNewTabsNotification(newTabsFound.length > 0);
+      } else {
+        log("No tabs found in account, using default tabs.", "SettingsTabs");
+        setTabs(defaultTabs.map((tab) => ({ ...tab, installed: true })));
+        updatePersonalizationTabs(defaultTabs.map((tab) => ({ ...tab, installed: true })));
+      }
+
+      setHideTabTitles(account.personalization.hideTabTitles ?? false);
+      setShowTabBackground(account.personalization.showTabBackground ?? false);
+    };
+
+    loadTabs();
+  }, []);
+
+  const handleAddNewTabs = () => {
+    log("Adding new tabs.", "SettingsTabs");
+    const updatedTabs = [
+      ...tabs,
+      ...newTabs.map((tab) => ({ ...tab, installed: true, enabled: false })),
+    ];
+    setTabs(updatedTabs);
+    updatePersonalizationTabs(updatedTabs);
+    setNewTabs([]);
+    setShowNewTabsNotification(false);
+  };
+
   useEffect(() => {
+    log("Ensuring Home tab is in the correct position.", "SettingsTabs");
     void (async () => {
       const newTabs = [...tabs];
-      const homeIndex = newTabs.findIndex(tab => tab.tab === "Home");
+      const homeIndex = newTabs.findIndex((tab) => tab.tab === "Home");
 
-      // Ensure Home is among first 5 tabs
       if (homeIndex > 4) {
         const homeTab = newTabs.splice(homeIndex, 1)[0];
         newTabs.splice(4, 0, homeTab);
-      }
-
-      if (homeIndex > 4) {
         setTabs(newTabs);
       }
       setLoading(false);
@@ -64,20 +170,8 @@ const SettingsTabs = () => {
     void (async () => {
       mutateProperty("personalization", {
         ...account.personalization,
-        tabs: tabs.map(({ tab, enabled, installed }) => ({ name: tab, enabled, installed })),
-      });
-    })();
-  }, [tabs]);
-
-  const [hideTabTitles, setHideTabTitles] = useState(false);
-  const [showTabBackground, setShowTabBackground] = useState(false);
-
-  useEffect(() => {
-    void (async () => {
-      mutateProperty("personalization", {
-        ...account.personalization,
-        hideTabTitles : hideTabTitles,
-        showTabBackground: showTabBackground,
+        hideTabTitles,
+        showTabBackground,
       });
     })();
   }, [hideTabTitles, showTabBackground]);
@@ -119,6 +213,19 @@ const SettingsTabs = () => {
   const { showAlert } = useAlert();
   const { colors } = theme;
 
+  const resetTabs = () => {
+    log("Resetting tabs to default.", "SettingsTabs");
+    const resetTabs = defaultTabs.map((tab) => ({
+      ...tab,
+      enabled: tab.tab === "Home", // Only Home tab is enabled by default
+      installed: true,
+    }));
+    setTabs(resetTabs);
+    updatePersonalizationTabs(resetTabs);
+    setHideTabTitles(false);
+    setShowTabBackground(false);
+  };
+
   return (
     <View>
       <NestableScrollContainer
@@ -132,6 +239,8 @@ const SettingsTabs = () => {
             paddingTop: 0,
           }}
         >
+
+
           <NativeList>
             <View
               style={{
@@ -161,19 +270,11 @@ const SettingsTabs = () => {
                   height: 58,
                 }}
               >
-                {tabs.map((tab, index) => {
-                  const lottieRef = useRef<LottieView>(null);
-
-                  if (!tab.enabled) {
-                    return null;
-                  }
-
+                {tabs.filter((tab) => tab.enabled).map((tab, index) => {
                   return (
                     <Reanimated.View
                       key={tab.tab}
-                      style={{
-                        flex: 1
-                      }}
+                      style={{ flex: 1 }}
                       layout={LinearTransition.springify().mass(1).damping(20).stiffness(300)}
                       entering={ZoomIn}
                       exiting={ZoomOut}
@@ -186,12 +287,12 @@ const SettingsTabs = () => {
                           alignItems: "center",
                           justifyContent: "center",
                           paddingHorizontal: 4,
-                          gap: 2
+                          gap: 2,
                         }}
                         onPress={() => {
                           setPreviewIndex(index);
-                          lottieRef.current?.reset();
-                          lottieRef.current?.play();
+                          lottieRefs.current[index].current?.reset();
+                          lottieRefs.current[index].current?.play();
                         }}
                       >
                         <Reanimated.View
@@ -238,7 +339,7 @@ const SettingsTabs = () => {
                               height: "100%",
                               marginVertical: hideTabTitles ? 8 : 0,
                             }}
-                            ref={lottieRef}
+                            ref={lottieRefs.current[index]}
                           />
                         </Reanimated.View>
                         {!hideTabTitles && (
@@ -292,24 +393,41 @@ const SettingsTabs = () => {
                 Vous pouvez choisir jusqu'à 5 onglets à afficher sur la page d'accueil.
               </NativeText>
             </NativeItem>
+
           </NativeList>
 
-          <NativeListHeader
-            label="Réorganiser les onglets"
-          />
+          <NativeListHeader label="Réorganiser les onglets" />
 
-          <NativeList>
+          <NativeList
+            animated
+          >
+            {showNewTabsNotification && (
+              <NativeItem
+                leading={
+                  <Gift color={theme.colors.primary} size={28} strokeWidth={2} />
+                }
+                onPress={handleAddNewTabs}
+                style={{
+                  backgroundColor: theme.colors.primary + "30",
+                }}
+                androidStyle={{
+                  backgroundColor: theme.colors.primary + "20",
+                }}
+              >
+                <NativeText variant="title">Nouveaux onglets disponibles !</NativeText>
+                <NativeText variant="subtitle">
+                  {newTabs.map((tab) => tab.label).join(", ")}. Appuyez ici pour les ajouter.
+                </NativeText>
+              </NativeItem>
+            )}
+
             <NestableDraggableFlatList
               initialNumToRender={tabs.length}
               scrollEnabled={false}
               data={tabs}
               renderItem={({ item, getIndex, drag }) => (
                 <ShadowDecorator>
-                  <View
-                    style={{
-                      backgroundColor: theme.colors.card,
-                    }}
-                  >
+                  <View style={{ backgroundColor: theme.colors.card }}>
                     <NativeItem
                       onLongPress={() => {
                         setLoading(true);
@@ -325,11 +443,7 @@ const SettingsTabs = () => {
                             keypath: "*",
                             color: theme.colors.text,
                           }]}
-                          style={{
-                            width: 24,
-                            height: 24,
-                            marginVertical: 2,
-                          }}
+                          style={{ width: 24, height: 24, marginVertical: 2 }}
                         />
                       }
                       trailing={
@@ -382,47 +496,66 @@ const SettingsTabs = () => {
                           <Equal
                             size={24}
                             color={theme.colors.text}
-                            style={{
-                              marginRight: 6,
-                              opacity: 0.6
-                            }}
+                            style={{ marginRight: 6, opacity: 0.6 }}
                           />
                         </View>
                       }
                     >
-                      <NativeText variant="title">
-                        {item.label}
-                      </NativeText>
+                      <NativeText variant="title">{item.label}</NativeText>
                     </NativeItem>
                   </View>
                 </ShadowDecorator>
               )}
               keyExtractor={(item) => item.tab}
-              onDragEnd={({ data }) => setTabs(data)}
+              onDragEnd={({ data }) => {
+                setTabs(data);
+                updatePersonalizationTabs(data);
+              }}
             />
           </NativeList>
 
-          <NativeListHeader
-            label="Options"
-          />
+          <NativeListHeader label="Options" />
 
           <NativeList>
-            <NativeItem
+            <NativeItem onPress={resetTabs}>
+              <NativeText
+                style={{
+                  fontSize: 16,
+                  fontFamily: "semibold",
+                  color: theme.colors.text,
+                }}
+              >
+                Réinitialiser les onglets
+              </NativeText>
+              <NativeText
+                style={{
+                  fontSize: 14,
+                  color: theme.colors.text + "90",
+                }}
+              >
+                Réinitialiser les onglets par défaut
+              </NativeText>
+            </NativeItem>
 
+            <NativeItem
               separator
               icon={<Captions />}
               trailing={
                 <Switch
                   value={!hideTabTitles}
-                  onValueChange={() => setHideTabTitles(!hideTabTitles)}
+                  onValueChange={() => {
+                    setHideTabTitles(!hideTabTitles);
+                  }}
                 />
               }
             >
-              <NativeText style={{
-                fontSize: 16,
-                fontFamily: "semibold",
-                color: theme.colors.text,
-              }}>
+              <NativeText
+                style={{
+                  fontSize: 16,
+                  fontFamily: "semibold",
+                  color: theme.colors.text,
+                }}
+              >
                 Afficher les titres des onglets
               </NativeText>
             </NativeItem>
@@ -431,16 +564,19 @@ const SettingsTabs = () => {
               trailing={
                 <Switch
                   value={showTabBackground}
-                  onValueChange={() => setShowTabBackground(!showTabBackground)}
-
+                  onValueChange={() => {
+                    setShowTabBackground(!showTabBackground);
+                  }}
                 />
               }
             >
-              <NativeText style={{
-                fontSize: 16,
-                fontFamily: "semibold",
-                color: theme.colors.text,
-              }}>
+              <NativeText
+                style={{
+                  fontSize: 16,
+                  fontFamily: "semibold",
+                  color: theme.colors.text,
+                }}
+              >
                 Afficher un fond aux onglets
               </NativeText>
             </NativeItem>

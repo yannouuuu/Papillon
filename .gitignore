@@ -43,4 +43,4 @@ web-build/
 android/app/release/
 
 AppIcon.appiconset/*
-AppIcon.appiconset.backup/
+AppIcon.appiconset.backup/*
