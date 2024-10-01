@@ -21,7 +21,7 @@ import {useCurrentAccount} from "@/stores/account";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {defaultTabs} from "@/consts/DefaultTabs";
 
-const ModalContent = ({ navigation }) => {
+const ModalContent = ({ navigation, refresh, endRefresh }) => {
   const { colors } = useTheme();
 
   const account = useCurrentAccount(store => store.account!);
@@ -65,17 +65,22 @@ const ModalContent = ({ navigation }) => {
     }
   }, [account.personalization.tabs, mutateProperty]);
 
-  function RefreshData () {
+  async function RefreshData () {
     checkForUpdateRecently();
     checkForNewTabs();
+    endRefresh();
   }
 
   useEffect(() => {
-    RefreshData();
+    if (refresh)
+      RefreshData();
+  }, [refresh]);
+
+  useEffect(() => {
     return navigation.addListener("focus", () => {
       RefreshData();
     });
-  }, [navigation, checkForNewTabs]);
+  }, []);
 
   useEffect(() => {
     return NetInfo.addEventListener(state => {

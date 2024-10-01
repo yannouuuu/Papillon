@@ -71,6 +71,7 @@ const Home: Screen<"HomeScreen"> = ({ navigation }) => {
   const [shouldOpenContextMenu, setShouldOpenContextMenu] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [canHaptics, setCanHaptics] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const openAccSwitcher = useCallback(() => {
     setShouldOpenContextMenu(false);
@@ -252,8 +253,8 @@ const Home: Screen<"HomeScreen"> = ({ navigation }) => {
           setModalOpen(e.nativeEvent.contentOffset.y >= 265 + insets.top);
         }}
         refreshControl={<RefreshControl
-          refreshing={false}
-          onRefresh={() => {}}
+          refreshing={refreshing}
+          onRefresh={() => setRefreshing(true)}
           style={{zIndex: 100}}
           progressViewOffset={285 + insets.top}
         />}
@@ -278,6 +279,8 @@ const Home: Screen<"HomeScreen"> = ({ navigation }) => {
           <Animated.View style={modalContentAnimatedStyle}>
             <ModalContent
               navigation={navigation}
+              refresh={refreshing}
+              endRefresh={() => setRefreshing(false)}
             />
           </Animated.View>
         </Animated.View>
