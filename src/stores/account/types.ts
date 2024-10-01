@@ -115,7 +115,7 @@ export interface EcoleDirecteAccount extends BaseAccount {
   authentication: {
     session: PawdirecteSession
     account: PawdirecteAccount
-  }
+  },
 }
 
 export interface SkolengoAccount extends BaseAccount {
