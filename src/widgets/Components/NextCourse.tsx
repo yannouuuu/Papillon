@@ -20,21 +20,34 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
   const [nextCourse, setNextCourse] = useState<TimetableClass | null>(null);
   const [widgetTitle, setWidgetTitle] = useState("Prochain cours");
 
+  const currentWeekNumber = useMemo(() => dateToEpochWeekNumber(new Date()), []);
+
   useImperativeHandle(ref, () => ({
     handlePress: () => "Lessons"
   }));
+
+  const fetchTimetable = useCallback(async () => {
+    if (!timetables[currentWeekNumber] && account.instance) {
+      setLoading(true);
+      try {
+        await updateTimetableForWeekInCache(account, currentWeekNumber);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }, [account, currentWeekNumber, timetables, setLoading]);
 
   const updateNextCourse = useCallback(() => {
     const todayDate = new Date();
     const today = todayDate.getTime();
 
-    if (!account.instance || !timetables) {
+    if (!account.instance || !timetables[currentWeekNumber]) {
       setNextCourse(null);
       setHidden(true);
       return;
     }
 
-    const allCourses = Object.values(timetables).flat();
+    const weekCourses = timetables[currentWeekNumber];
 
     const updatedNextCourse = allCourses
       .filter(c => c.endTimestamp > today && c.status !== TimetableClassStatus.CANCELED)
@@ -43,7 +56,7 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
     setNextCourse(updatedNextCourse);
     setHidden(!updatedNextCourse);
     setLoading(false);
-  }, [account.instance, timetables, setHidden, setLoading]);
+  }, [account.instance, timetables, currentWeekNumber, setHidden, setLoading]);
 
 
   useEffect(() => {
@@ -115,15 +128,18 @@ const NextCourseLesson: React.FC<{
         setWidgetTitle("Cours terminé");
       }
 
-      // Calculer le temps restant jusqu'à la prochaine minute
-      const nowDate = new Date();
-      const secondsUntilNextMinute = 60 - nowDate.getSeconds();
-      setTimeout(updateRemainingTime, secondsUntilNextMinute * 1000); // Planifier l'update au début de la prochaine minute
+      // Schedule next update at the start of the next minute
+      const nextMinute = new Date(now);
+      nextMinute.setSeconds(0);
+      nextMinute.setMilliseconds(0);
+      nextMinute.setMinutes(nextMinute.getMinutes() + 1);
+      const delay = nextMinute.getTime() - now;
+      setTimeout(updateRemainingTime, delay);
     };
 
     updateRemainingTime();
 
-    return () => clearTimeout(updateRemainingTime); // Nettoyer le timeout
+    return () => clearTimeout(updateRemainingTime);
   }, [nextCourse, setWidgetTitle]);
 
   return (
