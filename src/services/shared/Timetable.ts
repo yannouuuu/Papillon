@@ -11,6 +11,7 @@ export interface TimetableClass {
   teacher?: string
   backgroundColor?: string,
   status?: TimetableClassStatus,
+  statusText?: string,
   source?: string
 }
 
