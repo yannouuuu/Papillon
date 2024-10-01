@@ -33,6 +33,48 @@ const ModalContent = ({ navigation, refresh, endRefresh }) => {
   const [isOnline, setIsOnline] = useState(false);
   const errorTitle = useMemo(() => getErrorTitle(), []);
 
+  const [elements, setElements] = useState([]);
+
+  useEffect(() => {
+    setElements([]);
+    Elements.forEach((Element) => {
+      setElements(prevElements => [
+        ...prevElements,
+        {
+          id: Element.id,
+          component: Element.component,
+          importance: null,
+        }
+      ]);
+    });
+  }, []);
+
+  function sortElementsByImportance () {
+    setElements(prevElements => {
+      const sortedElements = [...prevElements];
+      sortedElements.sort((a, b) => {
+        let aImportance = a.importance === null ? -1 : a.importance;
+        let bImportance = b.importance === null ? -1 : b.importance;
+        return bImportance - aImportance;
+      });
+      return sortedElements;
+    });
+  }
+
+  const updateImportance = (id, value) => {
+    setElements(prevElements => {
+      const updatedElements = [...prevElements];
+      const index = updatedElements.findIndex(element => element.id === id);
+      updatedElements[index].importance = value;
+      return updatedElements;
+    });
+  };
+
+  const handleImportanceChange = (id, value) => {
+    updateImportance(id, value);
+    sortElementsByImportance();
+  };
+
   function checkForUpdateRecently () {
     AsyncStorage.getItem("changelog.lastUpdate")
       .then((value) => {
@@ -68,6 +110,7 @@ const ModalContent = ({ navigation, refresh, endRefresh }) => {
   async function RefreshData () {
     checkForUpdateRecently();
     checkForNewTabs();
+    sortElementsByImportance();
     endRefresh();
   }
 
@@ -146,15 +189,20 @@ const ModalContent = ({ navigation, refresh, endRefresh }) => {
       <Reanimated.View
         layout={animPapillon(LinearTransition)}
       >
-        {Elements.map((Element, index) => (Element &&
+        {elements.map((Element, index) => (Element &&
         <Reanimated.View
           key={index}
           layout={animPapillon(LinearTransition)}
           entering={animPapillon(FadeInUp)}
           exiting={animPapillon(FadeOutDown)}
         >
-          <Element
+          <Element.component
             navigation={navigation}
+            onImportance={
+              Element.importance === null ?
+                (value) => handleImportanceChange(Element.id, value):
+                () => {}
+            }
           />
         </Reanimated.View>
         ))}
