@@ -2,16 +2,16 @@ import { NativeItem, NativeList, NativeListHeader, NativeText } from "@/componen
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
 import { useCurrentAccount } from "@/stores/account";
 import { useTheme } from "@react-navigation/native";
-import { getBackgroundColorAsync } from "expo-navigation-bar";
 import LottieView from "lottie-react-native";
 import { AlertTriangle, Captions, Equal, SendToBack } from "lucide-react-native";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Platform, Switch, View } from "react-native";
+import { Alert, Platform, Switch, View } from "react-native";
 import { NestableDraggableFlatList, NestableScrollContainer, ShadowDecorator } from "react-native-draggable-flatlist";
 import { PressableScale } from "react-native-pressable-scale";
-import Reanimated, { FadeIn, FadeOut, FadeOutRight, LinearTransition, ZoomIn, ZoomOut, ZoomOutRight } from "react-native-reanimated";
+import Reanimated, { FadeIn, FadeOut, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { defaultTabs } from "@/consts/DefaultTabs";
+import { useAlert } from "@/providers/AlertProvider";
 
 
 const SettingsTabs = () => {
@@ -23,6 +23,7 @@ const SettingsTabs = () => {
   const safeTabs = ["Home"];
 
   const [tabs, setTabs] = useState(defaultTabs);
+  const [loading, setLoading] = useState<true | false>(true);
 
   const toggleTab = (tab: string) => {
     void (async () => {
@@ -55,6 +56,7 @@ const SettingsTabs = () => {
       if (homeIndex > 4) {
         setTabs(newTabs);
       }
+      setLoading(false);
     })();
   }, [tabs]);
 
@@ -89,6 +91,7 @@ const SettingsTabs = () => {
         }));
 
         setTabs(new_tabs);
+        setLoading(false);
       }
       else {
         setTabs(defaultTabs);
@@ -100,8 +103,9 @@ const SettingsTabs = () => {
 
       setHideTabTitles(account.personalization.hideTabTitles ?? false);
       setShowTabBackground(account.personalization.showTabBackground ?? false);
+      setLoading(false);
     })();
-  }, []);
+  }, [setLoading]);
 
   const [failAnimation, setFailAnimation] = useState(false);
 
@@ -111,6 +115,9 @@ const SettingsTabs = () => {
   };
 
   const [previewIndex, setPreviewIndex] = useState(0);
+
+  const { showAlert } = useAlert();
+  const { colors } = theme;
 
   return (
     <View>
@@ -304,11 +311,11 @@ const SettingsTabs = () => {
                     }}
                   >
                     <NativeItem
-                      onPress={async () => {
-                        toggleTab(item.tab);
+                      onLongPress={() => {
+                        setLoading(true);
+                        drag();
                       }}
-                      onLongPress={drag}
-                      delayLongPress={200}
+                      delayLongPress={50}
                       chevron={false}
                       separator={(getIndex() ?? +Infinity) < tabs.length - 1}
                       leading={
@@ -340,12 +347,35 @@ const SettingsTabs = () => {
                               entering={ZoomIn.springify().mass(1).damping(20).stiffness(300)}
                               exiting={ZoomOut.duration(300)}
                             >
-                              <PapillonCheckbox
-                                checked={item.enabled}
-                                onPress={() => {
-                                  toggleTab(item.tab);
-                                }}
-                              />
+                              {!loading && (
+                                <PapillonCheckbox
+                                  checked={item.enabled}
+                                  onPress={() => {
+                                    if (!item.enabled && tabs.filter(t => t.enabled).length === 5) {
+                                      if (Platform.OS === "ios") {
+                                        Alert.alert("Information", "Vous ne pouvez pas ajouter plus de 5 onglets sur la page d'accueil.", [
+                                          {
+                                            text: "OK",
+                                          },
+                                        ]);
+                                      } else {
+                                        showAlert({
+                                          title: "Information",
+                                          message: "Vous ne pouvez pas ajouter plus de 5 onglets sur la page d'accueil.",
+                                          actions: [
+                                            {
+                                              title: "OK",
+                                              onPress: () => {},
+                                              backgroundColor: colors.card,
+                                            },
+                                          ],
+                                        });
+                                      }
+                                    }
+                                    toggleTab(item.tab);
+                                  }}
+                                />
+                              )}
                             </Reanimated.View>
                           )}
 
