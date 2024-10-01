@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     gap: 12,
     borderRadius: 10,
     borderCurve: "continuous",
+    /*
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -156,6 +157,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.15,
     shadowRadius: 3,
+    */
     elevation: 3,
   },
 
