@@ -10,7 +10,7 @@
     "prebuild": "npm run backup-app-icon && npx expo prebuild",
     "postprebuild": "npm run restore-app-icon",
     "backup-app-icon": "cp -R ios/Papillon/Images.xcassets/AppIcon.appiconset ./AppIcon.appiconset.backup",
-    "restore-app-icon": "cp -R ./AppIcon.appiconset.backup/* ios/Papillon/Images.xcassets/AppIcon.appiconset/"
+    "restore-app-icon": "rm -rf ios/Papillon/Images.xcassets/AppIcon.appiconset && cp -R ./AppIcon.appiconset.backup ios/Papillon/Images.xcassets/AppIcon.appiconset"
   },
   "dependencies": {
     "@birdwingo/react-native-reanimated-graph": "^1.1.3",

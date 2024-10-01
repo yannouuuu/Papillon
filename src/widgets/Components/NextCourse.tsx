@@ -64,6 +64,8 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
     fetchTimetable();
   }, [fetchTimetable]);
 
+  useEffect(() => {
+    void async function () {
       if (nextCourse) {
         setNextCourse(nextCourse);
         setHidden(false);
