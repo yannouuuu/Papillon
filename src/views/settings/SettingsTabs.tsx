@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { View, Switch } from "react-native";
+import { View, Switch, Platform, Alert } from "react-native";
 import {
   NativeItem,
   NativeList,
@@ -10,17 +10,33 @@ import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
 import { useCurrentAccount } from "@/stores/account";
 import { useTheme } from "@react-navigation/native";
 import LottieView from "lottie-react-native";
-import { AlertTriangle, Captions, Equal, SendToBack, Gift } from "lucide-react-native";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Alert, Platform, Switch, View } from "react-native";
-import { NestableDraggableFlatList, NestableScrollContainer, ShadowDecorator } from "react-native-draggable-flatlist";
+import {
+  AlertTriangle,
+  Captions,
+  Equal,
+  SendToBack,
+  Gift,
+} from "lucide-react-native";
+import {
+  NestableDraggableFlatList,
+  NestableScrollContainer,
+  ShadowDecorator,
+} from "react-native-draggable-flatlist";
 import { PressableScale } from "react-native-pressable-scale";
-import Reanimated, { FadeIn, FadeOut, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
+import Reanimated, {
+  FadeIn,
+  FadeOut,
+  FadeInUp,
+  FadeOutDown,
+  LinearTransition,
+  ZoomIn,
+  ZoomOut,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { defaultTabs } from "@/consts/DefaultTabs";
-import { useAlert } from "@/providers/AlertProvider";
-import { log } from "@/utils/logger/logger";
 import { animPapillon } from "@/utils/ui/animations";
+import { log } from "@/utils/logger/logger";
+import { useAlert } from "@/providers/AlertProvider";
 
 // Types for Tab and Account
 interface Tab {
@@ -49,7 +65,6 @@ const SettingsTabs = () => {
 
   const safeTabs = ["Home"];
 
-  const [tabs, setTabs] = useState(defaultTabs);
   const [loading, setLoading] = useState<true | false>(true);
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [newTabs, setNewTabs] = useState<Tab[]>([]);
@@ -134,6 +149,7 @@ const SettingsTabs = () => {
 
       setHideTabTitles(account.personalization.hideTabTitles ?? false);
       setShowTabBackground(account.personalization.showTabBackground ?? false);
+      setLoading(false);
     };
 
     loadTabs();
@@ -176,43 +192,6 @@ const SettingsTabs = () => {
     })();
   }, [hideTabTitles, showTabBackground]);
 
-  useLayoutEffect(() => {
-    void(async () => {
-      if (account.personalization.tabs) {
-        const new_tabs = account.personalization.tabs.map(personalizationTab => ({
-          ...tabs.find(t => t.tab === personalizationTab.name)!,
-          enabled: personalizationTab.enabled,
-        }));
-
-        setTabs(new_tabs);
-        setLoading(false);
-      }
-      else {
-        setTabs(defaultTabs);
-        mutateProperty("personalization", {
-          ...account.personalization,
-          tabs: defaultTabs.map(({ tab, enabled }) => ({ name: tab, enabled })),
-        });
-      }
-
-      setHideTabTitles(account.personalization.hideTabTitles ?? false);
-      setShowTabBackground(account.personalization.showTabBackground ?? false);
-      setLoading(false);
-    })();
-  }, [setLoading]);
-
-  const [failAnimation, setFailAnimation] = useState(false);
-
-  const playFailAnimation = () => {
-    setFailAnimation(true);
-    setTimeout(() => setFailAnimation(false), 900);
-  };
-
-  const [previewIndex, setPreviewIndex] = useState(0);
-
-  const { showAlert } = useAlert();
-  const { colors } = theme;
-
   const resetTabs = () => {
     log("Resetting tabs to default.", "SettingsTabs");
     const resetTabs = defaultTabs.map((tab) => ({
@@ -225,6 +204,8 @@ const SettingsTabs = () => {
     setHideTabTitles(false);
     setShowTabBackground(false);
   };
+
+  const { showAlert } = useAlert();
 
   return (
     <View>
@@ -291,8 +272,8 @@ const SettingsTabs = () => {
                         }}
                         onPress={() => {
                           setPreviewIndex(index);
-                          lottieRefs.current[index].current?.reset();
-                          lottieRefs.current[index].current?.play();
+                          lottieRefs.current[index]?.current?.reset();
+                          lottieRefs.current[index]?.current?.play();
                         }}
                       >
                         <Reanimated.View
@@ -480,7 +461,7 @@ const SettingsTabs = () => {
                                             {
                                               title: "OK",
                                               onPress: () => {},
-                                              backgroundColor: colors.card,
+                                              backgroundColor: theme.colors.card,
                                             },
                                           ],
                                         });
