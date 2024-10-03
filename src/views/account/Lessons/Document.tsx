@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import {View, ScrollView, Text, TouchableOpacity, Alert} from "react-native";
 import { Homework, HomeworkReturnType } from "@/services/shared/Homework";
 import { getSubjectData } from "@/services/shared/Subject";
+import { Screen } from "@/router/helpers/types";
 
 import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -23,17 +24,18 @@ const getDuration = (minutes: number): string => {
   return `${durationHours}h ${lz(durationRemainingMinutes)} min`;
 };
 
-const LessonDocument = ({ route, navigation }) => {
+const LessonDocument: Screen<"LessonDocument"> = ({ route, navigation }) => {
   const theme = useTheme();
 
-  const lesson: TimetableClass = route.params.lesson || {};
+  const lesson = route.params.lesson as unknown as TimetableClass;
 
   const [subjectData, setSubjectData] = useState({
     color: "#888888", pretty: "Matière inconnue", emoji: "❓",
   });
 
   const fetchSubjectData = () => {
-    const data = getSubjectData(lesson.subject);
+    console.log("Fetching subject data for", lesson);
+    const data = getSubjectData(lesson.title || "");
     setSubjectData(data);
   };
 
@@ -62,13 +64,13 @@ const LessonDocument = ({ route, navigation }) => {
               locale: fr,
             }
           ) + " (à " + new Date(lesson.startTimestamp).toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit", hour12: false}) + ")",
-          enabled: lesson.startTimestamp,
+          enabled: lesson.startTimestamp != null,
         },
         {
           icon: <Hourglass />,
           text: "Durée du cours",
           value: getDuration(Math.round((lesson.endTimestamp - lesson.startTimestamp) / 60000)),
-          enabled: lesson.endTimestamp,
+          enabled: lesson.endTimestamp != null,
         }
       ]
     },
@@ -79,13 +81,13 @@ const LessonDocument = ({ route, navigation }) => {
           icon: <DoorOpen />,
           text: "Salle de classe",
           value: lesson.room,
-          enabled: lesson.room,
+          enabled: lesson.room != null,
         },
         {
           icon: <PersonStanding />,
           text: "Professeur",
           value: lesson.teacher,
-          enabled: lesson.teacher,
+          enabled: lesson.teacher != null,
         },
       ]
     },
@@ -96,7 +98,7 @@ const LessonDocument = ({ route, navigation }) => {
           icon: <Info />,
           text: "Statut",
           value: lesson.status,
-          enabled: lesson.status,
+          enabled: lesson.status != null,
         },
       ]
     }
