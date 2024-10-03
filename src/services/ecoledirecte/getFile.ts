@@ -7,5 +7,5 @@ export const getFile = async (account: EcoleDirecteAccount, id: string, type: st
     "X-Token": account.authentication.session.token ?? "",
     "Content-Type": "application/x-www-form-urlencoded"
   }, "POST", { forceDownload: 0 });
-  return b64Content.replace("data:application/force-download;base64,", "");
+  return b64Content.split("base64,")[1];
 };

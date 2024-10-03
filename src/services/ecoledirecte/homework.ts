@@ -4,7 +4,7 @@ import type { EcoleDirecteAccount } from "@/stores/account/types";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import { weekNumberToDaysList } from "@/utils/epochWeekNumber";
 import { log } from "@/utils/logger/logger";
-import type { AttachmentType } from "../shared/Attachment";
+import { AttachmentType } from "../shared/Attachment";
 
 export const getHomeworkForWeek = async (account: EcoleDirecteAccount, weekNumber: number): Promise<Homework[]> => {
   if (!account.authentication.session)
@@ -21,7 +21,7 @@ export const getHomeworkForWeek = async (account: EcoleDirecteAccount, weekNumbe
       response.push({
         attachments: homework.attachments.map((att) => ({
           url: `${att.name}\\${att.id}\\${att.kind}`,
-          type: att.kind as AttachmentType,
+          type: AttachmentType.File, // no links as attachements in ed,
           name: att.name
         })),
         color: "#000000", // TODO
