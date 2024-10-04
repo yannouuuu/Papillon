@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { FlatList, View, Dimensions } from "react-native";
+import { Button, StyleSheet } from "react-native";
 
 import { Screen } from "@/router/helpers/types";
 import { NativeText } from "@/components/Global/NativeComponents";
@@ -69,7 +70,7 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   }, [pickerDate, account.instance]);
 
   useEffect(() => {
-    loadTimetableWeek(getWeekFromDate(new Date()));
+    loadTimetableWeek(getWeekFromDate(new Date()), true);
   }, [account.personalization.icalURLs]);
 
   const [loadingWeeks, setLoadingWeeks] = useState([]);
@@ -118,12 +119,49 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
     return day;
   };
 
+  const flatListRef = useRef(null);
+  const [data, setData] = useState(() => {
+    const today = new Date();
+    return Array.from({ length: 100 }, (_, i) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - 50 + i);
+      return date;
+    });
+  });
+
+  const renderItem = useCallback(({ item: date }) => {
+    const weekNumber = getWeekFromDate(date);
+    return (
+      <View style={{ width: Dimensions.get('window').width }}>
+        <Page
+          paddingTop={outsideNav ? 80 : insets.top + 56}
+          current={date.getTime() === pickerDate.getTime()}
+          date={date}
+          day={getAllLessonsForDay(date)}
+          weekExists={timetables[weekNumber] && timetables[weekNumber].length > 0}
+          refreshAction={() => loadTimetableWeek(weekNumber, true)}
+          loading={loadingWeeks.includes(weekNumber)}
+        />
+      </View>
+    );
+  }, [pickerDate, timetables, loadingWeeks, outsideNav, insets, getAllLessonsForDay, loadTimetableWeek]);
+
+  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
+    if (viewableItems.length > 0) {
+      const newDate = viewableItems[0].item;
+      setPickerDate(newDate);
+      loadTimetableWeek(getWeekFromDate(newDate), false);
+    }
+  }, [loadTimetableWeek]);
+
+  const getItemLayout = useCallback((_, index) => ({
+    length: Dimensions.get('window').width,
+    offset: Dimensions.get('window').width * index,
+    index,
+  }), []);
+
   return (
-    <View
-      style={{
-        flex: 1,
-      }}
-    >
+    <View style={{ flex: 1 }}>
       <PapillonModernHeader outsideNav={outsideNav}>
         <PapillonHeaderSelector
           loading={loading}
@@ -193,29 +231,29 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
         </PapillonPicker>
       </PapillonModernHeader>
 
-      <InfiniteDatePager
-        initialDate={selectedDate}
-        onDateChange={(date) => {
-          const newDate = new Date(date);
-          newDate.setHours(0, 0, 0, 0);
-
-          if (pickerDate.getTime() !== date.getTime()) {
-            setPickerDate(newDate);
-          }
+      <FlatList
+        ref={flatListRef}
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.toISOString()}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
+        getItemLayout={getItemLayout}
+        initialScrollIndex={50}
+        onEndReached={() => {
+          // Charger plus de dates si nécessaire
+          const lastDate = data[data.length - 1];
+          const newDates = Array.from({ length: 30 }, (_, i) => {
+            const date = new Date(lastDate);
+            date.setDate(lastDate.getDate() + i + 1);
+            return date;
+          });
+          setData(prevData => [...prevData, ...newDates]);
         }}
-        renderDate={(date) => (
-          <Page
-            paddingTop={outsideNav ? 80 : insets.top + 56}
-            current={date.getDay() == pickerDate.getDay()}
-            date={date}
-            day={getAllLessonsForDay(date)}
-            weekExists={timetables[getWeekFromDate(date)] && timetables[getWeekFromDate(date)].length > 0}
-            refreshAction={() => {
-              loadTimetableWeek(getWeekFromDate(date), true);
-            }}
-            loading={loadingWeeks.includes(getWeekFromDate(date))}
-          />
-        )}
+        onEndReachedThreshold={0.5}
       />
 
       <LessonsDateModal
@@ -225,8 +263,11 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
         onDateSelect={(date) => {
           const newDate = new Date(date);
           newDate.setHours(0, 0, 0, 0);
-          // setPickerDate(newDate);
-          setSelectedDate(newDate);
+          setPickerDate(newDate);
+          const index = data.findIndex(d => d.getTime() === newDate.getTime());
+          if (index !== -1) {
+            flatListRef.current?.scrollToIndex({ index, animated: true });
+          }
         }}
       />
     </View>
