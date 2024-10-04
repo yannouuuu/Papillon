@@ -30,6 +30,17 @@ const TimetableElement = () => {
     );
   };
 
+  const isTomorrow = (timestamp: number) => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const date = new Date(timestamp);
+    return (
+      date.getDate() === tomorrow.getDate() &&
+      date.getMonth() === tomorrow.getMonth() &&
+      date.getFullYear() === tomorrow.getFullYear()
+    );
+  };
+
   const fetchTimetable = async () => {
     if (!timetables[currentWeekNumber] && account.instance) {
       setLoading(true);
@@ -49,6 +60,14 @@ const TimetableElement = () => {
 
     if (todayCourses.length > 0) {
       return todayCourses;
+    }
+
+    const tomorrowCourses = weekCourses
+      .filter(c => isTomorrow(c.startTimestamp))
+      .sort((a, b) => a.startTimestamp - b.startTimestamp);
+
+    if (tomorrowCourses.length > 0) {
+      return tomorrowCourses.slice(0, 3);
     }
 
     return weekCourses
@@ -110,14 +129,18 @@ const TimetableElement = () => {
           <MissingItem
             emoji="📚"
             title="Aucun cours à venir"
-            description="Il n'y a pas de cours à venir pour aujourd'hui."
+            description="Il n'y a pas de cours à venir pour les prochains jours."
           />
         </NativeItem>
       </NativeList>
     );
   }
 
-  const label = isToday(nextCourses[0].startTimestamp) ? "Emploi du temps" : "Prochains cours";
+  const label = isToday(nextCourses[0].startTimestamp)
+    ? "Emploi du temps"
+    : isTomorrow(nextCourses[0].startTimestamp)
+      ? "Cours de demain"
+      : "Prochains cours";
 
   return (
     <>

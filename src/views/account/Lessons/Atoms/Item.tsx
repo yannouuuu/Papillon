@@ -62,9 +62,9 @@ export const TimetableItem: React.FC<{
         }}
       >
         <View style={[{ flex: 1, flexDirection: "column", overflow: "hidden", borderRadius: 10 }]}>
-          {item.status && (
+          {item.statusText && (
             <View style={[styles.statusContainer, { backgroundColor: item.status === TimetableClassStatus.CANCELED ? "#E8BEBF" : subjectData.color + "33" }]}>
-              <Text style={[styles.statusText, { color: item.status === TimetableClassStatus.CANCELED ? "#B42828" :  subjectData.color}]}>{item.status}</Text>
+              <Text style={[styles.statusText, { color: item.status === TimetableClassStatus.CANCELED ? "#B42828" :  subjectData.color}]}>{item.statusText}</Text>
             </View>
           )}
 

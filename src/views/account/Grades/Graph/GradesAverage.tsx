@@ -121,7 +121,7 @@ const GradesAverageGraph: React.FC<GradesAverageGraphProps> = ({ grades, overall
             layout={animPapillon(LinearTransition)}
             key={theme.colors.primary + account.instance}
           >
-            {hLength > 2 ? (
+            {hLength > 1 ? (
               <Reanimated.View
                 layout={animPapillon(LinearTransition)}
                 entering={FadeIn}
