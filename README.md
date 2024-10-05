@@ -23,6 +23,7 @@ Voici un aperçu de ce que nous avons accompli jusqu'à présent et de ce qui re
     - [x] 🟢 Pronote
     - [ ] 🔵 EcoleDirecte
     - [ ] 🟡 Skolengo
+    - [ ] ⚫ Universités
   - 🏠 Interface de sélection de l'établissement
     - **Pour PRONOTE**
       - URL de l'établissement
