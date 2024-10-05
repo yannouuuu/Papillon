@@ -38,6 +38,7 @@ export interface Personalization {
   showTabBackground: boolean,
   transparentTabBar: boolean,
   hideTabBar: boolean,
+  popupRestauration?: boolean,
   magicEnabled?: boolean,
   icalURLs: PapillonIcalURL[],
   tabs: Tab[],

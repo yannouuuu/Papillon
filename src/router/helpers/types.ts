@@ -128,7 +128,7 @@ export type RouteParameters = {
   QrcodeAnswer: undefined
   QrcodeScanner: { accountID: string }
   PriceDetectionOnboarding: { accountID: string }
-  PriceBeforeScan: undefined
+  PriceBeforeScan: { accountID: string }
 
   AddonSettingsPage: {
     addon: AddonPlacementManifest
