@@ -125,7 +125,7 @@ export type RouteParameters = {
   ExternalAccountSelector: undefined;
   ExternalTurboselfLogin: undefined
   ExternalArdLogin: undefined
-  QrcodeAnswer: undefined
+  QrcodeAnswer: { accountID: string }
   QrcodeScanner: { accountID: string }
   PriceDetectionOnboarding: { accountID: string }
   PriceBeforeScan: { accountID: string }
