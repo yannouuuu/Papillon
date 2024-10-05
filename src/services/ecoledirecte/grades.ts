@@ -98,7 +98,7 @@ export const getGradesAndAverages = async (
     classOverall: decodeGradeValue(overview.classAverage),
     overall: decodeGradeValue(overview.overallAverage),
     subjects: overview.subjects
-      .filter((a) => a.studentAverage.kind !== -1)
+      .filter((s) => s.studentAverage.kind === GradeKind.Grade)
       .map((s) => {
         return {
           classAverage: decodeGradeValue(s.classAverage),
