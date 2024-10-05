@@ -140,7 +140,7 @@ const PronoteV6Import: Screen<"PronoteV6Import"> = ({ route, navigation }) => {
           primary
           value="Me reconnecter"
           onPress={() => TryLogin()}
-          icon={loading && <ActivityIndicator />}
+          icon={loading ? <ActivityIndicator />: undefined}
         />
 
         <ButtonCta
