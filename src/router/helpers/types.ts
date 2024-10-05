@@ -1,6 +1,6 @@
 import { AddonPlacementManifest } from "@/addons/types";
 import type { Chat } from "@/services/shared/Chat";
-import type { Grade } from "@/services/shared/Grade";
+import type {Grade, GradesPerSubject} from "@/services/shared/Grade";
 import { Homework } from "@/services/shared/Homework";
 import type { AccountService } from "@/stores/account/types";
 import { Log } from "@/utils/logger/logger";
@@ -80,7 +80,7 @@ export type RouteParameters = {
   NewsItem: undefined;
 
   Grades?: { outsideNav?: boolean };
-  GradeSubject: undefined;
+  GradeSubject: { subject: GradesPerSubject, allGrades: Grade[] };
   GradeDocument: {
     grade: Grade,
     allGrades?: Grade[]
