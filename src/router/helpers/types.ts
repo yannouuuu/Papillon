@@ -1,4 +1,4 @@
-import {AddonLogs, AddonPlacementManifest} from "@/addons/types";
+import {AddonPlacementManifest} from "@/addons/types";
 import type { Chat } from "@/services/shared/Chat";
 import type {Grade, GradesPerSubject} from "@/services/shared/Grade";
 import { Homework } from "@/services/shared/Homework";
@@ -136,10 +136,14 @@ export type RouteParameters = {
     from: keyof RouteParameters
   };
   AddonLogs: {
-    logs: AddonLogs[],
+    logs: Log[],
     name: string
   };
-  AddonPage: undefined;
+  AddonPage: {
+    addon: AddonPlacementManifest
+    from: string
+    data: any
+  };
 };
 
 export type RouterScreenProps<ScreenName extends keyof RouteParameters> =
