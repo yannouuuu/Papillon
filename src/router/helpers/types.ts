@@ -127,7 +127,7 @@ export type RouteParameters = {
   ExternalArdLogin: undefined
   QrcodeAnswer: undefined
   QrcodeScanner: { accountID: string }
-  PriceDetectionOnboarding: undefined
+  PriceDetectionOnboarding: { accountID: string }
   PriceBeforeScan: undefined
 
   AddonSettingsPage: {
