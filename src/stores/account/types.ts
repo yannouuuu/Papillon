@@ -107,6 +107,7 @@ export interface PronoteAccount extends BaseAccount {
   authentication: pronote.RefreshInformation & {
     deviceUUID: string
   }
+  identityProvider: undefined
 }
 
 export interface EcoleDirecteAccount extends BaseAccount {
@@ -116,6 +117,7 @@ export interface EcoleDirecteAccount extends BaseAccount {
     session: PawdirecteSession
     account: PawdirecteAccount
   }
+  identityProvider: undefined
 }
 
 export interface SkolengoAccount extends BaseAccount {
@@ -123,6 +125,7 @@ export interface SkolengoAccount extends BaseAccount {
   instance?: ScolengoAPI.Skolengo
   authentication: SkolengoAuthConfig
   userInfo: ScolengoAPIUser
+  identityProvider: undefined
 }
 
 export interface LocalAccount extends BaseAccount {
