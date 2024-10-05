@@ -98,6 +98,7 @@ interface BaseExternalAccount {
   localID: string
   isExternal: true
   username: string
+  linkedExternalLocalIDs?: string[]
   data: Record<string, unknown>
 }
 
