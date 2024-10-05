@@ -9,6 +9,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type pronote from "pawnote";
 import type React from "react";
 import type { School as SkolengoSchool} from "scolengo-api/types/models/School";
+import {Information} from "@/services/shared/Information";
 
 export type RouteParameters = {
   // welcome.index
@@ -77,7 +78,7 @@ export type RouteParameters = {
   HomeworksDocument: { homework: Homework };
 
   News?: { outsideNav?: boolean };
-  NewsItem: undefined;
+  NewsItem: { message: string, important: boolean };
 
   Grades?: { outsideNav?: boolean };
   GradeSubject: { subject: GradesPerSubject, allGrades: Grade[] };
