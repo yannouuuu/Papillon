@@ -20,6 +20,8 @@ jobs:
 
       - name: Pnpm setup
         uses: pnpm/action-setup@v2
+        with:
+          version: latest
 
       - name: Environnement setup
         run: pnpm install
