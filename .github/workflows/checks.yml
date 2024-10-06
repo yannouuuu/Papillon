@@ -18,7 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Environnement
+      - name: Pnpm setup
+        uses: pnpm/action-setup@v2
+
+      - name: Environnement setup
         run: pnpm install
 
       - name: Typescript and Eslint scanning
