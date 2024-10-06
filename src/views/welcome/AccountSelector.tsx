@@ -38,7 +38,7 @@ import PapillonSpinner from "@/components/Global/PapillonSpinner";
 import {PressableScale} from "react-native-pressable-scale";
 
 import datasets from "@/consts/datasets.json";
-import {AnimatedScrollView} from "react-native-reanimated/lib/typescript/reanimated2/component/ScrollView";
+import Animated from "react-native-reanimated";
 
 
 // https://raw.githubusercontent.com/PapillonApp/datasets/refs/heads/main/illustrations/index.json
@@ -65,7 +65,7 @@ const AccountSelector: Screen<"AccountSelector"> = ({ navigation }) => {
   const [illustration, setIllustration] = useState<undefined | Illustration>(undefined);
   const [illustrationLoaded, setIllustrationLoaded] = useState(false);
 
-  const scrollRef = useAnimatedRef<AnimatedScrollView>();
+  const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
   const headerRatioHeight = 250;
   let headerAnimatedStyle = useAnimatedStyle(() => ({

@@ -4,10 +4,10 @@ import { useTheme } from "@react-navigation/native";
 import Reanimated, {
   LinearTransition,
   EntryExitAnimationFunction,
+  ComplexAnimationBuilder
 } from "react-native-reanimated";
 import { Svg, Circle, G } from "react-native-svg";
 import { animPapillon } from "@/utils/ui/animations";
-import {ComplexAnimationBuilder} from "react-native-reanimated/src/reanimated2/layoutReanimation/animationBuilder";
 
 interface PapillonSpinnerProps {
   size?: number;
