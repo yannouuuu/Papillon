@@ -5,7 +5,13 @@ import {Screen} from "@/router/helpers/types";
 import {AddonLogs as Logs} from "@/addons/types";
 
 const AddonLogs: Screen<"AddonLogs"> = ({ navigation, route }) => {
-  const logs: Logs[] = route.params.logs;
+  const logs: Logs[] = route.params.logs.map(l => {
+    return {
+      date: new Date(l.date),
+      message: l.message,
+      type: l.type
+    };
+  });
   return (
     <ScrollView>
       <View style={{paddingHorizontal: 16}}>
