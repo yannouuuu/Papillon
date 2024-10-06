@@ -134,8 +134,8 @@ export interface LocalAccount extends BaseAccount {
   service: AccountService.Local
 
   // Both are useless for local accounts.
-  instance: undefined
-  authentication: undefined
+  instance: undefined | Record<string, unknown>
+  authentication: undefined | boolean
 
   identityProvider: {
     identifier: string
