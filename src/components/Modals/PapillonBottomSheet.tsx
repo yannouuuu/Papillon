@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import React, {ReactElement, useCallback} from "react";
+import React, {useCallback} from "react";
 import { KeyboardAvoidingView, Modal, Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface BottomSheetProps {
   opened: boolean
-  children: ReactElement
+  children: React.ReactNode
   setOpened: (value: boolean) => unknown
   // Additional properties
   [key: string]: any
