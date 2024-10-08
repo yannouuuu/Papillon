@@ -24,6 +24,10 @@ Voici un aperçu de ce que nous avons accompli jusqu'à présent et de ce qui re
     - [ ] 🔵 EcoleDirecte
     - [ ] 🟡 Skolengo
     - [ ] 🏫 Universités
+      - Rennes 1
+      - Rennes 2
+      - Limoges
+      - Sorbonne Paris Nord
   - 🏠 Interface de sélection de l'établissement
     - **Pour PRONOTE**
       - URL de l'établissement
