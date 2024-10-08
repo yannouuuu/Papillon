@@ -23,7 +23,7 @@ Voici un aperçu de ce que nous avons accompli jusqu'à présent et de ce qui re
     - [x] 🟢 Pronote
     - [ ] 🔵 EcoleDirecte
     - [ ] 🟡 Skolengo
-    - [ ] ⚫ Universités
+    - [ ] 🏫 Universités
   - 🏠 Interface de sélection de l'établissement
     - **Pour PRONOTE**
       - URL de l'établissement
@@ -54,4 +54,3 @@ Voici un aperçu de ce que nous avons accompli jusqu'à présent et de ce qui re
 ![A propos du projet](https://raw.githubusercontent.com/PapillonApp/Papillon/main/.github/assets/part_dev_dark.svg#gh-dark-mode-only)
 
 Pour commencer à développer sur Papillon v7, référez vous au [centre de documentation pour développeurs](https://developers.papillon.bzh/getting-started/quick-start).
-
