@@ -22,7 +22,7 @@ Voici un aperçu de ce que nous avons accompli jusqu'à présent et de ce qui re
   - 🏫 Interface de choix du service scolaire
     - [x] 🟢 Pronote
     - [ ] 🔵 EcoleDirecte
-    - [ ] 🟡 Skolengo
+    - [x] 🟡 Skolengo
     - [ ] 🏫 Universités
       - Rennes 1
       - Rennes 2
