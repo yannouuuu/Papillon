@@ -80,6 +80,20 @@ const PronoteQRCode: Screen<"PronoteQRCode"> = ({ navigation }) => {
         qr: data,
         pin: QRValidationCode,
         deviceUUID: accountID
+      }).catch(async (error) => {
+        if(error instanceof pronote.SecurityError) {
+          const deviceName = "Papillon";
+
+          await pronote.securitySave(session, error.handle, {
+            mode: pronote.DoubleAuthMode.MGDA_Inactive,
+            deviceName
+          });
+
+          const context = error.handle.context;
+          return pronote.finishLoginManually(session, context.authentication, context.identity, context.initialUsername);
+        }
+
+        return;
       });
 
       const user = session.user.resources[0];
