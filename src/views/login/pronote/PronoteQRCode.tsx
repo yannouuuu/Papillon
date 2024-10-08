@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Text, View, StyleSheet, Modal, StatusBar, Alert, KeyboardAvoidingView, TextInput, Pressable } from "react-native";
+import { ActivityIndicator, Text, View, StyleSheet, Modal, Alert, KeyboardAvoidingView, TextInput, Pressable } from "react-native";
 import type { Screen } from "@/router/helpers/types";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@react-navigation/native";
@@ -80,21 +80,19 @@ const PronoteQRCode: Screen<"PronoteQRCode"> = ({ navigation }) => {
         qr: data,
         pin: QRValidationCode,
         deviceUUID: accountID
-      }).catch(async (error) => {
-        if(error instanceof pronote.SecurityError) {
-          const deviceName = "Papillon";
-
-          await pronote.securitySave(session, error.handle, {
-            mode: pronote.DoubleAuthMode.MGDA_Inactive,
-            deviceName
+      }).catch((error) => {
+        if (error instanceof pronote.SecurityError && !error.handle.shouldCustomPassword && !error.handle.shouldCustomDoubleAuth) {
+          navigation.navigate("Pronote2FA_Auth", {
+            session,
+            error,
+            accountID
           });
-
-          const context = error.handle.context;
-          return pronote.finishLoginManually(session, context.authentication, context.identity, context.initialUsername);
+        } else {
+          throw error;
         }
-
-        return;
       });
+
+      if (!refresh) throw pronote.AuthenticateError;
 
       const user = session.user.resources[0];
       const name = user.name;
