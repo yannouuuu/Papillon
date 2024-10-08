@@ -25,6 +25,7 @@ import Reanimated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 
 type DescriptorOptions = {
   tabBarLabel?: string;
@@ -119,6 +120,7 @@ const BasePapillonBar: React.FC<Omit<ReturnType<typeof useNavigationBuilder>, "N
           const lottie = useRef<LottieView>(null);
 
           const onPress = () => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             lottie.current?.play();
 
             navigation.emit({
@@ -326,6 +328,7 @@ export const LargePapillonBar: React.FC<Omit<ReturnType<typeof useNavigationBuil
             const lottie = useRef<LottieView>(null);
 
             const onPress = () => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               lottie.current?.play();
 
               navigation.emit({
