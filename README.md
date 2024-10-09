@@ -24,13 +24,10 @@ Voici un aperçu de ce que nous avons accompli jusqu'à présent et de ce qui re
     - [ ] 🔵 EcoleDirecte
     - [x] 🟡 Skolengo
     - [ ] 🏫 Universités
+      - Limoges
       - Rennes 1
       - Rennes 2
-      - Limoges
       - Sorbonne Paris Nord
-      - La tienne n'y ai pas ?
-        - Viens sur le [discord](https://discord.com/invite/59wyCZ73mb) pour que l'on t'aide !
-        - Amuse toi à développer ton propre module !
   - 🏠 Interface de sélection de l'établissement
     - **Pour PRONOTE**
       - URL de l'établissement
