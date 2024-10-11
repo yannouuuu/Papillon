@@ -49,7 +49,7 @@ const HomeworksElement = ({ navigation }) => {
   const endTime = startTime + 7 * 24 * 60 * 60 * 1000; // Ajouter 7 jours en millisecondes
 
   const hwFinalList = homeworks[(new Date().getDay() === 6 || new Date().getDay() === 0) ? dateToEpochWeekNumber(actualDay) + 1 : dateToEpochWeekNumber(actualDay)]?.filter(hw => hw.due / 1000 >= startTime && hw.due / 1000 <= endTime);
-  const hwFinalList2 = homeworks[(new Date().getDay() === 6 || new Date().getDay() === 0) ? dateToEpochWeekNumber(actualDay) + 2 : dateToEpochWeekNumber(actualDay) + 1]?.filter(hw => hw.due / 1000 >= startTime && hw.due / 1000 <= endTime);
+  const hwFinalList2 = homeworks[(new Date().getDay() === 5 || new Date().getDay() === 6 || new Date().getDay() === 0) ? dateToEpochWeekNumber(actualDay) + 2 : dateToEpochWeekNumber(actualDay) + 1]?.filter(hw => hw.due / 1000 >= startTime && hw.due / 1000 <= endTime);
 
   if(hwFinalList.length === 0) {
     return null;
