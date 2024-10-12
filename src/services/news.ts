@@ -4,6 +4,7 @@ import type { Information } from "./shared/Information";
 import { checkIfSkoSupported } from "./skolengo/default-personalization";
 import { error } from "@/utils/logger/logger";
 import { newsRead } from "pawnote";
+import { ca } from "date-fns/locale";
 
 /**
  * Updates the state and cache for the news.
@@ -36,6 +37,12 @@ export async function updateNewsInCache <T extends Account> (account: T): Promis
       useNewsStore.getState().updateInformations(informations);
       break;
     }
+    case AccountService.UPHF: {
+      const { getNews } = await import("./uphf/data/news");
+      const informations = await getNews(account);
+      useNewsStore.getState().updateInformations(informations);
+      break;
+    }
     default: {
       throw new Error("Service not implemented.");
     }
@@ -55,6 +62,9 @@ export async function setNewsRead <T extends Account> (account: T, message: Info
       break;
     }
     case AccountService.EcoleDirecte: { break; }
+    case AccountService.UPHF: {
+      break;
+    }
     default: {
       throw new Error("Service not implemented.");
     }
