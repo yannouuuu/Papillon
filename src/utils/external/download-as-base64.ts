@@ -1,9 +1,19 @@
 export default async function downloadAsBase64 (url: string, headers?: Record<string, string>, method = "GET", body: Record<string, any> = {}): Promise<string> {
-  const response = await fetch(url, {
-    headers,
-    method,
-    body: body as BodyInit
-  });
+  let response;
+  if (method === "GET") {
+    response = await fetch(url, {
+      headers,
+      method,
+    });
+  } else {
+    response = await fetch(url, {
+      headers,
+      method,
+      body: body as BodyInit
+    });
+
+  }
+
   const blob = await response.blob();
 
   return new Promise<string>(resolve => {
