@@ -28,8 +28,8 @@ const SettingsMagic: Screen<"SettingsMagic"> = ({ navigation }) => {
         <NativeItem
           trailing={
             <Switch
-              value={account?.personalization?.magicEnabled ?? false}
-              onValueChange={(value) => mutateProperty("personalization", { magicEnabled: value })}
+              value={account?.personalization?.MagicNews ?? false}
+              onValueChange={(value) => mutateProperty("personalization", { MagicNews: value })}
             />
           }
           leading={
@@ -44,6 +44,27 @@ const SettingsMagic: Screen<"SettingsMagic"> = ({ navigation }) => {
           </NativeText>
           <NativeText variant="subtitle">
             Trie les actualités en fonction de leur importance et place en haut de la page celles jugées importantes
+          </NativeText>
+        </NativeItem>
+        <NativeItem
+          trailing={
+            <Switch
+              value={account?.personalization?.MagicHomeworks ?? false}
+              onValueChange={(value) => mutateProperty("personalization", { MagicHomeworks: value })}
+            />
+          }
+          leading={
+            <NativeIcon
+              icon={<ArrowUpNarrowWide />}
+              color={colors.primary}
+            />
+          }
+        >
+          <NativeText variant="title">
+            Devoirs Intelligents
+          </NativeText>
+          <NativeText variant="subtitle">
+            Detecte automatiquement si une evaluation ou une tache final est dans le devoirs
           </NativeText>
         </NativeItem>
       </NativeList>

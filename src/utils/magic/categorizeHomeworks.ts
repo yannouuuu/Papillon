@@ -1,10 +1,8 @@
-import detection_json from "@/utils/magic/regex/evaldetection.json";
+import detectionJson from "@/utils/magic/regex/evaldetection.json";
 
-type DetectionJson = {
-  [key: string]: string[];
-};
+type DetectionJson = Record<string, string[]>;
 
-const detectionData: DetectionJson = detection_json;
+const detectionData: DetectionJson = detectionJson;
 
 function normalizeString (input: string): string {
   return input.toLowerCase().replace(/[\s-]+/g, "");
@@ -13,18 +11,9 @@ function normalizeString (input: string): string {
 function detectCategory (input: string): string | null {
   const normalizedInput = normalizeString(input);
 
-  for (const category in detectionData) {
-    for (const pattern of detectionData[category]) {
-      const regex = new RegExp(pattern, "i");
-      const match = input.match(regex);
-
-      if (match) {
-        console.log(`Texte d'entrée : "${input}"`);
-        console.log(`Catégorie détectée : ${category}`);
-        console.log(`Pattern détecté : ${pattern}`);
-        console.log(`Texte correspondant : ${match[0]}`);
-        return category;
-      }
+  for (const [category, patterns] of Object.entries(detectionData)) {
+    if (patterns.some(pattern => new RegExp(pattern, "i").test(input))) {
+      return category;
     }
   }
 
