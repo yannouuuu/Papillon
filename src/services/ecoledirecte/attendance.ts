@@ -1,92 +1,144 @@
-import ecoledirecte, { AttendanceItemKind, type AttendanceItem} from "pawdirecte";
+import ecoledirecte, { AttendanceItemKind } from "pawdirecte";
 import type { EcoleDirecteAccount } from "@/stores/account/types";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import type { Attendance } from "../shared/Attendance";
-import type {Delay} from "@/services/shared/Delay";
-import {dateStringAsTimeInterval, getDuration} from "@/services/ecoledirecte/time-interval";
-import type {Absence} from "@/services/shared/Absence";
-import type {Punishment} from "@/services/shared/Punishment";
-
-const decodeDelay = (item: AttendanceItem): Delay => {
-  const timeInterval = dateStringAsTimeInterval(item.displayDate);
-  const duration = (timeInterval?.end && timeInterval.start) ? getDuration(timeInterval).getTime() / (60 * 1000): 0;
-  return {
-    id: item.id.toString(),
-    timestamp: new Date(timeInterval?.start || item.date).getTime(),
-    duration: duration,
-    justified: item.justified,
-    justification: item.comment,
-    reasons: item.reason ?? void 0,
-  };
-};
-
-const decodeAbsence = (item: AttendanceItem): Absence => {
-  const timeInterval = dateStringAsTimeInterval(item.displayDate);
-  const duration = (timeInterval?.end && timeInterval.start) ? getDuration(timeInterval): new Date();
-  const fromTimestamp = timeInterval?.start ? new Date(timeInterval.start).getTime(): 0;
-  const toTimestamp = timeInterval?.end ? new Date(timeInterval.end).getTime(): 0;
-  return {
-    id: item.id.toString(),
-    fromTimestamp,
-    toTimestamp,
-    justified: item.justified,
-    hours: `${duration.getHours()}h${duration.getMinutes()}`,
-    administrativelyFixed: item.justified,
-    reasons: item.reason,
-  };
-};
-
-
-const decodePunishment = (item: AttendanceItem): Punishment => {
-  const timeInterval = dateStringAsTimeInterval(item.displayDate);
-  const duration = (timeInterval?.end && timeInterval.start) ? getDuration(timeInterval) .getTime() / (60 * 1000): 0;
-  return {
-    id: item.id.toString(),
-    duration,
-    givenBy: item.teacher,
-    timestamp: item.date.getTime(),
-    // TODO
-    duringLesson: false,
-    exclusion: false,
-    homework: {
-      documents: [],
-      text: ""
-    },
-    nature: "",
-    reason: {
-      circumstances: item.reason,
-      documents: [],
-      text: []
-    },
-    schedulable: false,
-    schedule: []
-  };
-};
 
 export const getAttendance = async (
   account: EcoleDirecteAccount,
 ): Promise<Attendance> => {
   if (!account.authentication.session)
     throw new ErrorServiceUnauthenticated("ecoledirecte");
-
-  const attendance = await ecoledirecte.studentAttendance(
+  const att = await ecoledirecte.studentAttendance(
     account.authentication.session,
     account.authentication.account,
   );
 
-  const delays = attendance.absences
+  const delays = att.absences
     .filter((a) => a.kind === AttendanceItemKind.RETARD)
-    .map(decodeDelay);
-  const absences = attendance.absences
+    .map((delay) => {
+      const range = dateStringAsTimeInterval(delay.displayDate);
+      if (range?.end && range.start)
+        return {
+          id: delay.id,
+          timestamp: new Date(range.start),
+          duration:
+            (new Date(range.end).getTime() - new Date(range.start).getTime()) /
+            (60 * 1000),
+          justified: delay.justified,
+          justification: delay.comment,
+          reasons: delay.reason ?? void 0,
+        };
+    });
+  const absences = att.absences
     .filter((a) => a.kind === AttendanceItemKind.ABSENCE)
-    .map(decodeAbsence);
-  const punishments = attendance.punishments
-    .map(decodePunishment);
+    .map((absence) => {
+      const range = dateStringAsTimeInterval(absence.displayDate);
+      if (range?.end && range.start) {
+        const duration = new Date(
+          new Date(range.end).getTime() - new Date(range.start).getTime(),
+        );
+        return {
+          id: absence.id,
+          fromTimestamp: new Date(range.start).getTime(),
+          toTimestamp: new Date(range.end).getTime(),
+          justified: absence.justified,
+          hours: `${duration.getHours()}h${duration.getMinutes()}`,
+          administrativelyFixed: absence.justified,
+          reasons: absence.reason,
+        };
+      }
+    });
 
   return {
-    punishments,
-    absences,
-    delays,
+    punishments: [],
+    absences: absences,
+    delays: delays,
     observations: [],
   };
 };
+export type Timeinterval = {
+  start: string;
+  end: string;
+};
+export function dateAsISO860 (str: string): string {
+  const parts = str.split(" ");
+  let month = "01";
+  switch (parts[2]) {
+    case "janvier":
+      month = "01";
+      break;
+    case "février":
+      month = "02";
+      break;
+    case "mars":
+      month = "03";
+      break;
+    case "avril":
+      month = "04";
+      break;
+    case "mai":
+      month = "05";
+      break;
+    case "juin":
+      month = "06";
+      break;
+    case "juillet":
+      month = "07";
+      break;
+    case "août":
+      month = "08";
+      break;
+    case "septembre":
+      month = "09";
+      break;
+    case "octobre":
+      month = "10";
+      break;
+    case "novembre":
+      month = "11";
+      break;
+    case "décembre":
+      month = "12";
+      break;
+  }
+  return (
+    `${parts[3]}-${month}-${parts[1]}T${parts[5]}:00.000+02:00`
+  );
+}
+export function dateStringAsTimeInterval (
+  str: string,
+): Timeinterval | undefined {
+  if (str.includes("du")) {
+    /**
+     * @example
+     * str is equal to "du mercredi 21 février 2024 au jeudi 22 février 2024"
+     */
+    const parts = str.split("au");
+    const start = dateAsISO860(parts[0].replace("du", "").trim());
+    const end = dateAsISO860(parts[1].trim());
+    return { start: start, end: end } as Timeinterval;
+  }
+  if (str.includes("le")) {
+    /**
+     * @example
+     * str is equal to "le mercredi 21 février 2024 de 08:55 à 09:45"
+     * or "le mercredi 21 février 2024"
+     */
+    const parts = str.split("à");
+    let startDate: string;
+    let endDate: string;
+    // C'est une journée complète ("le mercredi 21 février 2024")
+    if (!str.includes(":")) {
+      startDate = `${parts[0].replace("le", "").trim()} de 00:00`;
+      endDate = `${parts[0].split("de")[0].replace("le", "").trim()} de 23:59`;
+    } else {
+      startDate = parts[0].replace("le", "").trim();
+      endDate =
+        `${parts[0].split("de")[0].replace("le", "").trim()} de ${parts[1].trim()}`;
+    }
+    const start = dateAsISO860(startDate);
+    const end = dateAsISO860(endDate);
+    return { start: start, end: end } as Timeinterval;
+  }
+  return undefined;
+}
