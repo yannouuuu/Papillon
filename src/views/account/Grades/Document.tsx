@@ -114,7 +114,7 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
           title: "Moyenne de la classe",
           description: "Impact de la note sur la moyenne de la classe",
           value: classDiff.difference === undefined ? "???" :
-            (classDiff.difference > 0 ? "+ " : "- ") +
+            (classDiff.difference > 0 ? "- " : "+ ") +
             classDiff.difference.toFixed(2).replace("-", "") + " pts",
         }
       ]
