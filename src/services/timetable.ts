@@ -34,6 +34,7 @@ export async function updateTimetableForWeekInCache <T extends Account> (account
       const { getTimetableForWeek } = await import("./ecoledirecte/timetable");
       const rangeDate = weekNumberToDateRange(epochWeekNumber);
       const timetable = await getTimetableForWeek(account, rangeDate);
+      useTimetableStore.getState().updateClasses(epochWeekNumber, timetable);
       break;
     }
     case AccountService.UPHF: {
