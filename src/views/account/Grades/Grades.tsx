@@ -159,7 +159,7 @@ const Grades: Screen<"Grades"> = ({ route, navigation }) => {
               />
             )}
 
-            {grades[selectedPeriod] && grades[selectedPeriod].length > 2 && (
+            {grades[selectedPeriod] && grades[selectedPeriod].length > 1 && (
               <Reanimated.View layout={animPapillon(LinearTransition)} entering={FadeInUp.duration(200)} exiting={FadeOut.duration(100)} key={account.instance + "graph"}>
                 <GradesAverageGraph
                   grades={grades[selectedPeriod] ?? []}
