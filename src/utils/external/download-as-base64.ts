@@ -2,7 +2,7 @@ export default async function downloadAsBase64 (url: string, headers?: Record<st
   const response = await fetch(url, {
     headers,
     method,
-    body: body as BodyInit
+    body: method != "POST" ? null: body as BodyInit
   });
   const blob = await response.blob();
 
