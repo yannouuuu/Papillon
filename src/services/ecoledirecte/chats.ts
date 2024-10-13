@@ -9,7 +9,7 @@ export const getChats = async (account: EcoleDirecteAccount): Promise<Chat[]> =>
 
   const chats = await ecoledirecte.studentReceivedMessages(account.authentication.session, account.authentication.account);
 
-  return chats.map((chat) => ({
+  return chats.chats.map((chat) => ({
     id: chat.id.toString(),
     subject: chat.subject,
     recipient: chat.sender,
