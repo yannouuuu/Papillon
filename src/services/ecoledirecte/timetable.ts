@@ -22,6 +22,7 @@ const decodeTimetableClass = (c: ecoledirecte.TimetableItem): TimetableClass => 
         teacher: c.teacher ?? void 0,
         // TODO: add more states
         status: c.updated ? TimetableClassStatus.MODIFIED : c.cancelled ? TimetableClassStatus.CANCELED : void 0,
+        statusText: c.updated ? TimetableClassStatus.MODIFIED : c.cancelled ? TimetableClassStatus.CANCELED : void 0,
         ...base
       } satisfies TimetableClass;
     case TimetableItemKind.PERMANENCE:
