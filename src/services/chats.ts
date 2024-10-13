@@ -18,15 +18,19 @@ export const getChats = async <T extends Account> (account: T): Promise<Array<Ch
   }
 };
 
-export const getChatMessages = async <T extends Account> (account: T, chat: Chat): Promise<ChatMessage> => {
+export const getChatMessages = async <T extends Account> (account: T, chat: Chat): Promise<ChatMessage[]> => {
   switch (account.service) {
+    case AccountService.Pronote: {
+      const { getChatMessages } = await import("./pronote/chats");
+      return await getChatMessages(account, chat);
+    }
     case AccountService.EcoleDirecte: {
       const { getChatMessages } = await import("./ecoledirecte/chats");
-      return await getChatMessages(account, chat);
+      return [await getChatMessages(account, chat)];
     }
     default:
       console.info(`[getChatMessages]: returning empty since ${account.service} not implemented.`);
-      return {};
+      return [];
   }
 };
 

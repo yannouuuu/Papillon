@@ -1,11 +1,11 @@
-import ecoledirecte, { AttendanceItemKind, type AttendanceItem} from "pawdirecte";
+import ecoledirecte, {AttendanceItem, AttendanceItemKind} from "pawdirecte";
 import type { EcoleDirecteAccount } from "@/stores/account/types";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
 import type { Attendance } from "../shared/Attendance";
-import type {Delay} from "@/services/shared/Delay";
 import {dateStringAsTimeInterval, getDuration} from "@/services/ecoledirecte/time-interval";
-import type {Absence} from "@/services/shared/Absence";
-import type {Punishment} from "@/services/shared/Punishment";
+import {Punishment} from "@/services/shared/Punishment";
+import {Absence} from "@/services/shared/Absence";
+import {Delay} from "@/services/shared/Delay";
 
 const decodeDelay = (item: AttendanceItem): Delay => {
   const timeInterval = dateStringAsTimeInterval(item.displayDate);
@@ -30,7 +30,7 @@ const decodeAbsence = (item: AttendanceItem): Absence => {
     fromTimestamp,
     toTimestamp,
     justified: item.justified,
-    hours: `${duration.getHours()}h${duration.getMinutes()}`,
+    hours: duration.getHours() + "h" + duration.getMinutes(),
     administrativelyFixed: item.justified,
     reasons: item.reason,
   };
@@ -68,7 +68,6 @@ export const getAttendance = async (
 ): Promise<Attendance> => {
   if (!account.authentication.session)
     throw new ErrorServiceUnauthenticated("ecoledirecte");
-
   const attendance = await ecoledirecte.studentAttendance(
     account.authentication.session,
     account.authentication.account,
@@ -81,6 +80,7 @@ export const getAttendance = async (
     .filter((a) => a.kind === AttendanceItemKind.ABSENCE)
     .map(decodeAbsence);
   const punishments = attendance.punishments
+    .filter((a) => a.kind === AttendanceItemKind.PUNITION)
     .map(decodePunishment);
 
   return {
