@@ -11,7 +11,7 @@ const months = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet"
 export function dateAsISO860 (str: string): string {
   const parts = str.split(" ");
   const hour = parts[5].split(":");
-  return (new Date(Number(parts[3]), months.indexOf(parts[2]), Number(parts[5]), Number(hour[0]), Number(hour[1]))).toISOString();
+  return (new Date(Number(parts[3]), months.indexOf(parts[2]), Number(parts[1]), Number(hour[0]), Number(hour[1]))).toISOString();
 }
 
 export function dateStringAsTimeInterval (
