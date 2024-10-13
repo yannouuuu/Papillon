@@ -5,6 +5,7 @@ import { ErrorServiceUnauthenticated } from "../shared/errors";
 import { weekNumberToDaysList } from "@/utils/epochWeekNumber";
 import { log } from "@/utils/logger/logger";
 import { AttachmentType } from "../shared/Attachment";
+import {formatDate} from "@/services/ecoledirecte/format-date";
 
 export const getHomeworkForWeek = async (account: EcoleDirecteAccount, weekNumber: number): Promise<Homework[]> => {
   if (!account.authentication.session)
@@ -43,10 +44,3 @@ export const toggleHomeworkState = async (account: EcoleDirecteAccount, homework
   log(`Homework ${homework.id} marked as ${homework.done ? "not done" : "done"}.`, "ED->toggleHomeworkState");
 };
 
-const formatDate = (date: Date) => {
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // months are 0-indexed, so +1
-  const day = date.getDate().toString().padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
