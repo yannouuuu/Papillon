@@ -19,7 +19,7 @@ export const getChats = async (account: EcoleDirecteAccount): Promise<Chat[]> =>
 
 export const getChatMessages = async (account: EcoleDirecteAccount, chat: Chat): Promise<ChatMessage> => {
   if (!account.instance)
-    throw new ErrorServiceUnauthenticated("pronote");
+    throw new ErrorServiceUnauthenticated("ecoledirecte");
 
   const message = await ecoledirecte.readMessage(account.authentication.session, account.authentication.account, Number(chat.id));
 
