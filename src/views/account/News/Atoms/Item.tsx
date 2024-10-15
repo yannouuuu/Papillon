@@ -71,18 +71,7 @@ const NewsListItem = ({ index, message, navigation, parentMessages, isED }) => {
           opacity: 0.8,
         }}
       >
-        <RenderHTML
-          contentWidth={Dimensions.get("window").width - (16 * 3)}
-          source={{
-            html: message.content,
-          }}
-          ignoredStyles={["fontFamily", "fontSize"]}
-          baseStyle={{
-            fontFamily: "regular",
-            fontSize: 16,
-            color: theme.colors.text,
-          }}
-        />
+        {message.content ? parse_news_resume(message.content) : ""}
       </NativeText>
       <NativeText
         numberOfLines={1}
