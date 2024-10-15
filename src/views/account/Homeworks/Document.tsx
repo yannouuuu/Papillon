@@ -6,7 +6,7 @@ import { getSubjectData } from "@/services/shared/Subject";
 
 import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
-import { FileText, Link, Paperclip } from "lucide-react-native";
+import { FileText, Link, Paperclip, CircleAlert } from "lucide-react-native";
 
 import * as WebBrowser from "expo-web-browser";
 import { useTheme } from "@react-navigation/native";
@@ -131,6 +131,12 @@ const HomeworksDocument = ({ route }) => {
         style={{flex: 1}}
       >
         <NativeList>
+          {homework.exam &&
+            <NativeItem icon={<CircleAlert />}>
+              <NativeText variant="default">{"Évaluation"}</NativeText>
+            </NativeItem>
+          }
+
           <NativeItem>
             <RenderHTML
               source={{ html: homework.content }}

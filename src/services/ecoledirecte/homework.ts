@@ -30,7 +30,8 @@ export const getHomeworkForWeek = async (account: EcoleDirecteAccount, weekNumbe
         done: homework.done,
         due: date.getTime(),
         id: homework.id.toString(),
-        subject: homework.subject
+        subject: homework.subject,
+        exam: homework.exam
       });
     }
   }
