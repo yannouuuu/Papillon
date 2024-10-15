@@ -14,6 +14,7 @@ export const getChats = async (account: EcoleDirecteAccount): Promise<Chat[]> =>
     subject: chat.subject,
     recipient: chat.sender,
     creator: chat.sender,
+    read: chat.read
   }));
 };
 
@@ -31,9 +32,9 @@ export const getChatMessages = async (account: EcoleDirecteAccount, chat: Chat):
     subject: chat.subject,
     //@ts-ignore
     attachments: message.files.map((a) => ({
-      type: a.type,
+      type: "file", // no links as attachements in ed
       name: a.name,
-      url: ""
+      url: `${a.name}\\${a.id}\\${a.type}`
     }))
   };
 };
