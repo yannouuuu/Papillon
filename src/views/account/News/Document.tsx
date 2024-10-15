@@ -64,7 +64,7 @@ const NewsItem = ({route, navigation, isED}) => {
 
   return (
     <View style={{flex: 1}}>
-      <PapillonModernHeader height={110} outsideNav={true}>
+      <PapillonModernHeader native height={110} outsideNav={true}>
         <View style={{flexDirection: "row", gap: 12, alignItems: "center"}}>
           <InitialIndicator
             initial={parse_initials(message.author)}
@@ -118,7 +118,7 @@ const NewsItem = ({route, navigation, isED}) => {
         }}
         contentContainerStyle={{
           paddingBottom: 16,
-          paddingTop: 96,
+          paddingTop: 106,
         }}
       >
         <View style={{paddingHorizontal: 16}}>
