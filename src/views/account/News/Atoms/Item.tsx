@@ -13,6 +13,7 @@ import parse_initials from "@/utils/format/format_pronote_initials";
 import formatDate from "@/utils/format/format_date_complets";
 import InitialIndicator from "@/components/News/InitialIndicator";
 import RenderHTML from "react-native-render-html";
+import { selectColorSeed } from "@/utils/format/select_color_seed";
 
 const NewsListItem = ({ index, message, navigation, parentMessages, isED }) => {
   const theme = useTheme();
@@ -30,7 +31,7 @@ const NewsListItem = ({ index, message, navigation, parentMessages, isED }) => {
       leading={
         <InitialIndicator
           initial={parse_initials(message.author)}
-          color={theme.colors.primary}
+          color={selectColorSeed(message.author)}
         />
       }
       separator={index !== parentMessages.length - 1}

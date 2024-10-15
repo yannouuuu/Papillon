@@ -22,6 +22,7 @@ import {setNewsRead} from "@/services/news";
 import {useCurrentAccount} from "@/stores/account";
 import PapillonPicker from "@/components/Global/PapillonPicker";
 import parse_initials from "@/utils/format/format_pronote_initials";
+import { selectColorSeed } from "@/utils/format/select_color_seed";
 
 const NewsItem = ({route, navigation, isED}) => {
   let message = route.params.message && JSON.parse(route.params.message) as Information;
@@ -67,7 +68,7 @@ const NewsItem = ({route, navigation, isED}) => {
         <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
           <InitialIndicator
             initial={parse_initials(message.author)}
-            color={theme.colors.primary}
+            color={selectColorSeed(message.author)}
           />
           <View style={{flex: 1}}>
             <NativeText variant="title" numberOfLines={1}>{message.title === "" ? message.author : message.title}</NativeText>
