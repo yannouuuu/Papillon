@@ -143,9 +143,6 @@ const Chat: Screen<"Chat"> = ({ navigation, route }) => {
                       <NativeText variant="title" numberOfLines={2}>
                         {attachment.name}
                       </NativeText>
-                      {account.service !== AccountService.EcoleDirecte && <NativeText variant="subtitle" numberOfLines={1}>
-                        {attachment.url}
-                      </NativeText>} {/* No need to show attachment URL because it's just a way to store data and is meaningless to the user. */}
                     </NativeItem>
                   ))}
                 </NativeList>
