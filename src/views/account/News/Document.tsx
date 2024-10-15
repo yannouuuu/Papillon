@@ -64,13 +64,13 @@ const NewsItem = ({route, navigation, isED}) => {
 
   return (
     <View style={{flex: 1}}>
-      <PapillonModernHeader outsideNav={true}>
-        <View style={{flexDirection: "row", gap: 10, alignItems: "center"}}>
+      <PapillonModernHeader height={110} outsideNav={true}>
+        <View style={{flexDirection: "row", gap: 12, alignItems: "center"}}>
           <InitialIndicator
             initial={parse_initials(message.author)}
             color={selectColorSeed(message.author)}
           />
-          <View style={{flex: 1}}>
+          <View style={{flex: 1, gap: 3}}>
             <NativeText variant="title" numberOfLines={1}>{message.title === "" ? message.author : message.title}</NativeText>
             <NativeText variant="subtitle" numberOfLines={1}>{message.title === "" ? formatDate(message.date) : message.author}</NativeText>
           </View>
