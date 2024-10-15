@@ -32,6 +32,7 @@ interface ModernHeaderProps {
   height?: number,
   startLocation?: number,
   native? : boolean,
+  tint?: string,
 };
 
 export const PapillonModernHeader: React.FC<ModernHeaderProps> = (props) => {
@@ -49,7 +50,7 @@ export const PapillonModernHeader: React.FC<ModernHeaderProps> = (props) => {
   );
 };
 
-const LinearGradientModernHeader: React.FC<ModernHeaderProps> = ({ children, outsideNav = false, height = 70, startLocation = 0.5, native = false }) => {
+const LinearGradientModernHeader: React.FC<ModernHeaderProps> = ({ children, outsideNav = false, height = 70, startLocation = 0.5 }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -105,7 +106,7 @@ const LinearGradientModernHeader: React.FC<ModernHeaderProps> = ({ children, out
 };
 
 
-const NativeModernHeader: React.FC<ModernHeaderProps> = ({ children, outsideNav = false, height = 70, startLocation = 0.5, native = false }) => {
+const NativeModernHeader: React.FC<ModernHeaderProps> = ({ children, outsideNav = false, tint = null }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -120,8 +121,8 @@ const NativeModernHeader: React.FC<ModernHeaderProps> = ({ children, outsideNav 
           justifyContent: "space-between",
           alignItems: "center",
           gap: 8,
-          backgroundColor: theme.colors.text + "10",
-          borderBottomColor: theme.colors.text + "30",
+          backgroundColor: tint ? tint : theme.colors.text + "10",
+          borderBottomColor: theme.colors.border,
           borderBottomWidth: 0.5,
         }]}
         layout={animPapillon(LinearTransition)}
