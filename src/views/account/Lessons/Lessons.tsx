@@ -1,33 +1,22 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, View, Dimensions } from "react-native";
-import { Button, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
-import { Screen } from "@/router/helpers/types";
-import { NativeText } from "@/components/Global/NativeComponents";
-import InfiniteDatePager from "@/components/Global/InfiniteDatePager";
-import HorizontalDatePicker from "./Atoms/LessonsDatePicker";
+import type { Screen } from "@/router/helpers/types";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
-import { AccountService } from "@/stores/account/types";
 import { updateTimetableForWeekInCache } from "@/services/timetable";
 import { Page } from "./Atoms/Page";
 import { LessonsDateModal } from "./LessonsHeader";
-import { set, size } from "lodash";
 import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 
-import Reanimated, { FadeIn, FadeInDown, FadeInLeft, FadeOut, FadeOutDown, FadeOutLeft, FadeOutRight, FadeOutUp, LinearTransition, ZoomIn, ZoomOut } from "react-native-reanimated";
+import Reanimated, { FadeIn, FadeOut, LinearTransition, ZoomIn } from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import PapillonSpinner from "@/components/Global/PapillonSpinner";
-import { PressableScale } from "react-native-pressable-scale";
-import { Link, useTheme } from "@react-navigation/native";
-import { BlurView } from "expo-blur";
+import { useTheme } from "@react-navigation/native";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
-import { LinearGradient } from "expo-linear-gradient";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { ArrowLeftToLine, ArrowUp, CalendarCheck, CalendarClock, CalendarPlus, CalendarSearch, Clock, History, Link2, LinkIcon, ListRestart, Loader, MoreHorizontal, MoreVertical, Plus, Rewind } from "lucide-react-native";
+import { CalendarPlus,  MoreVertical } from "lucide-react-native";
 import { PapillonHeaderAction, PapillonHeaderSelector, PapillonHeaderSeparator, PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
-import { fetchIcalData } from "@/services/local/ical";
 import PapillonPicker from "@/components/Global/PapillonPicker";
 
 const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
@@ -38,9 +27,8 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
-  let loadedWeeks = useRef<Set<number>>(new Set());
-  let currentlyLoadingWeeks = useRef<Set<number>>(new Set());
-  let lastAccountID = useRef<string | null>(null);
+  const loadedWeeks = useRef<Set<number>>(new Set());
+  const currentlyLoadingWeeks = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     // add all week numbers in timetables to loadedWeeks
@@ -66,6 +54,7 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
     void (async () => {
       const weekNumber = getWeekFromDate(pickerDate);
       await loadTimetableWeek(weekNumber, false);
+      console.log(timetables);
     })();
   }, [pickerDate, account.instance]);
 
@@ -132,7 +121,7 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   const renderItem = useCallback(({ item: date }) => {
     const weekNumber = getWeekFromDate(date);
     return (
-      <View style={{ width: Dimensions.get('window').width }}>
+      <View style={{ width: Dimensions.get("window").width }}>
         <Page
           paddingTop={outsideNav ? 80 : insets.top + 56}
           current={date.getTime() === pickerDate.getTime()}
@@ -155,8 +144,8 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   }, [loadTimetableWeek]);
 
   const getItemLayout = useCallback((_, index) => ({
-    length: Dimensions.get('window').width,
-    offset: Dimensions.get('window').width * index,
+    length: Dimensions.get("window").width,
+    offset: Dimensions.get("window").width * index,
     index,
   }), []);
 
