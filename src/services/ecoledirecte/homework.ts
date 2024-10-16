@@ -1,4 +1,4 @@
-import ecoledirecte from "pawdirecte";
+import ecoledirecte, { ClassSubject } from "pawdirecte";
 import type { Homework } from "@/services/shared/Homework";
 import type { EcoleDirecteAccount } from "@/stores/account/types";
 import { ErrorServiceUnauthenticated } from "../shared/errors";
@@ -6,18 +6,23 @@ import { weekNumberToDaysList } from "@/utils/epochWeekNumber";
 import { log } from "@/utils/logger/logger";
 import { AttachmentType } from "../shared/Attachment";
 import {formatDate} from "@/services/ecoledirecte/format-date";
+import { useTimetableStore } from "@/stores/timetable";
 
-export const getHomeworkForWeek = async (account: EcoleDirecteAccount, weekNumber: number): Promise<Homework[]> => {
+export const getHomeworkForWeek = async (account: EcoleDirecteAccount, weekNumber: number): Promise<{homework: Homework[], subjects: ClassSubject[]}> => {
   if (!account.authentication.session)
     throw new ErrorServiceUnauthenticated("ecoledirecte");
 
   const weekdays = weekNumberToDaysList(weekNumber);
   const response: Homework[] = [];
-
+  let subjects: ClassSubject[] = [];
   for (const date of weekdays) {
     const formattedDate = formatDate(date);
 
-    const homeworks = await ecoledirecte.studentHomeworks(account.authentication.session, account.authentication.account, formattedDate);
+    const cdt = await ecoledirecte.studentHomeworks(account.authentication.session, account.authentication.account, formattedDate);
+
+    subjects = [...subjects, cdt.subjects].flat();
+
+    const homeworks = cdt.homeworks;
     for (const homework of homeworks) {
       response.push({
         attachments: homework.attachments.map((att) => ({
@@ -35,7 +40,8 @@ export const getHomeworkForWeek = async (account: EcoleDirecteAccount, weekNumbe
       });
     }
   }
-  return response.filter(hw => hw.content !== "");
+
+  return {homework: response.filter(hw => hw.content !== ""), subjects};
 };
 
 export const toggleHomeworkState = async (account: EcoleDirecteAccount, homework: Homework): Promise<void> => {

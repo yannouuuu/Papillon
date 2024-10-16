@@ -41,7 +41,6 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   today.setHours(0, 0, 0, 0);
 
   const [pickerDate, setPickerDate] = React.useState(new Date(today));
-  const [selectedDate, setSelectedDate] = React.useState(new Date(today));
 
   const getWeekFromDate = (date: Date) => {
     const epochWeekNumber = dateToEpochWeekNumber(date);
@@ -54,7 +53,6 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
     void (async () => {
       const weekNumber = getWeekFromDate(pickerDate);
       await loadTimetableWeek(weekNumber, false);
-      console.log(timetables);
     })();
   }, [pickerDate, account.instance]);
 
