@@ -10,18 +10,28 @@ import { Page } from "./Atoms/Page";
 import { LessonsDateModal } from "./LessonsHeader";
 import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 
-import Reanimated, { FadeIn, FadeOut, LinearTransition, ZoomIn } from "react-native-reanimated";
+import Reanimated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+  ZoomIn,
+} from "react-native-reanimated";
 import { animPapillon } from "@/utils/ui/animations";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@react-navigation/native";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
-import { CalendarPlus,  MoreVertical } from "lucide-react-native";
-import { PapillonHeaderAction, PapillonHeaderSelector, PapillonHeaderSeparator, PapillonModernHeader } from "@/components/Global/PapillonModernHeader";
+import { CalendarPlus, MoreVertical } from "lucide-react-native";
+import {
+  PapillonHeaderAction,
+  PapillonHeaderSelector,
+  PapillonHeaderSeparator,
+  PapillonModernHeader,
+} from "@/components/Global/PapillonModernHeader";
 import PapillonPicker from "@/components/Global/PapillonPicker";
 
 const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
-  const account = useCurrentAccount(store => store.account!);
-  const timetables = useTimetableStore(store => store.timetables);
+  const account = useCurrentAccount((store) => store.account!);
+  const timetables = useTimetableStore((store) => store.timetables);
 
   const outsideNav = route.params?.outsideNav;
   const insets = useSafeAreaInsets();
@@ -66,7 +76,11 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const loadTimetableWeek = async (weekNumber: number, force = false) => {
-    if ((currentlyLoadingWeeks.current.has(weekNumber) || loadedWeeks.current.has(weekNumber)) && !force) {
+    if (
+      (currentlyLoadingWeeks.current.has(weekNumber) ||
+				loadedWeeks.current.has(weekNumber)) &&
+			!force
+    ) {
       return;
     }
 
@@ -79,8 +93,7 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
     try {
       await updateTimetableForWeekInCache(account, weekNumber, force);
       currentlyLoadingWeeks.current.add(weekNumber);
-    }
-    finally {
+    } finally {
       currentlyLoadingWeeks.current.delete(weekNumber);
       loadedWeeks.current.add(weekNumber);
       setUpdatedWeeks(new Set(updatedWeeks).add(weekNumber));
@@ -116,36 +129,55 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
     });
   });
 
-  const renderItem = useCallback(({ item: date }) => {
-    const weekNumber = getWeekFromDate(date);
-    return (
-      <View style={{ width: Dimensions.get("window").width }}>
-        <Page
-          paddingTop={outsideNav ? 80 : insets.top + 56}
-          current={date.getTime() === pickerDate.getTime()}
-          date={date}
-          day={getAllLessonsForDay(date)}
-          weekExists={timetables[weekNumber] && timetables[weekNumber].length > 0}
-          refreshAction={() => loadTimetableWeek(weekNumber, true)}
-          loading={loadingWeeks.includes(weekNumber)}
-        />
-      </View>
-    );
-  }, [pickerDate, timetables, loadingWeeks, outsideNav, insets, getAllLessonsForDay, loadTimetableWeek]);
+  const renderItem = useCallback(
+    ({ item: date }) => {
+      const weekNumber = getWeekFromDate(date);
+      return (
+        <View style={{ width: Dimensions.get("window").width }}>
+          <Page
+            paddingTop={outsideNav ? 80 : insets.top + 56}
+            current={date.getTime() === pickerDate.getTime()}
+            date={date}
+            day={getAllLessonsForDay(date)}
+            weekExists={
+              timetables[weekNumber] && timetables[weekNumber].length > 0
+            }
+            refreshAction={() => loadTimetableWeek(weekNumber, true)}
+            loading={loadingWeeks.includes(weekNumber)}
+          />
+        </View>
+      );
+    },
+    [
+      pickerDate,
+      timetables,
+      loadingWeeks,
+      outsideNav,
+      insets,
+      getAllLessonsForDay,
+      loadTimetableWeek,
+    ],
+  );
 
-  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      const newDate = viewableItems[0].item;
-      setPickerDate(newDate);
-      loadTimetableWeek(getWeekFromDate(newDate), false);
-    }
-  }, [loadTimetableWeek]);
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }) => {
+      if (viewableItems.length > 0) {
+        const newDate = viewableItems[0].item;
+        setPickerDate(newDate);
+        loadTimetableWeek(getWeekFromDate(newDate), false);
+      }
+    },
+    [loadTimetableWeek],
+  );
 
-  const getItemLayout = useCallback((_, index) => ({
-    length: Dimensions.get("window").width,
-    offset: Dimensions.get("window").width * index,
-    index,
-  }), []);
+  const getItemLayout = useCallback(
+    (_, index) => ({
+      length: Dimensions.get("window").width,
+      offset: Dimensions.get("window").width * index,
+      index,
+    }),
+    [],
+  );
 
   return (
     <View style={{ flex: 1 }}>
@@ -154,41 +186,46 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
           loading={loading}
           onPress={() => setShowDatePicker(true)}
         >
-          <Reanimated.View
-            layout={animPapillon(LinearTransition)}
-          >
+          <Reanimated.View layout={animPapillon(LinearTransition)}>
             <Reanimated.View
               key={pickerDate.toLocaleDateString("fr-FR", { weekday: "short" })}
               entering={FadeIn.duration(150)}
               exiting={FadeOut.duration(150)}
             >
-              <Reanimated.Text style={[styles.weekPickerText, styles.weekPickerTextIntl,
-                {
-                  color: theme.colors.text,
-                }
-              ]}
+              <Reanimated.Text
+                style={[
+                  styles.weekPickerText,
+                  styles.weekPickerTextIntl,
+                  {
+                    color: theme.colors.text,
+                  },
+                ]}
               >
                 {pickerDate.toLocaleDateString("fr-FR", { weekday: "long" })}
               </Reanimated.Text>
             </Reanimated.View>
           </Reanimated.View>
 
-
           <AnimatedNumber
             value={pickerDate.getDate().toString()}
-            style={[styles.weekPickerText, styles.weekPickerTextNbr,
+            style={[
+              styles.weekPickerText,
+              styles.weekPickerTextNbr,
               {
                 color: theme.colors.text,
-              }
+              },
             ]}
           />
 
-          <Reanimated.Text style={[styles.weekPickerText, styles.weekPickerTextIntl,
-            {
-              color: theme.colors.text,
-            }
-          ]}
-          layout={animPapillon(LinearTransition)}
+          <Reanimated.Text
+            style={[
+              styles.weekPickerText,
+              styles.weekPickerTextIntl,
+              {
+                color: theme.colors.text,
+              },
+            ]}
+            layout={animPapillon(LinearTransition)}
           >
             {pickerDate.toLocaleDateString("fr-FR", { month: "long" })}
           </Reanimated.Text>
@@ -206,8 +243,8 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
               label: "Importer un iCal",
               onPress: () => {
                 navigation.navigate("LessonsImportIcal");
-              }
-            }
+              },
+            },
           ]}
         >
           <PapillonHeaderAction
@@ -238,7 +275,7 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
             date.setDate(lastDate.getDate() + i + 1);
             return date;
           });
-          setData(prevData => [...prevData, ...newDates]);
+          setData((prevData) => [...prevData, ...newDates]);
         }}
         onEndReachedThreshold={0.5}
       />
@@ -251,7 +288,9 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
           const newDate = new Date(date);
           newDate.setHours(0, 0, 0, 0);
           setPickerDate(newDate);
-          const index = data.findIndex(d => d.getTime() === newDate.getTime());
+          const index = data.findIndex(
+            (d) => d.getTime() === newDate.getTime(),
+          );
           if (index !== -1) {
             flatListRef.current?.scrollToIndex({ index, animated: true });
           }

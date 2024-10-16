@@ -5,7 +5,12 @@ import {
   NativeText,
 } from "@/components/Global/NativeComponents";
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { View, ScrollView, Text, TouchableOpacity, Alert, Platform } from "react-native";
+import {
+  View,
+  ScrollView,
+  Text,
+  Platform,
+} from "react-native";
 import { Homework, HomeworkReturnType } from "@/services/shared/Homework";
 import { getSubjectData } from "@/services/shared/Subject";
 import { Screen } from "@/router/helpers/types";
@@ -18,8 +23,6 @@ import {
   FileText,
   Hourglass,
   Info,
-  Link,
-  Paperclip,
   PersonStanding,
 } from "lucide-react-native";
 
@@ -49,16 +52,18 @@ const LessonDocument: Screen<"LessonDocument"> = ({ route, navigation }) => {
   const lesson = route.params.lesson as unknown as TimetableClass;
   const subjects = useClassSubjectStore();
   const [classSubjects, setClassSubjects] = useState<ClassSubject[]>([]);
-  const account = useCurrentAccount(store => store.account!);
-
+  const account = useCurrentAccount((store) => store.account!);
 
   const openUrl = (url: string) => {
-    if (account.service === AccountService.EcoleDirecte && Platform.OS === "ios") {
+    if (
+      account.service === AccountService.EcoleDirecte &&
+			Platform.OS === "ios"
+    ) {
       getAndOpenFile(account, url);
     } else {
       WebBrowser.openBrowserAsync(url, {
-        presentationStyle: "formSheet",
-        controlsColor: theme.colors.primary
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
+        controlsColor: theme.colors.primary,
       });
     }
   };
@@ -68,10 +73,10 @@ const LessonDocument: Screen<"LessonDocument"> = ({ route, navigation }) => {
       subjects.subjects.filter(
         (b) =>
           new Date(b.date).getDate() ===
-            new Date(lesson.startTimestamp).getDate() &&
-          new Date(b.date).getMonth() ===
-            new Date(lesson.startTimestamp).getMonth() &&
-          lesson.subject === b.subject
+						new Date(lesson.startTimestamp).getDate() &&
+					new Date(b.date).getMonth() ===
+						new Date(lesson.startTimestamp).getMonth() &&
+					lesson.subject === b.subject,
       ) ?? [],
     );
   }, []);
@@ -231,9 +236,9 @@ const LessonDocument: Screen<"LessonDocument"> = ({ route, navigation }) => {
             </View>
           );
         })}
-        {
-          classSubjects.length > 0 && <View>
-            <NativeListHeader label="Contenu de séance"/>
+        {classSubjects.length > 0 && (
+          <View>
+            <NativeListHeader label="Contenu de séance" />
             <NativeList>
               {classSubjects.map((subject, index) => {
                 return (
@@ -254,24 +259,25 @@ const LessonDocument: Screen<"LessonDocument"> = ({ route, navigation }) => {
                       {subject.attachments.map((attachment, index) => (
                         <NativeItem
                           key={index}
-                          onPress={() => openUrl(`${attachment.name}\\${attachment.id}\\${attachment.kind}`)}
-                          icon={
-                            <FileText />
+                          onPress={() =>
+                            openUrl(
+                              `${attachment.name}\\${attachment.id}\\${attachment.kind}`,
+                            )
                           }
+                          icon={<FileText />}
                         >
-                          <NativeText variant="title"  numberOfLines={2}>
+                          <NativeText variant="title" numberOfLines={2}>
                             {attachment.name}
                           </NativeText>
-
                         </NativeItem>
                       ))}
-                    </NativeItem></>
+                    </NativeItem>
+                  </>
                 );
               })}
             </NativeList>
           </View>
-        }
-
+        )}
       </ScrollView>
     </>
   );
