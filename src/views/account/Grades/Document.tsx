@@ -19,8 +19,6 @@ import {
   Users,
 } from "lucide-react-native";
 import { getAverageDiffGrade } from "@/utils/grades/getAverages";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import type { Grade } from "@/services/shared/Grade";
 import type { AverageDiffGrade } from "@/utils/grades/getAverages";
 import { Screen } from "@/router/helpers/types";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
@@ -28,7 +26,6 @@ import InsetsBottomView from "@/components/Global/InsetsBottomView";
 const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
   const { grade, allGrades = [] } = route.params;
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
 
   const [subjectData, setSubjectData] = useState({
     color: "#888888",
@@ -115,7 +112,11 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
           icon: <UserMinus />,
           title: "Note minimale",
           description: "Moins bonne note de la classe",
-          value: grade.min.value?.toFixed(2) ?? "??",
+          value:
+						grade.min.value?.toFixed(2) &&
+						grade.min.value.toFixed(2) !== "-1.00"
+						  ? grade.min.value?.toFixed(2)
+						  : "??",
           bareme: "/" + grade.outOf.value,
         },
       ],
