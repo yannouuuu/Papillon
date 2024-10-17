@@ -12,9 +12,10 @@ interface GradeItemProps {
   navigation: NativeStackNavigationProp<RouteParameters, keyof RouteParameters>
   index: number;
   totalItems: number;
+  allGrades: Grade[];
 }
 
-const GradeItem: React.FC<GradeItemProps> = ({ subject, grade, navigation, index, totalItems }) => {
+const GradeItem: React.FC<GradeItemProps> = ({ subject, grade, navigation, index, totalItems, allGrades }) => {
   const subjectData = useMemo(() => getSubjectData(subject.average.subjectName), [subject.average.subjectName]);
 
   const formattedDate = new Date(grade.timestamp).toLocaleDateString("fr-FR", {
@@ -31,7 +32,7 @@ const GradeItem: React.FC<GradeItemProps> = ({ subject, grade, navigation, index
   return (
     <NativeItem
       separator={index < totalItems - 1}
-      onPress={() => navigation.navigate("GradeDocument", { grade })}
+      onPress={() => navigation.navigate("GradeDocument", { grade, allGrades })}
       chevron={false}
       animated
       leading={

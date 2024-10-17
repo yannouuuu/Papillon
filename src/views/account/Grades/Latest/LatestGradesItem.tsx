@@ -18,8 +18,8 @@ const GradesLatestItem: React.FC<GradeLatestItemProps> = ({ grade, i, navigation
   const [subjectData, setSubjectData] = useState({
     color: "#888888", pretty: "Matière inconnue", emoji: "❓", });
 
-  const fetchSubjectData = async () => {
-    const data = await getSubjectData(grade.subjectName);
+  const fetchSubjectData = () => {
+    const data = getSubjectData(grade.subjectName);
     setSubjectData(data);
   };
 

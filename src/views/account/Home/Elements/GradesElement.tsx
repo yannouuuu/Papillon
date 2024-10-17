@@ -10,10 +10,21 @@ import type { Grade } from "@/services/shared/Grade";
 import RedirectButton from "@/components/Home/RedirectButton";
 
 const GradesElement: React.FC = () => {
-  const account = useCurrentAccount((store) => store.account);
+  const account = useCurrentAccount((store) => store.account!);
+  const periods = useGradesStore(store => store.periods);
 
   const defaultPeriod = useGradesStore(store => store.defaultPeriod);
   const grades = useGradesStore((store) => store.grades);
+  const [userSelectedPeriod, setUserSelectedPeriod] = useState<string | null>(null);
+  const selectedPeriod = useMemo(() => userSelectedPeriod ?? defaultPeriod, [userSelectedPeriod, defaultPeriod]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!periods.map(period => period.name).includes(selectedPeriod)) {
+        setUserSelectedPeriod(defaultPeriod);
+      }
+    }, 0);
+  }, [account.instance, defaultPeriod]);
 
   useEffect(() => {
     void async function () {
@@ -70,6 +81,7 @@ const GradesElement: React.FC = () => {
             navigation={PapillonNavigation.current}
             index={index}
             totalItems={lastThreeGrades.length}
+            allGrades={grades[selectedPeriod]}
           />
         ))}
       </NativeList>

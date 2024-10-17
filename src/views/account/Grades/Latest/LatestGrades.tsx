@@ -6,6 +6,7 @@ import Reanimated, {
   LinearTransition
 } from "react-native-reanimated";
 import GradesLatestItem from "./LatestGradesItem";
+import { Grade } from "@/services/shared/Grade";
 
 const GradesLatestList = (props: GradesLatestListProps) => {
   const { latestGrades, navigation, allGrades } = props;
@@ -30,8 +31,8 @@ const GradesLatestList = (props: GradesLatestListProps) => {
           gap: 10,
         }}
       >
-        {latestGrades.map((grade, index) => (
-          <GradesLatestItem key={index} grade={grade} i={index} navigation={navigation} allGrades={allGrades} />
+        {latestGrades.map((grade: Grade, index: number) => (
+          <GradesLatestItem key={grade.id + index} grade={grade} i={index} navigation={navigation} allGrades={allGrades} />
         ))}
       </Reanimated.ScrollView>
     </>

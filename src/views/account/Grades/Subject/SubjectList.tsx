@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Reanimated, { FadeInDown, FadeInUp, FadeOutUp } from "react-native-reanimated";
 import SubjectTitle from "./SubjectTitle";
-import { GradeInformation, type Grade, type GradesPerSubject } from "@/services/shared/Grade";
+import { type Grade, type GradesPerSubject } from "@/services/shared/Grade";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RouteParameters } from "@/router/helpers/types";
 
@@ -24,8 +24,8 @@ const SubjectItem: React.FC<SubjectItemProps> = ({
     color: "#888888", pretty: "Matière inconnue", emoji: "❓",
   });
 
-  const fetchSubjectData = async () => {
-    const data = await getSubjectData(subject.average.subjectName);
+  const fetchSubjectData = () => {
+    const data = getSubjectData(subject.average.subjectName);
     setSubjectData(data);
   };
 

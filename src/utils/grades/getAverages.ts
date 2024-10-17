@@ -84,7 +84,7 @@ export const getSubjectAverage = (subject: Grade[], target: Target = "student"):
 // Fonction pour calculer la différence de moyenne avec et sans certaines notes
 const getAverageDiffGrade = (grades: Grade[], list: Grade[], target: Target = "student"): AverageDiffGrade => {
   const baseAverage = getSubjectAverage(list, target); // Calculer la moyenne de base avec toutes les notes
-  const baseWithoutGradeAverage = getSubjectAverage(list.filter(grade => !grades.includes(grade)), target); // Calculer la moyenne sans certaines notes
+  const baseWithoutGradeAverage = getSubjectAverage(list.filter(grade =>JSON.stringify(grades[0]) !== JSON.stringify(grade)), target); // Calculer la moyenne sans certaines notes
 
   return {
     difference: baseWithoutGradeAverage - baseAverage, // Calculer la différence entre les deux moyennes
