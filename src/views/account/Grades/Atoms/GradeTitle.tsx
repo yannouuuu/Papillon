@@ -105,7 +105,7 @@ export const GradeTitle = ({ grade, subjectData }: GradeTitleProps) => {
               textAlignVertical: "center",
             }: undefined}
           >
-            {grade.description || `Note rendue le ${new Date(grade.timestamp).toLocaleDateString("fr-FR", {
+            {grade.description || `Note renseignée le ${new Date(grade.timestamp).toLocaleDateString("fr-FR", {
               weekday: "long",
               day: "numeric",
               month: "long",

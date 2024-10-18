@@ -9,16 +9,15 @@ interface CategorizedMessages {
 export const categorizeMessages = (messages: Information[]): CategorizedMessages => {
   const importantMessages: CategorizedMessages["importantMessages"] = [];
   const normalMessages: CategorizedMessages["normalMessages"] = [];
-
-  messages.forEach((message) => {
+  for (const message of messages) {
     const { title, content, read } = message;
     let matchCount = 0;
     const matchingWords: string[] = [];
 
-    Object.values(important_json).forEach((regexArray: string[]) => {
-      regexArray.forEach((regex) => {
+    for (const regexArray of Object.values(important_json)) {
+      for (const regex of regexArray) {
         const pattern = new RegExp(regex, "i");
-        const titleMatches = title && title.match(pattern);
+        const titleMatches = title?.match(pattern);
         const contentMatches = content.match(pattern);
 
         // Filter out empty strings and add only non-empty matches to matchingWords
@@ -37,11 +36,10 @@ export const categorizeMessages = (messages: Information[]): CategorizedMessages
             matchingWords.push(...nonEmptyContentMatches);
           }
         }
-      });
-    });
-
+      }
+    };
     if (!message.title) {
-      message.title = "Sans titre";
+      message.title = "";
     }
 
     if (matchCount > 0 && !read) {
@@ -52,7 +50,7 @@ export const categorizeMessages = (messages: Information[]): CategorizedMessages
     } else {
       normalMessages.push(message);
     }
-  });
+  }
 
   const limitedImportantMessages = importantMessages.slice(0, 3);
 
