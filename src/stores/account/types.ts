@@ -140,6 +140,7 @@ export interface UphfAccount extends BaseAccount {
   authentication: {
     refreshAuthToken: string
   }
+  identityProvider?: undefined
 }
 
 export interface LocalAccount extends BaseAccount {
