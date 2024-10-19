@@ -1,4 +1,4 @@
-import { useTheme } from "@react-navigation/native";
+import {RouteProp, useTheme} from "@react-navigation/native";
 import React from "react";
 import {
   Dimensions,
@@ -24,11 +24,13 @@ interface NewsListItemProps {
   index: number
   message: NewsItem
   navigation: NativeStackNavigationProp<RouteParameters, "News", undefined>
+  route: RouteProp<RouteParameters, "News">
   parentMessages: NewsItem[]
 }
 
-const NewsListItem: React.FC<NewsListItemProps> = ({ index, message, navigation, parentMessages }) => {
+const NewsListItem: React.FC<NewsListItemProps> = ({ index, message, navigation, parentMessages, route }) => {
   const theme = useTheme();
+  const isED  = route.params?.isED || false;
 
   return (
     <NativeItem

@@ -25,9 +25,10 @@ import {AttachmentType} from "@/services/shared/Attachment";
 import parse_initials from "@/utils/format/format_pronote_initials";
 import { selectColorSeed } from "@/utils/format/select_color_seed";
 
-const NewsItem: Screen<"NewsItem"> = ({ route, navigation, isED }) => {
-  let message = route.params.message && JSON.parse(route.params.message) as Information;
+const NewsItem: Screen<"NewsItem"> = ({ route, navigation }) => {
+  let message = JSON.parse(route.params.message) as Information;
   const important = route.params.important;
+  const isED = route.params.isED;
   const account = useCurrentAccount((store) => store.account!);
 
   const theme = useTheme();
@@ -73,7 +74,7 @@ const NewsItem: Screen<"NewsItem"> = ({ route, navigation, isED }) => {
           />
           <View style={{flex: 1, gap: 3}}>
             <NativeText variant="title" numberOfLines={1}>{message.title === "" ? message.author : message.title}</NativeText>
-            <NativeText variant="subtitle" numberOfLines={1}>{message.title === "" ? formatDate(message.date) : message.author}</NativeText>
+            <NativeText variant="subtitle" numberOfLines={1}>{message.title === "" ? formatDate(message.date.toDateString()) : message.author}</NativeText>
           </View>
           {isED && <PapillonPicker
             animated

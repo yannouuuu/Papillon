@@ -55,5 +55,5 @@ function getRandomItemFromList (list: Array<string>, seed: string) {
 }
 
 export const selectColorSeed = (subject: string) => {
-  return getRandomItemFromList(colors, subject);
+  return getRandomItemFromList(colors, subject) as string;
 };

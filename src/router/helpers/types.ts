@@ -78,8 +78,8 @@ export type RouteParameters = {
   Homeworks?: { outsideNav?: boolean };
   HomeworksDocument: { homework: Homework };
 
-  News?: { outsideNav?: boolean };
-  NewsItem: { message: string, important: boolean };
+  News?: { outsideNav?: boolean, isED: boolean };
+  NewsItem: { message: string, important: boolean, isED: boolean };
 
   Grades?: { outsideNav?: boolean };
   GradeSubject: { subject: GradesPerSubject, allGrades: Grade[] };
