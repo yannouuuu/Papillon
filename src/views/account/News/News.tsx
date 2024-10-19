@@ -17,6 +17,7 @@ import TabAnimatedTitle from "@/components/Global/TabAnimatedTitle";
 import { protectScreenComponent } from "@/router/helpers/protected-screen";
 import MissingItem from "@/components/Global/MissingItem";
 import {Information} from "@/services/shared/Information";
+import {AccountService} from "@/stores/account/types";
 
 type NewsItem = Omit<Information, "date"> & { date: string, important: boolean };
 
@@ -66,6 +67,7 @@ const NewsScreen: Screen<"News"> = ({ route, navigation }) => {
       message={item}
       navigation={navigation}
       parentMessages={sortedMessages}
+      isED={account.service == AccountService.EcoleDirecte}
     />
   ), [navigation, sortedMessages]);
 

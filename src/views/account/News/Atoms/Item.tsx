@@ -24,14 +24,12 @@ interface NewsListItemProps {
   index: number
   message: NewsItem
   navigation: NativeStackNavigationProp<RouteParameters, "News", undefined>
-  route: RouteProp<RouteParameters, "News">
+  isED: boolean
   parentMessages: NewsItem[]
 }
 
-const NewsListItem: React.FC<NewsListItemProps> = ({ index, message, navigation, parentMessages, route }) => {
+const NewsListItem: React.FC<NewsListItemProps> = ({ index, message, navigation, parentMessages, isED }) => {
   const theme = useTheme();
-  const isED  = route.params?.isED || false;
-
   return (
     <NativeItem
       onPress={() => {
