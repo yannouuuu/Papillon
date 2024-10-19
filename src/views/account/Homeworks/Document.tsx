@@ -23,8 +23,6 @@ import { FileText, Link, Paperclip, CircleAlert } from "lucide-react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useTheme } from "@react-navigation/native";
 import RenderHTML from "react-native-render-html";
-import {useSafeAreaInsets} from "react-native-safe-area-context";
-import {PapillonModernHeader} from "@/components/Global/PapillonModernHeader";
 import { Screen } from "@/router/helpers/types";
 import { WebBrowserPresentationStyle } from "expo-web-browser/src/WebBrowser.types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
