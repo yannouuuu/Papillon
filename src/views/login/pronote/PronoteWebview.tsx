@@ -55,11 +55,11 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
   const instanceURL = route.params.instanceURL.toLowerCase();
 
   const infoMobileURL =
-		instanceURL + "/InfoMobileApp.json?id=0D264427-EEFC-4810-A9E9-346942A862A4";
+    instanceURL + "/InfoMobileApp.json?id=0D264427-EEFC-4810-A9E9-346942A862A4";
 
   let webViewRef = createRef<WebView>();
   let currentLoginStateIntervalRef = useRef<ReturnType<
-		typeof setInterval
+    typeof setInterval
   > | null>(null);
 
   const createStoredAccount = useAccounts((store) => store.create);
@@ -132,9 +132,9 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
   `.trim();
 
   /**
-	 * Creates the hook inside the webview when logging in.
-	 * Also hides the "Download PRONOTE app" button.
-	 */
+   * Creates the hook inside the webview when logging in.
+   * Also hides the "Download PRONOTE app" button.
+   */
   const INJECT_PRONOTE_INITIAL_LOGIN_HOOK = `
     (function () {
       window.hookAccesDepuisAppli = function() {
@@ -311,8 +311,8 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                   .catch((error) => {
                     if (
                       error instanceof pronote.SecurityError &&
-											!error.handle.shouldCustomPassword &&
-											!error.handle.shouldCustomDoubleAuth
+                      !error.handle.shouldCustomPassword &&
+                      !error.handle.shouldCustomDoubleAuth
                     ) {
                       navigation.navigate("Pronote2FA_Auth", {
                         session,
@@ -400,7 +400,7 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                       showAlert({
                         title: "Attention",
                         message:
-													"Désolé, seules les comptes élèves sont compatibles pour le moment.",
+                          "Désolé, seules les comptes élèves sont compatibles pour le moment.",
                         actions: [
                           {
                             title: "OK",
