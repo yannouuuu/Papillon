@@ -79,10 +79,10 @@ const Router: React.FC = () => {
               let str = "";
               let view: NavigationState | PartialState<NavigationState> | undefined = state;
               while (view?.routes) {
-                if (view.index) {
-                  str += "/" + view.routes[view.index].name;
-                  view = view.routes[view.index].state;
-                }
+                // @ts-expect-error (view is not undefined here bc of while condition, but ts think it can be)
+                str += "/" + view.routes[view.index].name;
+                // @ts-expect-error (same)
+                view = view.routes[view.index].state;
               }
               navigate(str);
             }}
