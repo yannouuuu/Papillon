@@ -128,50 +128,50 @@ const Lessons: Screen<"Lessons"> = ({ route, navigation }) => {
     });
   });
   const renderItem = useCallback(({ item: date }: { item: Date }) => {
-      const weekNumber = getWeekFromDate(date);
-      return (
-        <View style={{ width: Dimensions.get("window").width }}>
-          <Page
-            paddingTop={outsideNav ? 80 : insets.top + 56}
-            current={date.getTime() === pickerDate.getTime()}
-            date={date}
-            day={getAllLessonsForDay(date)}
-            weekExists={
-              timetables[weekNumber] && timetables[weekNumber].length > 0
-            }
-            refreshAction={() => loadTimetableWeek(weekNumber, true)}
-            loading={loadingWeeks.includes(weekNumber)}
-          />
-        </View>
-      );
-    },
-    [
-      pickerDate,
-      timetables,
-      loadingWeeks,
-      outsideNav,
-      insets,
-      getAllLessonsForDay,
-      loadTimetableWeek,
-    ],
+    const weekNumber = getWeekFromDate(date);
+    return (
+      <View style={{ width: Dimensions.get("window").width }}>
+        <Page
+          paddingTop={outsideNav ? 80 : insets.top + 56}
+          current={date.getTime() === pickerDate.getTime()}
+          date={date}
+          day={getAllLessonsForDay(date)}
+          weekExists={
+            timetables[weekNumber] && timetables[weekNumber].length > 0
+          }
+          refreshAction={() => loadTimetableWeek(weekNumber, true)}
+          loading={loadingWeeks.includes(weekNumber)}
+        />
+      </View>
+    );
+  },
+  [
+    pickerDate,
+    timetables,
+    loadingWeeks,
+    outsideNav,
+    insets,
+    getAllLessonsForDay,
+    loadTimetableWeek,
+  ],
   );
 
   const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken<Date>[] }) => {
-      if (viewableItems.length > 0) {
-        const newDate = viewableItems[0].item;
-        setPickerDate(newDate);
-        loadTimetableWeek(getWeekFromDate(newDate), false);
-      }
-    },
-    [loadTimetableWeek],
+    if (viewableItems.length > 0) {
+      const newDate = viewableItems[0].item;
+      setPickerDate(newDate);
+      loadTimetableWeek(getWeekFromDate(newDate), false);
+    }
+  },
+  [loadTimetableWeek],
   );
 
   const getItemLayout = useCallback((_: any, index: number) => ({
-      length: Dimensions.get("window").width,
-      offset: Dimensions.get("window").width * index,
-      index,
-    }),
-    [],
+    length: Dimensions.get("window").width,
+    offset: Dimensions.get("window").width * index,
+    index,
+  }),
+  [],
   );
 
   return (

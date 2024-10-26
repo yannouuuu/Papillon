@@ -70,7 +70,7 @@ const NextCourseWidget = forwardRef(({ hidden, setHidden, loading, setLoading }:
       setLoading(false);
     }();
   }, [account.instance, timetables]);
-  
+
   useEffect(() => {
     setLoading(true);
     updateNextCourse();

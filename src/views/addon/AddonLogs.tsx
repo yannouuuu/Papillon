@@ -47,6 +47,6 @@ const AddonLogs: Screen<"AddonLogs"> = ({ navigation, route }) => {
       </View>
     </ScrollView>
   );
-}
+};
 
 export default AddonLogs;
