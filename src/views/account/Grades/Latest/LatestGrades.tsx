@@ -2,7 +2,15 @@ import { NativeListHeader } from "@/components/Global/NativeComponents";
 import { animPapillon } from "@/utils/ui/animations";
 import Reanimated, { LinearTransition } from "react-native-reanimated";
 import GradesLatestItem from "./LatestGradesItem";
-import { Grade } from "@/services/shared/Grade";
+import {Grade} from "@/services/shared/Grade";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {RouteParameters} from "@/router/helpers/types";
+
+interface GradesLatestListProps {
+  latestGrades: Grade[]
+  allGrades: Grade[]
+  navigation: NativeStackNavigationProp<RouteParameters, "Grades", undefined>
+}
 
 const GradesLatestList = (props: GradesLatestListProps) => {
   const { latestGrades, navigation, allGrades } = props;
