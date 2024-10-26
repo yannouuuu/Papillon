@@ -308,17 +308,17 @@ const PronoteWebview: Screen<"PronoteWebview"> = ({ route, navigation }) => {
                     token: message.data.mdp,
                     deviceUUID
                   }
-                ).catch((error) => {
-                  if (error instanceof pronote.SecurityError && !error.handle.shouldCustomPassword && !error.handle.shouldCustomDoubleAuth) {
-                    navigation.navigate("Pronote2FA_Auth", {
-                      session,
-                      error,
-                      accountID: deviceUUID
-                    });
-                  } else {
-                    throw error;
-                  }
-                });
+                  ).catch((error) => {
+                    if (error instanceof pronote.SecurityError && !error.handle.shouldCustomPassword && !error.handle.shouldCustomDoubleAuth) {
+                      navigation.navigate("Pronote2FA_Auth", {
+                        session,
+                        error,
+                        accountID: deviceUUID
+                      });
+                    } else {
+                      throw error;
+                    }
+                  });
 
                 if (!refresh) throw pronote.AuthenticateError;
 
