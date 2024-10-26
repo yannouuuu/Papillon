@@ -1,4 +1,5 @@
 import { expoGoWrapper } from "@/utils/native/expoGoAlert";
+import {Notification} from "@notifee/react-native/src/types/Notification";
 
 const requestNotificationPermission = async () => {
   return expoGoWrapper(async () => {
@@ -7,12 +8,7 @@ const requestNotificationPermission = async () => {
   }, true);
 };
 
-interface papillonNotifyProps {
-  title: string
-  [key: string]: any
-}
-
-const papillonNotify = async (props: papillonNotifyProps) => {
+const papillonNotify = async (props: Notification) => {
   expoGoWrapper(async () => {
     const notifee = (await import("@notifee/react-native")).default;
     await notifee.displayNotification({
