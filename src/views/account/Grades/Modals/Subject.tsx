@@ -53,8 +53,8 @@ const GradeSubjectScreen: Screen<"GradeSubject"> = ({ route, navigation }) => {
       icon: <UserMinus />,
       label: "Moy. la plus basse",
       value: parseFloat((subject.average?.min?.value || -1).toString()).toFixed(2) !== "-1.00"
-				  ? parseFloat((subject.average?.min?.value || -1).toString()).toFixed(2)
-				  : "??",
+        ? parseFloat((subject.average?.min?.value || -1).toString()).toFixed(2)
+        : "??",
     },
   ];
 
