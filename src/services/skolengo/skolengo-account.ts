@@ -1,4 +1,3 @@
-import { ReanimatedGraphPublicMethods } from "@birdwingo/react-native-reanimated-graph";
 import { Skolengo, OID_CLIENT_ID, OID_CLIENT_SECRET, BASE_URL } from "scolengo-api";
 import { SkolengoAuthConfig, SkolengoJWT, SkolengoTokenSet, authTokenToSkolengoTokenSet } from "./skolengo-types";
 import { DiscoveryDocument } from "expo-auth-session";
