@@ -1,7 +1,7 @@
 import React, { useRef, useCallback, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import InfinitePager from "react-native-infinite-pager";
-import {InfinitePagerImperativeApi, InfinitePagerPageComponent} from "react-native-infinite-pager/src";
+import {InfinitePagerImperativeApi, InfinitePagerPageComponent} from "react-native-infinite-pager";
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 
