@@ -11,7 +11,7 @@ export type AddonInfo = {
 };
 
 export type AddonLogs = {
-  type: "log" | "error" | "warn" | "info" | string,
+  type: "log" | "error" | "warn" | "info",
   message: string,
   date: Date
 };
