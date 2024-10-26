@@ -18,6 +18,7 @@ import { getContributors, Contributor } from "@/utils/GetRessources/GetContribs"
 const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { colors } = theme;
 
   const [clickedOnVersion, setClickedOnVersion] = useState<number>(0);
   const [contributors, setContributors] = useState<Contributor[]>([]);
@@ -116,7 +117,7 @@ const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
                 marginTop: 2,
               }}
             >
-              <Github size={18} color="#000000" opacity={0.7} />
+              <Github size={18} color={colors.text} opacity={0.7} />
 
               <NativeText variant="subtitle">
                 {team.github?.split("/").pop()?.toLowerCase()}
@@ -130,7 +131,7 @@ const SettingsAbout: Screen<"SettingsAbout"> = ({ navigation }) => {
                 marginTop: 2,
               }}
             >
-              <MapPin size={18} color="#000000" opacity={0.7} />
+              <MapPin size={18} color={colors.text} opacity={0.7} />
 
               <NativeText variant="subtitle">
                 {team.location}
