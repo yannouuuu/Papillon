@@ -61,7 +61,7 @@ const formatDate = (date: string | number | Date): string => {
 };
 
 const WeekView: Screen<"Homeworks"> = ({ route, navigation }) => {
-  const flatListRef: React.MutableRefObject<FlatList> = useRef(null)  as any as React.MutableRefObject<FlatList>;
+  const flatListRef: React.MutableRefObject<FlatList> = useRef(null) as any as React.MutableRefObject<FlatList>;
   const { width } = Dimensions.get("window");
   const finalWidth = width - (width > 600 ? (
     320 > width * 0.35 ? width * 0.35 :
@@ -75,7 +75,7 @@ const WeekView: Screen<"Homeworks"> = ({ route, navigation }) => {
   const account = useCurrentAccount(store => store.account!);
   const homeworks = useHomeworkStore(store => store.homeworks);
 
-  // @ts-ignore
+  // @ts-expect-error
   let firstDate = account?.instance?.instance?.firstDate || null;
   if (!firstDate) {
     firstDate = new Date();
@@ -317,7 +317,7 @@ const WeekView: Screen<"Homeworks"> = ({ route, navigation }) => {
   const goToWeek = useCallback((weekNumber: number) => {
     const index = data.findIndex(week => week === weekNumber);
     if (index !== -1) {
-      // @ts-ignore
+      // @ts-expect-error
       const currentIndex = Math.round(flatListRef.current?.contentOffset?.x / finalWidth) || 0;
       const distance = Math.abs(index - currentIndex);
       const animated = distance <= 10; // Animate if the distance is 10 weeks or less
@@ -331,7 +331,6 @@ const WeekView: Screen<"Homeworks"> = ({ route, navigation }) => {
 
       // Use a timeout to ensure the FlatList has updated before scrolling
       setTimeout(() => {
-        // @ts-ignore
         flatListRef.current?.scrollToIndex({ index: 50, animated: false });
         setSelectedWeek(weekNumber);
       }, 0);
