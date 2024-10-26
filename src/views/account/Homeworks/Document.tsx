@@ -187,6 +187,9 @@ const HomeworksDocument = ({ route }) => {
                   <NativeText variant="title" numberOfLines={2}>
                     {attachment.name}
                   </NativeText>
+                  <NativeText variant="subtitle" numberOfLines={1}>
+                    {attachment.url}
+                  </NativeText>
                 </NativeItem>
               ))}
             </NativeList>
