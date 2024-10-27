@@ -81,13 +81,13 @@ const HomeworksElement = ({ navigation }: HomeworksElementProps) => {
             }}
           />
         ))}
-        {new Date().getDay() >= 2 && hwFinalList2 && hwFinalList2.length > 0 && hwFinalList2.map((hw, index) => (
+        {new Date().getDay() >= 2 && hwFinalList2.length > 0 && hwFinalList2.map((hw, index) => (
           <HomeworkItem
             homework={hw}
             key={index}
             index={index}
             navigation={navigation}
-            total={homeworks[dateToEpochWeekNumber(actualDay) + 1].length}
+            total={homeworks[dateToEpochWeekNumber(actualDay) + 1]?.length || 0}
             onDonePressHandler={() => {
               handleDonePress(hw);
             }}
